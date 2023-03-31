@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "arahata.linter-actionlint",
+    "editorconfig.editorconfig",
+    "fnando.linter",
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "redhat.vscode-yaml",
+    "HashiCorp.terraform",
+    "aaron-bond.better-comments"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "comments": true
+  },
+  "rules": {
+    "no-dropping-the-ra": true,
+    "ja-no-space-between-full-width": true
+  }
+}
