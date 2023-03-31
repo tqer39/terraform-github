@@ -1,0 +1,14 @@
+---
+pull_request_rules:
+  - name: Automatic merge ⬇️
+    conditions:
+      - "status-success=Auto Assign / add-reviews"
+      - "status-success=Labeler / Auto-labeling"
+      - "status-success=actionlint / actionlint"
+      - "status-success=pre-commit / pre-commit"
+      - base=main
+      - "#files=1"
+    actions:
+      merge:
+        method: merge
+        strict: true
