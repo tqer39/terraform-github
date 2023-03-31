@@ -27,6 +27,7 @@
     "ooyama",
     "pyenv",
     "pyproject",
+    "reviewdog",
     "rinchsan",
     "shellcheck",
     "textlint",
