@@ -54,3 +54,9 @@ repos:
           - "textlint-filter-rule-comments@1.2.2"
           - "textlint-rule-no-dropping-the-ra@3.0.0"
           - "textlint-rule-terminology@3.0.1"
+
+  # shellcheck
+  - repo: https://github.com/koalaman/shellcheck-precommit
+    rev: v0.9.0
+    hooks:
+      - id: shellcheck
