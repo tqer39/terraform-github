@@ -6,8 +6,9 @@ pull_request_rules:
       - "status-success=Labeler / Auto-labeling"
       - "status-success=actionlint / actionlint"
       - "status-success=pre-commit / pre-commit"
+      - "status-success=Configuration changed"
+      - "status-success=Summary"
       - base=main
-      - "#files=1"
     actions:
       merge:
         method: merge
