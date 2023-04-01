@@ -18,6 +18,7 @@
     "autoupdate",
     "buildscript",
     "codecov",
+    "CODEOWNERS",
     "codeql",
     "getsentry",
     "kentaro",

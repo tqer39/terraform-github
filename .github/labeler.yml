@@ -24,3 +24,6 @@
 
 "actionlint":
   - ".github/workflows/actionlint.yml"
+
+"CODEOWNERS":
+  - "CODEOWNERS"
