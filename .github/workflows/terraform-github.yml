@@ -72,8 +72,7 @@ jobs:
         uses: ./.github/actions/terraform-plan
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Start Deployment
         if: github.ref == 'refs/heads/main'
@@ -89,7 +88,7 @@ jobs:
         uses: ./.github/actions/terraform-apply
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
-          TF_VAR_GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Finish Deployment
         if: always() && github.ref == 'refs/heads/main'

@@ -1,10 +1,10 @@
 module "tqer39" {
   source = "../../modules/repository"
 
-  GITHUB_TOKEN   = var.GITHUB_TOKEN
-  default_branch = "main"
   repository     = "tqer39"
+  default_branch = "main"
   topics         = ["managed-by-terraform-github"]
+  description    = "personal information repository"
 
   branches_to_protect = {
     "main" = {

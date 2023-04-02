@@ -1,3 +1,3 @@
 provider "github" {
-  token = var.GITHUB_TOKEN
+  owner = "tqer39"
 }
