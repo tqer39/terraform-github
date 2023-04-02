@@ -3,12 +3,12 @@
 # See https://pre-commit.com/hooks.html for more hooks
 
 repos:
-  # pre-commit-hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=512"]
+      - id: check-json
       - id: check-yaml
       - id: detect-aws-credentials
         args: [--allow-missing-credentials]
@@ -18,12 +18,11 @@ repos:
         args: ["--fix=lf"]
       - id: trailing-whitespace
 
-  # markdownlint
-  # see: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.33.0
+  # yamllint
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.27.1
     hooks:
-      - id: markdownlint
+      - id: yamllint
 
   # cspell
   - repo: https://github.com/streetsidesoftware/cspell-cli
@@ -31,11 +30,12 @@ repos:
     hooks:
       - id: cspell
 
-  # yamllint
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.27.1
+  # markdownlint
+  # see: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.33.0
     hooks:
-      - id: yamllint
+      - id: markdownlint
 
   # textlint
   - repo: local
