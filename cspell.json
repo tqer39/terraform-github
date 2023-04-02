@@ -22,6 +22,7 @@
     "CODEOWNERS",
     "codeql",
     "getsentry",
+    "itkq",
     "kentaro",
     "linuxbrew",
     "markdownlint",
@@ -37,6 +38,7 @@
     "SSIA",
     "textlint",
     "textlintcache",
+    "tfcmt",
     "tflint",
     "tqer"
   ]
