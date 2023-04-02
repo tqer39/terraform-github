@@ -3,7 +3,7 @@ variable "GITHUB_TOKEN" {
   description = "(Required) The GitHub token to use for authentication."
 }
 
-variable "branch" {
+variable "default_branch" {
   type        = string
   description = "(Required) The repository branch to create."
   default     = "main"
@@ -78,4 +78,10 @@ variable "vulnerability_alerts" {
   type        = bool
   description = "(Optional) - Set to true to enable security alerts for vulnerable dependencies. Enabling requires alerts to be enabled on the owner level. (Note for importing: GitHub enables the alerts on public repos but disables them on private repos by default.) See GitHub Documentation for details. Note that vulnerability alerts have not been successfully tested on any GitHub Enterprise instance and may be unavailable in those settings."
   default     = false
+}
+
+variable "branches_to_protect" {
+  type        = any
+  default     = {}
+  description = "github_branch_protection variables. See https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection#argument-reference"
 }
