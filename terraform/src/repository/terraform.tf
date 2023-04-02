@@ -7,7 +7,7 @@ terraform {
     }
     github = {
       source  = "integrations/github"
-      version = "5.0"
+      version = "5.18"
     }
   }
   backend "s3" {
