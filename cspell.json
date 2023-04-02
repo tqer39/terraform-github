@@ -42,6 +42,7 @@
     "textlintcache",
     "tfcmt",
     "tflint",
+    "tfstate",
     "tqer"
   ]
 }
