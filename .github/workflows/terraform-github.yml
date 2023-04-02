@@ -80,7 +80,7 @@ jobs:
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          TF_VAR_GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Start Deployment
         if: github.ref == 'refs/heads/main'
