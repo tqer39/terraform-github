@@ -1,0 +1,34 @@
+resource "github_branch_protection" "this" {
+  repository_id           = github_repository.this.name
+  for_each                = var.branches_to_protect
+  pattern                 = each.key
+  enforce_admins          = try(each.value.enforce_admins, false)
+  require_signed_commits  = try(each.value.require_signed_commits, false)
+  push_restrictions       = try(each.value.push_restrictions, [])
+  allows_deletions        = try(each.value.allows_deletions, false)
+  allows_force_pushes     = try(each.value.allows_force_pushes, false)
+  required_linear_history = try(each.value.required_linear_history, true)
+
+  dynamic "required_status_checks" {
+    for_each = each.value.required_status_checks ? [each.value.required_status_checks] : []
+    content {
+      strict   = try(each.value.status_check_up_to_date, true)
+      contexts = try(each.value.status_check_contexts, [])
+    }
+  }
+
+  dynamic "required_pull_request_reviews" {
+    for_each = each.value.require_pull_request_reviews ? [each.value.require_pull_request_reviews] : []
+    content {
+      dismiss_stale_reviews           = each.value.dismiss_stale_reviews
+      restrict_dismissals             = try(each.value.restrict_dismissals)
+      dismissal_restrictions          = try(each.value.dismissal_restrictions, [])
+      require_code_owner_reviews      = try(each.value.require_code_owner_reviews, false)
+      required_approving_review_count = each.value.required_approving_review_count == 0 ? 1 : each.value.required_approving_review_count
+    }
+  }
+
+  depends_on = [
+    github_repository.this,
+  ]
+}
