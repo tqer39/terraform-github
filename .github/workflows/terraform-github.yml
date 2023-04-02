@@ -42,7 +42,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.0.0
+        uses: actions/checkout@v3.5.0
 
       - name: Set Matrix
         id: set-matrix
