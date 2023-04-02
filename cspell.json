@@ -17,6 +17,7 @@
     "automerge",
     "autoupdate",
     "buildscript",
+    "chdir",
     "codecov",
     "CODEOWNERS",
     "codeql",
@@ -36,6 +37,7 @@
     "SSIA",
     "textlint",
     "textlintcache",
+    "tflint",
     "tqer"
   ]
 }
