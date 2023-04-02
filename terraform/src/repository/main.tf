@@ -1,8 +1,8 @@
 module "tqer39" {
   source = "../../modules/repository"
 
-  default_branch = "main"
   repository     = "tqer39"
+  default_branch = "main"
   topics         = ["managed-by-terraform-github"]
 
   branches_to_protect = {
