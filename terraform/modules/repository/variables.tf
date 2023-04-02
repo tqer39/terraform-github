@@ -23,7 +23,7 @@ variable "description" {
 variable "visibility" {
   type        = string
   description = "(Optional) Can be `public` or `private`. If your organization is associated with an enterprise account using GitHub Enterprise Cloud or GitHub Enterprise Server 2.20+, visibility can also be `internal`. The `visibility` parameter overrides the `private` parameter."
-  default     = "private"
+  default     = "public"
 }
 
 variable "has_wiki" {
