@@ -2,13 +2,18 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 
+exclude: |
+  (?x)^(
+    USAGE.md
+  )$
+
 repos:
-  # pre-commit-hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.4.0
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=512"]
+      - id: check-json
       - id: check-yaml
       - id: detect-aws-credentials
         args: [--allow-missing-credentials]
@@ -18,24 +23,24 @@ repos:
         args: ["--fix=lf"]
       - id: trailing-whitespace
 
+  # yamllint
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.30.0
+    hooks:
+      - id: yamllint
+
+  # cspell
+  - repo: https://github.com/streetsidesoftware/cspell-cli
+    rev: v6.31.0
+    hooks:
+      - id: cspell
+
   # markdownlint
   # see: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.33.0
     hooks:
       - id: markdownlint
-
-  # cspell
-  - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v6.2.0
-    hooks:
-      - id: cspell
-
-  # yamllint
-  - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.27.1
-    hooks:
-      - id: yamllint
 
   # textlint
   - repo: local
@@ -70,9 +75,21 @@ repos:
         types:
           - yaml
 
+  # actionlint
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.6.23
+    hooks:
+      - id: actionlint-docker
+
   # renovate-config-validator
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 34.158.2
+    rev: 35.31.1
     hooks:
       - id: renovate-config-validator
         files: renovate.json
+
+  # terraform fmt
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.77.1
+    hooks:
+      - id: terraform_fmt

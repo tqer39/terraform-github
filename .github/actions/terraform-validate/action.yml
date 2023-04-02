@@ -1,0 +1,46 @@
+---
+name: Terraform Validate
+
+description: Terraform Validate
+
+inputs:
+  github-token:
+    description: サードパーティの Action を実行するための権限を付与
+    required: true
+  working-directory:
+    description: Terraform CLI 実行時のパス
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Terraform Validate
+      run: terraform validate -no-color
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+
+    - uses: actions/cache@v3
+      name: Cache plugin dir
+      with:
+        path: ~/.tflint.d/plugins
+        key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v3
+      with:
+        tflint_version: latest
+
+    - name: Show version
+      run: tflint --version
+      shell: bash
+
+    - name: Init TFLint
+      run: tflint --init
+      env:
+        # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+        GITHUB_TOKEN: ${{ github.token }}
+      shell: bash
+
+    - name: Run TFLint
+      run: tflint --chdir=${{ inputs.working-directory }} --module
+      shell: bash
