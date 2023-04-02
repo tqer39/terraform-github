@@ -4,14 +4,11 @@ name: Terraform Plan
 description: Terraform Plan
 
 inputs:
-  github-token:
+  GITHUB_TOKEN:
     description: サードパーティの Action を実行するための権限を付与するための認証用トークン
     required: true
   working-directory:
     description: Terraform CLI 実行時のパス
-    required: true
-  TF_VAR_GITHUB_TOKEN:
-    description: Terraform 実行時に利用する GitHub トークン
     required: true
 
 runs:
@@ -25,7 +22,7 @@ runs:
     - name: Terraform Validate
       uses: ./.github/actions/terraform-validate
       with:
-        github-token: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         working-directory: ${{ inputs.working-directory }}
 
     - name: Setup tfcmt
@@ -37,8 +34,7 @@ runs:
         TARGET=$(echo ${{ inputs.working-directory }} | sed -e 's|^.*terraform/src/||' | cut -c 1-36)
         tfcmt --var target:$TARGET plan -patch -- terraform plan -no-color
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-        TF_VAR_GITHUB_TOKEN: ${{ inputs.TF_VAR_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
       working-directory: ${{ inputs.working-directory }}
       shell: bash
 

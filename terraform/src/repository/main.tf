@@ -1,7 +1,6 @@
 module "tqer39" {
   source = "../../modules/repository"
 
-  GITHUB_TOKEN   = var.GITHUB_TOKEN
   default_branch = "main"
   repository     = "tqer39"
   topics         = ["managed-by-terraform-github"]
