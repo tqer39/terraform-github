@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   deployments: write
   id-token: write
   pull-requests: write
@@ -68,13 +68,6 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.OIDC_IAM_ROLE }}
 
-      - name: Get token
-        id: get-token
-        uses: getsentry/action-github-app-token@v2
-        with:
-          app_id: ${{ secrets.GHA_TF_APP_ID }}
-          private_key: ${{ secrets.GHA_TF_PRIVATE_KEY }}
-
       - name: Terraform Plan
         uses: ./.github/actions/terraform-plan
         with:
@@ -96,7 +89,7 @@ jobs:
         uses: ./.github/actions/terraform-apply
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
-          TF_VAR_GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
+          TF_VAR_GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Finish Deployment
         if: always() && github.ref == 'refs/heads/main'
