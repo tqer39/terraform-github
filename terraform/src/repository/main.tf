@@ -1,6 +1,7 @@
 module "tqer39" {
   source = "../../modules/repository"
 
-  branch     = "main"
-  repository = "tqer39"
+  GITHUB_TOKEN = var.GITHUB_TOKEN
+  branch       = "main"
+  repository   = "tqer39"
 }

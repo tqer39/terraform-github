@@ -1,3 +1,8 @@
+variable "GITHUB_TOKEN" {
+  type        = string
+  description = "(Required) The GitHub token to use for authentication."
+}
+
 variable "branch" {
   type        = string
   description = "(Required) The repository branch to create."
