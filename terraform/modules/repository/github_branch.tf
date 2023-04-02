@@ -1,5 +1,5 @@
 resource "github_branch" "this" {
-  for_each = { for k, branch in var.branches_to_protect : k => branch if branch != "main" }
+  for_each = { for k, v in var.branches_to_protect : k => v if k != "main" }
 
   repository = github_repository.this.name
   branch     = each.key
