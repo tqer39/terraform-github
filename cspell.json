@@ -25,6 +25,8 @@
     "linuxbrew",
     "markdownlint",
     "nodenv",
+    "oidc",
+    "OIDC",
     "ooyama",
     "pyenv",
     "pyproject",
