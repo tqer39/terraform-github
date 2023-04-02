@@ -78,7 +78,7 @@ jobs:
       - name: Terraform Plan
         uses: ./.github/actions/terraform-plan
         with:
-          working-directory: ./terraform/environments/${{ env.AWS_ENV_NAME }}/${{ matrix.directory }}
+          working-directory: ./terraform/src/${{ matrix.directory }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           TF_VAR_GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
@@ -95,7 +95,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: ./.github/actions/terraform-apply
         with:
-          working-directory: ./terraform/environments/${{ env.AWS_ENV_NAME }}/${{ matrix.directory }}
+          working-directory: ./terraform/src/${{ matrix.directory }}
           TF_VAR_GITHUB_TOKEN: ${{ steps.get-token.outputs.token }}
 
       - name: Finish Deployment
