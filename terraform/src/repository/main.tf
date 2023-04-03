@@ -3,7 +3,7 @@ module "tqer39" {
 
   repository     = "tqer39"
   default_branch = "main"
-  topics         = ["managed-by-terraform-github"]
+  topics         = ["profile"]
   description    = "personal information repository"
 
   branches_to_protect = {
