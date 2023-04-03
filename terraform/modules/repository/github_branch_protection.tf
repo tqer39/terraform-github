@@ -20,8 +20,8 @@ resource "github_branch_protection" "this" {
   dynamic "required_pull_request_reviews" {
     for_each = each.value.require_pull_request_reviews ? [each.value.require_pull_request_reviews] : []
     content {
-      dismiss_stale_reviews           = each.value.dismiss_stale_reviews
-      restrict_dismissals             = try(each.value.restrict_dismissals)
+      dismiss_stale_reviews           = try(each.value.dismiss_stale_reviews, false)
+      restrict_dismissals             = try(each.value.restrict_dismissals, false)
       dismissal_restrictions          = try(each.value.dismissal_restrictions, [])
       require_code_owner_reviews      = try(each.value.require_code_owner_reviews, false)
       required_approving_review_count = each.value.required_approving_review_count == 0 ? 1 : each.value.required_approving_review_count

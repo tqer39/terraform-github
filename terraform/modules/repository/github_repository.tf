@@ -2,7 +2,7 @@ resource "github_repository" "this" {
   name                   = var.repository
   description            = var.description
   visibility             = var.visibility
-  topics                 = var.topics
+  topics                 = length(var.topics) == 0 ? ["managed-by-terraform-github"] : concat(var.topics, ["managed-by-terraform-github"])
   has_wiki               = var.has_wiki
   has_projects           = var.has_projects
   auto_init              = var.auto_init
