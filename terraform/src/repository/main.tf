@@ -8,9 +8,8 @@ module "tqer39" {
 
   branches_to_protect = {
     "main" = {
-      require_pull_request_reviews    = true
-      required_approving_review_count = 1
-      required_status_checks          = true
+      require_pull_request_reviews = true
+      required_status_checks       = true
     }
   }
 }
