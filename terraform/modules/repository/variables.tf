@@ -80,3 +80,30 @@ variable "branches_to_protect" {
   default     = {}
   description = "github_branch_protection variables. See https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection#argument-reference"
 }
+
+variable "allowed_actions" {
+  type        = string
+  description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
+  default     = "selected"
+}
+
+variable "github_owned_allowed" {
+  type        = bool
+  description = "Required) Whether GitHub-owned actions are allowed in the repository."
+  default     = true
+}
+
+variable "patterns_allowed" {
+  type        = list(string)
+  description = "(Optional) Specifies a list of string-matching patterns to allow specific action(s). Wildcards, tags, and SHAs are allowed."
+  default = [
+    "actions/cache@*",
+    "actions/checkout@*"
+  ]
+}
+
+variable "verified_allowed" {
+  type        = bool
+  description = "(Optional) Whether actions in GitHub Marketplace from verified creators are allowed. Set to true to allow all GitHub Marketplace actions by verified creators."
+  default     = true
+}
