@@ -1,14 +1,11 @@
 resource "github_actions_repository_permissions" "this" {
   repository      = github_repository.this.name
-  allowed_actions = try(var.allowed_actions, "selected")
+  allowed_actions = var.allowed_actions
 
   allowed_actions_config {
-    github_owned_allowed = try(var.github_owned_allowed, true)
-    patterns_allowed = try(var.patterns_allowed, [
-      "actions/cache@*",
-      "actions/checkout@*",
-    ])
-    verified_allowed = try(var.verified_allowed, true)
+    github_owned_allowed = var.github_owned_allowed
+    patterns_allowed     = var.patterns_allowed
+    verified_allowed     = var.verified_allowed
   }
 
   depends_on = [
