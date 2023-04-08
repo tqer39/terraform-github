@@ -10,6 +10,7 @@ module "tqer39" {
     "main" = {
       require_pull_request_reviews = true
       required_status_checks       = true
+      allows_force_pushes          = true
     }
   }
 }
