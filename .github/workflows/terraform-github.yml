@@ -3,6 +3,8 @@ name: Terraform - AWS - Portfolio
 
 on:
   pull_request:
+    branches:
+      - main
     paths:
       - ".github/actions/**/action.yml"
       - ".github/workflows/terraform-github.yml"
