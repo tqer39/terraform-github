@@ -56,6 +56,7 @@ jobs:
             # .terraform.lock.hcl に対応する terraform init コマンドを実行する
             echo "Checking ${TERRAFORM_DIR}..."
             if [ -f "${TERRAFORM_DIR}/terraform.tf" ]; then
+              echo "working directory: ${TERRAFORM_DIR}"
               terraform -chdir="$TERRAFORM_DIR" init -backend=false -upgrade
               terraform -chdir="$TERRAFORM_DIR" providers lock -platform=darwin_amd64 -platform=linux_amd64 -platform=darwin_arm64 -platform=windows_amd64
             fi
