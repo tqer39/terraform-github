@@ -48,10 +48,6 @@ jobs:
             exit 1
           fi
 
-      - name: Providers lock
-        if: success()
-        continue-on-error: true
-        run: |
           for TERRAFORM_DIR in $UPGRADE_DIRS; do
             # .terraform.lock.hcl に対応する terraform init コマンドを実行する
             echo "Checking ${TERRAFORM_DIR}..."
