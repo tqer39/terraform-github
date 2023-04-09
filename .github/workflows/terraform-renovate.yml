@@ -58,6 +58,8 @@ jobs:
             fi
           done
 
+          git add -A .
+
       - name: Commit lock file
         if: success()
         uses: EndBug/add-and-commit@v9
