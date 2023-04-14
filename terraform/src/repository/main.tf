@@ -13,3 +13,20 @@ module "tqer39" {
     }
   }
 }
+
+module "renovate_config" {
+  source = "../../modules/repository"
+
+  repository     = "renovate-config"
+  default_branch = "main"
+  topics         = ["renovate"]
+  description    = "Renovate Configuration."
+
+  branches_to_protect = {
+    "main" = {
+      required_pull_request_reviews   = true
+      required_approving_review_count = 1
+      required_status_checks          = true
+    }
+  }
+}
