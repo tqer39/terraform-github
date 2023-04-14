@@ -1,5 +1,5 @@
 ---
-name: Terraform - AWS - Portfolio
+name: Terraform - GitHub - Portfolio
 
 on:
   pull_request:
