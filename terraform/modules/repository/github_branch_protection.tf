@@ -10,7 +10,7 @@ resource "github_branch_protection" "this" {
   required_linear_history = try(each.value.required_linear_history, true)
 
   dynamic "required_status_checks" {
-    for_each = each.value.required_status_checks ? [each.value.required_status_checks] : []
+    for_each = try(each.value.required_status_checks, false) ? [each.value.required_status_checks] : []
     content {
       strict   = try(each.value.status_check_up_to_date, true)
       contexts = try(each.value.status_check_contexts, [])
@@ -18,7 +18,7 @@ resource "github_branch_protection" "this" {
   }
 
   dynamic "required_pull_request_reviews" {
-    for_each = each.value.require_pull_request_reviews ? [each.value.require_pull_request_reviews] : []
+    for_each = try(each.value.require_pull_request_reviews, false) ? [each.value.require_pull_request_reviews] : []
     content {
       dismiss_stale_reviews           = try(each.value.dismiss_stale_reviews, false)
       restrict_dismissals             = try(each.value.restrict_dismissals, false)
