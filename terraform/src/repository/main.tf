@@ -8,8 +8,6 @@ module "tqer39" {
 
   branches_to_protect = {
     "main" = {
-      require_pull_request_reviews = true
-      required_status_checks       = true
       # GitHub Action のワークフローで main に push するために必要
       allows_force_pushes = true
     }
