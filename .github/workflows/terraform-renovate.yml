@@ -26,7 +26,7 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Checked update dirs
+      - name: git switch
         continue-on-error: true
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -35,6 +35,9 @@ jobs:
           git fetch origin "$BRANCH_NAME"
           git switch "$BRANCH_NAME"
 
+      - name: Checked changed files
+        continue-on-error: true
+        run: |
           CHANGED_FILES="$(git diff --name-only origin/main)"
           echo "Changed files:"
           echo "$CHANGED_FILES"
@@ -43,6 +46,9 @@ jobs:
             exit 1
           fi
 
+      - name: Checked update dirs
+        continue-on-error: true
+        run: |
           UPGRADE_DIRS=$(echo "$CHANGED_FILES" | grep -oE '(.*/)?\.terraform\.lock\.hcl' | xargs -I {} dirname {} | sort | uniq)
           echo "Upgrade directories:"
           echo "${UPGRADE_DIRS}"
@@ -51,6 +57,9 @@ jobs:
             exit 1
           fi
 
+      - name: Terraform providers lock
+        continue-on-error: true
+        run: |
           for TERRAFORM_DIR in $UPGRADE_DIRS; do
             # .terraform.lock.hcl に対応する terraform init コマンドを実行する
             echo "Checking ${TERRAFORM_DIR}..."
