@@ -30,3 +30,20 @@ module "renovate_config" {
     }
   }
 }
+
+module "terraform_aws" {
+  source = "../../modules/repository"
+
+  repository     = "terraform-aws"
+  default_branch = "main"
+  topics         = ["aws"]
+  description    = "Configure AWS resources with Terraform."
+
+  branches_to_protect = {
+    "main" = {
+      required_pull_request_reviews   = true
+      required_approving_review_count = 1
+      required_status_checks          = true
+    }
+  }
+}
