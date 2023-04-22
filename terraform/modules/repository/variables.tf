@@ -29,7 +29,7 @@ variable "has_issue" {
 
 variable "has_wiki" {
   type        = bool
-  description = "(Optional) Set to true to enable the GitHub Wiki features on the repository."
+  description = "(Optional) Set to `true` to enable the GitHub Wiki features on the repository."
   default     = false
 }
 
