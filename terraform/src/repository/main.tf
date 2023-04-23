@@ -47,3 +47,20 @@ module "terraform_aws" {
     }
   }
 }
+
+module "terraform_github" {
+  source = "../../modules/repository"
+
+  repository     = "terraform-github"
+  default_branch = "main"
+  topics         = ["github"]
+  description    = "Configure GitHub resources with Terraform."
+
+  branches_to_protect = {
+    "main" = {
+      required_pull_request_reviews   = true
+      required_approving_review_count = 1
+      required_status_checks          = true
+    }
+  }
+}
