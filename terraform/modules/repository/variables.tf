@@ -21,9 +21,15 @@ variable "visibility" {
   default     = "public"
 }
 
+variable "has_issues" {
+  type        = bool
+  description = "(Optional) Set to `true` to enable the GitHub Issues features on the repository."
+  default     = true
+}
+
 variable "has_wiki" {
   type        = bool
-  description = "(Optional) Set to true to enable the GitHub Wiki features on the repository."
+  description = "(Optional) Set to `true` to enable the GitHub Wiki features on the repository."
   default     = false
 }
 
