@@ -21,7 +21,7 @@ variable "visibility" {
   default     = "public"
 }
 
-variable "has_issue" {
+variable "has_issues" {
   type        = bool
   description = "(Optional) Set to `true` to enable the GitHub Issues features on the repository."
   default     = true
