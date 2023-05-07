@@ -65,6 +65,23 @@ module "terraform_github" {
   }
 }
 
+module "terraform_vercel" {
+  source = "../../modules/repository"
+
+  repository     = "terraform-vercel"
+  default_branch = "main"
+  topics         = ["vercel"]
+  description    = "Configure Vercel resources with Terraform."
+
+  branches_to_protect = {
+    "main" = {
+      required_pull_request_reviews   = true
+      required_approving_review_count = 1
+      required_status_checks          = true
+    }
+  }
+}
+
 module "blog" {
   source = "../../modules/repository"
 
