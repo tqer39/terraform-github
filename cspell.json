@@ -45,6 +45,8 @@
     "tfcmt",
     "tflint",
     "tfstate",
-    "tqer"
+    "tqer",
+    "vercel",
+    "Vercel"
   ]
 }
