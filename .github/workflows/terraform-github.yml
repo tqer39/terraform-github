@@ -44,7 +44,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3.6.0
+        uses: actions/checkout@v4.1.1
 
       - name: Set Matrix
         id: set-matrix
@@ -63,7 +63,7 @@ jobs:
         directory: ${{ fromJson(needs.set-matrix.outputs.matrix )}}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: AWS Credential
         uses: ./.github/actions/aws-credential
