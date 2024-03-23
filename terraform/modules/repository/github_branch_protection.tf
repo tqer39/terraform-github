@@ -21,13 +21,13 @@ resource "github_branch_protection" "this" {
   }
 
   dynamic "required_pull_request_reviews" {
-    for_each = try(each.value.required_pull_request_reviews, false) ? [each.value.required_pull_request_reviews] : []
+    for_each = contains(keys(each.value), "required_pull_request_reviews") ? [each.value.required_pull_request_reviews] : []
     content {
       dismiss_stale_reviews           = try(each.value.dismiss_stale_reviews, false)
       restrict_dismissals             = try(each.value.restrict_dismissals, false)
       dismissal_restrictions          = try(each.value.dismissal_restrictions, [])
       require_code_owner_reviews      = try(each.value.require_code_owner_reviews, false)
-      required_approving_review_count = try(each.value.required_approving_review_count, null)
+      required_approving_review_count = try(each.value.required_approving_review_count, 1)
     }
   }
 
