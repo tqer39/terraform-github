@@ -1,29 +1,48 @@
-"editorconfig":
-  - ".editorconfig"
+rules:
+  - matchers:
+      - "*.editorconfig"
+    labels:
+      - editorconfig
 
-"document":
-  - "**/*.md"
-  - "**/*.txt"
-  - "**/*.rst"
+  - matchers:
+      - "**/*.md"
+      - "**/*.txt"
+      - "**/*.rst"
+    labels:
+      - document
 
-"terraform":
-  - ".github/actions/terraform**/action.yml"
-  - ".github/workflows/terraform**.yml"
+  - matchers:
+      - ".github/actions/terraform**/action.yml"
+      - ".github/workflows/terraform**.yml"
+    labels:
+      - terraform
 
-"textlint":
-  - "**/.textlint*"
+  - matchers:
+      - "**/.textlint*"
+    labels:
+      - textlint
 
-"yamllint":
-  - "**/.yamllint"
+  - matchers:
+      - "**/.yamllint"
+    labels:
+      - yamllint
 
-"markdownlint":
-  - "**/.markdownlint*.json"
+  - matchers:
+      - "**/.markdownlint*.json"
+    labels:
+      - markdownlint
 
-"asdf":
-  - "**/.tool-versions"
+  - matchers:
+      - "**/.tool-versions"
+    labels:
+      - asdf
 
-"actionlint":
-  - ".github/workflows/actionlint.yml"
+  - matchers:
+      - ".github/workflows/actionlint.yml"
+    labels:
+      - actionlint
 
-"CODEOWNERS":
-  - "CODEOWNERS"
+  - matchers:
+      - "CODEOWNERS"
+    labels:
+      - CODEOWNERS
