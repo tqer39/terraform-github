@@ -63,8 +63,7 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::${{ env.AWS_ACCOUNT_ID }}:role/${{ env.OIDC_IAM_ROLE }}
 
-      - name: Terraform Plan
-        uses: ./.github/actions/terraform-plan
+      - uses: ./.github/actions/terraform-plan
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
@@ -78,9 +77,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: ${{ env.AWS_ENV_NAME }}
 
-      - name: Terraform Apply
+      - uses: ./.github/actions/terraform-apply
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: ./.github/actions/terraform-apply
         with:
           working-directory: ./terraform/src/${{ matrix.directory }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
