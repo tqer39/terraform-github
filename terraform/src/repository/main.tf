@@ -90,7 +90,7 @@ module "blog" {
   }
 }
 
-module "time-capsule" {
+module "time_capsule" {
   source         = "../../modules/repository"
   repository     = "time-capsule"
   default_branch = "main"
