@@ -37,3 +37,4 @@ graph LR
 - `README.md`: リポジトリの説明を記述するためのファイルです。
 - `renovate.json`: Renovate（依存関係の更新ツール）の設定を行うためのファイルです。
 - `terraform/`: Terraformの設定ファイルやモジュールが格納されています。
+- `.cspell/`: cspell（スペルチェックツール）の設定ファイルが格納されています。
