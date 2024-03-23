@@ -17,7 +17,6 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: pre-commit
-        uses: pre-commit/action@v3.0.1
+      - uses: pre-commit/action@v3.0.1
         with:
           extra_args: -a --show-diff-on-failure
