@@ -1,4 +1,4 @@
-name: Terraform - GitHub - Portfolio
+name: Terraform - GitHub
 
 on:
   pull_request:
