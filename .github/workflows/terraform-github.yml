@@ -4,21 +4,9 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - ".github/actions/**/action.yml"
-      - ".github/workflows/terraform-github.yml"
-      - ".tool-versions"
-      - "terraform/src/**"
-      - "terraform/modules/**"
   push:
     branches:
       - main
-    paths:
-      - ".github/actions/**/action.yml"
-      - ".github/workflows/terraform-github.yml"
-      - ".tool-versions"
-      - "terraform/src/**"
-      - "terraform/modules/**"
   workflow_dispatch:
 
 concurrency: terraform-github
@@ -42,7 +30,7 @@ jobs:
           AWS_ENV_NAME: ${{ env.AWS_ENV_NAME }}
 
   terraform:
-    name: Terraform
+    name: terraform-github
     needs: [set-matrix]
     runs-on: ubuntu-latest
     timeout-minutes: 15
