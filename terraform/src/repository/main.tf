@@ -24,8 +24,7 @@ module "renovate_config" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
+      required_status_checks = true
     }
   }
 }
@@ -40,8 +39,7 @@ module "terraform_aws" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
+      required_status_checks = true
     }
   }
 }
@@ -56,9 +54,8 @@ module "terraform_github" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
-      status_check_contexts         = ["pre-commit", "terraform-github"]
+      required_status_checks = true
+      status_check_contexts  = ["pre-commit", "terraform-github"]
     }
   }
 }
@@ -73,8 +70,7 @@ module "terraform_vercel" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
+      required_status_checks = true
     }
   }
 }
@@ -89,8 +85,7 @@ module "blog" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
+      required_status_checks = true
     }
   }
 }
@@ -104,8 +99,7 @@ module "time-capsule" {
 
   branches_to_protect = {
     "main" = {
-      required_pull_request_reviews = true
-      required_status_checks        = true
+      required_status_checks = true
     }
   }
 }
