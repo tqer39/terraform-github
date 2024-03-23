@@ -1,4 +1,5 @@
 {
+  "dictionaries": ["custom-words"],
   "files": [
     "**",
     ".*/**"
@@ -10,43 +11,11 @@
     ".pre-commit-config.yaml",
     "pyproject.toml"
   ],
-  "words": [
-    "autobuild",
-    "Autobuild",
-    "autofix",
-    "automerge",
-    "autoupdate",
-    "bobheadxi",
-    "buildscript",
-    "chdir",
-    "codecov",
-    "CODEOWNERS",
-    "codeql",
-    "concat",
-    "deployments",
-    "getsentry",
-    "itkq",
-    "kentaro",
-    "linuxbrew",
-    "markdownlint",
-    "nodenv",
-    "noreply",
-    "oidc",
-    "OIDC",
-    "ooyama",
-    "pyenv",
-    "pyproject",
-    "reviewdog",
-    "rinchsan",
-    "shellcheck",
-    "SSIA",
-    "textlint",
-    "textlintcache",
-    "tfcmt",
-    "tflint",
-    "tfstate",
-    "tqer",
-    "vercel",
-    "Vercel"
-  ]
+  "dictionaryDefinitions": [
+    {
+      "name": "custom-words",
+      "path": "./.cspell/custom-words.txt",
+      "addWords": true
+    }
+]
 }
