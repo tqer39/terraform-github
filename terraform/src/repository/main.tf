@@ -61,6 +61,7 @@ module "terraform_github" {
       required_pull_request_reviews   = true
       required_approving_review_count = 1
       required_status_checks          = true
+      status_check_contexts           = ["pre-commit", "terraform-github"]
     }
   }
 }
