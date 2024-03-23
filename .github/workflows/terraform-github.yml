@@ -22,12 +22,6 @@ on:
       - "terraform/modules/**"
   workflow_dispatch:
 
-permissions:
-  contents: read
-  deployments: write
-  id-token: write
-  pull-requests: write
-
 concurrency: terraform-github
 
 env:
@@ -53,6 +47,11 @@ jobs:
     needs: [set-matrix]
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      deployments: write
+      id-token: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
