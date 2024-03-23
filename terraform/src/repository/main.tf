@@ -100,11 +100,11 @@ module "blog" {
 }
 
 module "time-capsule" {
-  source              = "../../modules/repository"
-  repository          = "time-capsule"
-  default_branch      = "main"
-  topics              = ["time-capsule"]
-  description         = "Create a time capsule repository."
+  source         = "../../modules/repository"
+  repository     = "time-capsule"
+  default_branch = "main"
+  topics         = ["time-capsule"]
+  description    = "Create a time capsule repository."
 
   branches_to_protect = {
     "main" = {
