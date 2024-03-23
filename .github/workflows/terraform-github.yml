@@ -44,10 +44,8 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Set Matrix
+      - uses: ./.github/actions/set-matrix
         id: set-matrix
-        uses: ./.github/actions/set-matrix
         with:
           AWS_ENV_NAME: ${{ env.AWS_ENV_NAME }}
 
