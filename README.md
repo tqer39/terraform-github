@@ -12,6 +12,15 @@
 4. [`terraform-plan`](.github/actions/terraform-plan/action.yml)アクションが実行され、Terraformの計画が作成されます。
 5. [`terraform-apply`](.github/actions/terraform-apply/action.yml)アクションが実行され、Terraformの計画が適用されます。
 
+```mermaid
+graph LR
+  A[GitHub Actions Trigger] --> B[setup-terraform]
+  B --> C[terraform-plan]
+  C --> D[terraform-apply]
+  D --> E[Infrastructure is deployed]
+  E --> F[Changes are reflected in the GitHub repository]
+```
+
 ## ディレクトリとファイルの役割
 
 - `.editorconfig`: エディタの設定を統一するためのファイルです。
