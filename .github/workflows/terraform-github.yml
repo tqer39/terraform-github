@@ -56,8 +56,7 @@ jobs:
       matrix:
         directory: ${{ fromJson(needs.set-matrix.outputs.matrix )}}
     steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: AWS Credential
         uses: ./.github/actions/aws-credential
