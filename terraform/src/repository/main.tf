@@ -98,3 +98,19 @@ module "blog" {
     }
   }
 }
+
+module "time-capsule" {
+  source         = "../../modules/repository"
+  repository     = "time-capsule"
+  default_branch = "main"
+  topics         = ["time-capsule"]
+  description    = "Create a time capsule repository."
+
+  branches_to_protect = {
+    "main" = {
+      required_pull_request_reviews   = true
+      required_approving_review_count = 1
+      required_status_checks          = true
+    }
+  }
+}

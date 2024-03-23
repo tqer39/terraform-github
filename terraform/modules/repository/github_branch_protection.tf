@@ -1,10 +1,13 @@
 resource "github_branch_protection" "this" {
-  repository_id           = github_repository.this.name
-  for_each                = var.branches_to_protect
-  pattern                 = each.key
-  enforce_admins          = try(each.value.enforce_admins, false)
-  require_signed_commits  = try(each.value.require_signed_commits, false)
-  push_restrictions       = try(each.value.push_restrictions, [])
+  repository_id          = github_repository.this.name
+  for_each               = var.branches_to_protect
+  pattern                = each.key
+  enforce_admins         = try(each.value.enforce_admins, false)
+  require_signed_commits = try(each.value.require_signed_commits, false)
+  required_status_checks {
+    strict   = try(each.value.required_status_checks, true)
+    contexts = try(each.value.status_check_contexts, [])
+  }
   allows_deletions        = try(each.value.allows_deletions, false)
   allows_force_pushes     = try(each.value.allows_force_pushes, false)
   required_linear_history = try(each.value.required_linear_history, true)
