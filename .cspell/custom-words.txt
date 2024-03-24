@@ -37,3 +37,4 @@ vercel
 Vercel
 textlintrc
 textlintignore
+bypassers

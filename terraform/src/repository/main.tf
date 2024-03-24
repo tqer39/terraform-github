@@ -9,7 +9,8 @@ module "tqer39" {
   branches_to_protect = {
     "main" = {
       # GitHub Action のワークフローで main に push するために必要
-      allows_force_pushes = true
+      allows_force_pushes           = true
+      required_pull_request_reviews = true
     }
   }
 }
@@ -24,7 +25,8 @@ module "renovate_config" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
+      required_status_checks        = true
+      required_pull_request_reviews = true
     }
   }
 }
@@ -39,7 +41,8 @@ module "terraform_aws" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
+      required_status_checks        = true
+      required_pull_request_reviews = true
     }
   }
 }
@@ -54,8 +57,9 @@ module "terraform_github" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
-      status_check_contexts  = ["pre-commit", "terraform-github"]
+      required_status_checks        = true
+      required_pull_request_reviews = true
+      status_check_contexts         = ["pre-commit", "terraform-github"]
     }
   }
 }
@@ -70,7 +74,8 @@ module "terraform_vercel" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
+      required_status_checks        = true
+      required_pull_request_reviews = true
     }
   }
 }
@@ -85,7 +90,8 @@ module "blog" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
+      required_status_checks        = true
+      required_pull_request_reviews = true
     }
   }
 }
@@ -99,7 +105,8 @@ module "time_capsule" {
 
   branches_to_protect = {
     "main" = {
-      required_status_checks = true
+      required_status_checks        = true
+      required_pull_request_reviews = true
     }
   }
 }
