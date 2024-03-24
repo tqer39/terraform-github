@@ -29,8 +29,7 @@ jobs:
         with:
           AWS_ENV_NAME: ${{ env.AWS_ENV_NAME }}
 
-  terraform:
-    name: terraform-github
+  terraform-github:
     needs: [set-matrix]
     runs-on: ubuntu-latest
     timeout-minutes: 15
