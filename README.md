@@ -2,7 +2,7 @@
 
 ## 概要
 
-このリポジトリはTerraformとGitHub Actionsを使用してGitHubにリポジトリデプロイするためのものです。Terraformはインフラストラクチャのコード化を可能にし、GitHub ActionsはCI/CDパイプラインを自動化します。
+このリポジトリはTerraformとGitHub Actionsを使用してGitHubにリポジトリデプロイするためのものです。
 
 ## デプロイフロー
 
