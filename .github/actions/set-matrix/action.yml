@@ -1,4 +1,3 @@
----
 name: set matrix
 
 description: Set matrix
@@ -17,7 +16,6 @@ runs:
   using: composite
   steps:
     - name: make values
-      id: set-matrix
       run: |
         TEMP="$(echo "[$(sed "s/^/\"/g" ".github/workflows/deploy_pipeline/${{ inputs.AWS_ENV_NAME }}" | sed "s/$/\",/g" | sed "$ s/,$//g")]" | jq -c)"
         echo "matrix=${TEMP}" >> $GITHUB_OUTPUT
