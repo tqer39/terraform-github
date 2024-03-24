@@ -9,7 +9,9 @@ on:
       - main
   workflow_dispatch:
 
-concurrency: terraform-github
+concurrency:
+  group: terraform-github-${{ github.run_id }}
+  cancel-in-progress: true
 
 env:
   AWS_ACCOUNT_ID: "072693953877"
