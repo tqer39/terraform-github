@@ -19,7 +19,6 @@ runs:
       shell: bash
 
     - uses: actions/cache@v3
-      name: Cache plugin dir
       with:
         path: ~/.tflint.d/plugins
         key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
