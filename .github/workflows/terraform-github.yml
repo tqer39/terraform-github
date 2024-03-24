@@ -17,20 +17,7 @@ env:
   AWS_ENV_NAME: portfolio
 
 jobs:
-  set-matrix:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/set-matrix
-        id: set-matrix
-        with:
-          AWS_ENV_NAME: ${{ env.AWS_ENV_NAME }}
-
   terraform-github:
-    needs: [set-matrix]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -38,10 +25,6 @@ jobs:
       deployments: write
       id-token: write
       pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        directory: ${{ fromJson(needs.set-matrix.outputs.matrix )}}
     steps:
       - uses: actions/checkout@v4
 
@@ -52,7 +35,7 @@ jobs:
 
       - uses: ./.github/actions/terraform-plan
         with:
-          working-directory: ./terraform/src/${{ matrix.directory }}
+          working-directory: ./terraform/src/repository
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Start Deployment
@@ -67,7 +50,7 @@ jobs:
       - uses: ./.github/actions/terraform-apply
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
-          working-directory: ./terraform/src/${{ matrix.directory }}
+          working-directory: ./terraform/src/repository
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       - name: Finish Deployment
