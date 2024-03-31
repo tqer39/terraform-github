@@ -101,7 +101,7 @@ module "time_capsule" {
   source         = "../../modules/repository"
   repository     = "time-capsule"
   default_branch = "main"
-  topics         = ["time-capsule"]
+  topics         = ["time-capsule", "nextjs"]
   description    = "Create a time capsule repository."
 
   branches_to_protect = {

@@ -5,13 +5,17 @@ on:
   pull_request:
     types: [opened, ready_for_review]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   add-reviews:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 5
     steps:
       - name: Auto Assign
         uses: kentaro-m/auto-assign-action@v2.0.0
