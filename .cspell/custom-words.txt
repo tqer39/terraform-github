@@ -38,3 +38,4 @@ Vercel
 textlintrc
 textlintignore
 bypassers
+nextjs
