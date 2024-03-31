@@ -44,6 +44,7 @@ module "terraform_aws" {
     "main" = {
       required_status_checks        = true
       required_pull_request_reviews = true
+      status_check_contexts         = ["pre-commit", "terraform-aws-management", "terraform-aws-portfolio", "terraform-aws-sandbox"]
     }
   }
 }
