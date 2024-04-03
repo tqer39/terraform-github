@@ -44,7 +44,7 @@ module "terraform_aws" {
     "main" = {
       required_status_checks        = true
       required_pull_request_reviews = true
-      status_check_contexts         = ["pre-commit", "workflow-result-terraform-aws-management", "workflow-result-terraform-aws-portfolio", "workflow-result-terraform-aws-sandbox"]
+      status_check_contexts         = ["pre-commit", "terraform-aws-management", "terraform-aws-portfolio", "terraform-aws-sandbox"]
     }
   }
 }
@@ -109,6 +109,7 @@ module "time_capsule" {
     "main" = {
       required_status_checks        = true
       required_pull_request_reviews = true
+      status_check_contexts         = ["pre-commit"]
     }
   }
 }
