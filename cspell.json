@@ -1,5 +1,4 @@
 {
-  "dictionaries": ["custom-words"],
   "files": [
     "**",
     ".*/**"
@@ -17,5 +16,50 @@
       "path": "./.cspell/custom-words.txt",
       "addWords": true
     }
+  ],
+  "words": [
+    "autobuild",
+    "Autobuild",
+    "autofix",
+    "automerge",
+    "autoupdate",
+    "bobheadxi",
+    "buildscript",
+    "bypassers",
+    "chdir",
+    "codecov",
+    "CODEOWNERS",
+    "codeql",
+    "concat",
+    "deployments",
+    "getsentry",
+    "itkq",
+    "kentaro",
+    "linuxbrew",
+    "markdownlint",
+    "nextjs",
+    "nodenv",
+    "noreply",
+    "O'oyama",
+    "oidc",
+    "OIDC",
+    "ooyama",
+    "pyenv",
+    "pyproject",
+    "reviewdog",
+    "rinchsan",
+    "shellcheck",
+    "SSIA",
+    "Takeru",
+    "textlint",
+    "textlintcache",
+    "textlintignore",
+    "textlintrc",
+    "tfcmt",
+    "tflint",
+    "tfstate",
+    "tqer",
+    "vercel",
+    "Vercel"
   ]
 }
