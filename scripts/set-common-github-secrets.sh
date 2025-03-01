@@ -4,6 +4,7 @@
 
 # Get repository list
 repos=$(gh repo list "$1" --json name -q '.[].name')
+echo "owner: $1"
 
 # Set secrets in repositories
 for repo in $repos; do
