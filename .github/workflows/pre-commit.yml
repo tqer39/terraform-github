@@ -21,7 +21,6 @@ jobs:
 
       - name: Get current Terraform version
         run: echo "TERRAFORM_VERSION=$(cat .terraform-version)" >> $GITHUB_ENV
-        shell: bash
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
