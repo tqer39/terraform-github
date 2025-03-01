@@ -7,7 +7,7 @@ repos=$(gh repo list "$1" --json name -q '.[].name')
 
 # Set secrets in repositories
 for repo in $repos; do
-  echo "Setting secret for $repo"
+  echo "\nSetting secret for $repo"
 
   gh api -X PUT \
     -H "Authorization: token $GH_TOKEN" \
