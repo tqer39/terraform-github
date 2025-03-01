@@ -23,26 +23,22 @@ repos:
         args: ["--fix=lf"]
       - id: trailing-whitespace
 
-  # yamllint
-  - repo: https://github.com/adrienverge/yamllint.git
+  - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
       - id: yamllint
 
-  # cspell
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v8.15.3
     hooks:
       - id: cspell
 
-  # markdownlint
   # see: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
   - repo: https://github.com/igorshubovych/markdownlint-cli
     rev: v0.42.0
     hooks:
       - id: markdownlint
 
-  # textlint
   - repo: local
     hooks:
       - id: textlint
@@ -60,13 +56,11 @@ repos:
           - "textlint-rule-no-dropping-the-ra@3.0.0"
           - "textlint-rule-terminology@3.0.1"
 
-  # shellcheck
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.10.0
     hooks:
       - id: shellcheck
 
-  # prettier
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v3.1.0
     hooks:
@@ -75,21 +69,18 @@ repos:
         types:
           - yaml
 
-  # actionlint
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.4
     hooks:
       - id: actionlint-docker
 
-  # renovate-config-validator
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 39.8.0
     hooks:
       - id: renovate-config-validator
         files: renovate.json
 
-  # terraform fmt
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.96.2
+    rev: v1.97.4
     hooks:
       - id: terraform_fmt
