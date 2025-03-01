@@ -20,7 +20,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Get current Terraform version
-        run: echo "TERRAFORM_VERSION=$(cat .terraform-version)" >> $GITHUB_ENV
+        run: echo "TERRAFORM_VERSION=$(cat .terraform-version)" >> "$GITHUB_ENV"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
