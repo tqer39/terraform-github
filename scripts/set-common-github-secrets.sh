@@ -7,7 +7,8 @@ repos=$(gh repo list "$1" --json name -q '.[].name')
 
 # Set secrets in repositories
 for repo in $repos; do
-  echo "\nSetting secret for $repo"
+  echo ""
+  echo "Setting secret for $repo"
 
   gh secret set GHA_APP_ID --repo "$1/$repo" --body "$GHA_APP_ID"
   gh secret set GHA_APP_PRIVATE_KEY --repo "$1/$repo" --body "$GHA_APP_PRIVATE_KEY"
