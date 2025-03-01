@@ -9,7 +9,6 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   pre-commit:
@@ -19,6 +18,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+
+      - name: Set PCT_TFPATH environment variable
+        run: echo "PCT_TFPATH=$(which terraform)" >> $GITHUB_ENV
 
       - uses: pre-commit/action@v3.0.1
         with:
