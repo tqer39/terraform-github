@@ -19,8 +19,14 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Set PCT_TFPATH environment variable
-        run: echo "PCT_TFPATH=$(which terraform)" >> $GITHUB_ENV
+      - name: Get current Terraform version
+        run: echo "TERRAFORM_VERSION=$(cat .terraform-version)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - uses: pre-commit/action@v3.0.1
         with:
