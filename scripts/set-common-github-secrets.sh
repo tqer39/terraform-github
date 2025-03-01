@@ -8,11 +8,12 @@ echo "owner: $1"
 
 # Set secrets in repositories
 for repo in $repos; do
+  # Skip terraform-github repository
   if [ "$repo" == "terraform-github" ]; then
     echo "Skipping terraform-github"
     continue
   fi
-  
+
   echo ""
   echo "Setting secret for $repo"
 
