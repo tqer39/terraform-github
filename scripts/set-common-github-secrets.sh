@@ -9,25 +9,8 @@ repos=$(gh repo list "$1" --json name -q '.[].name')
 for repo in $repos; do
   echo "\nSetting secret for $repo"
 
-  gh api -X PUT \
-    -H "Authorization: token $GH_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    "/repos/$1/$repo/actions/secrets/GHA_APP_ID" \
-    -f encrypted_value="$GHA_APP_ID" \
-    -f key_id="$(gh api "/repos/$1/$repo/actions/secrets/public-key" | jq -r .key_id)"
-
-  gh api -X PUT \
-    -H "Authorization: token $GH_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    "/repos/$1/$repo/actions/secrets/GHA_APP_PRIVATE_KEY" \
-    -f encrypted_value="$GHA_APP_PRIVATE_KEY" \
-    -f key_id="$(gh api "/repos/$1/$repo/actions/secrets/public-key" | jq -r .key_id)"
-
-  gh api -X PUT \
-    -H "Authorization: token $GH_TOKEN" \
-    -H "Accept: application/vnd.github.v3+json" \
-    "/repos/$1/$repo/actions/secrets/OPENAI_API_KEY" \
-    -f encrypted_value="$OPENAI_API_KEY" \
-    -f key_id="$(gh api "/repos/$1/$repo/actions/secrets/public-key" | jq -r .key_id)"
+  gh secret set GHA_APP_ID --repo $1/$repo --body "$GHA_APP_ID"
+  gh secret set GHA_APP_PRIVATE_KEY --repo $1/$repo --body "$GHA_APP_PRIVATE_KEY"
+  gh secret set OPENAI_API_KEY --repo $1/$repo --body "$OPENAI_API_KEY"
 
 done
