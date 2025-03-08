@@ -17,3 +17,14 @@ graph LR
   D --> E[Infrastructure is deployed]
   E --> F[Changes are reflected in the GitHub repository]
 ```
+
+## ローカルで `terraform plan` する方法
+
+```shell
+$AWS_PROFILE=XXXXXXXXXX
+$PIPE_LINE=terraform/src/repository
+aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE init -reconfigure
+aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE validate
+aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE plan
+aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE apply -auto-approve
+```
