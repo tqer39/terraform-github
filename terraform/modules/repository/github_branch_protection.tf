@@ -29,13 +29,6 @@ resource "github_branch_protection" "this" {
     }
   }
 
-  dynamic "restrict_pushes" {
-    for_each = try(each.value.restrict_pushes, false) ? [each.value.restrict_pushes] : []
-    content {
-      push_allowances = try(each.value.push_allowances, [])
-    }
-  }
-
   force_push_bypassers = try(each.value.force_push_bypassers, [])
 
   depends_on = [
