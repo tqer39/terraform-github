@@ -29,8 +29,6 @@ resource "github_branch_protection" "this" {
     }
   }
 
-  force_push_bypassers = try(each.value.force_push_bypassers, [])
-
   depends_on = [
     github_repository.this,
   ]
