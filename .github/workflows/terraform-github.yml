@@ -34,10 +34,19 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
+      - name: Generate GitHub App Token
+        id: app_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.GHA_APP_ID }}
+          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
       - uses: ./.github/actions/terraform-plan
         with:
           working-directory: ./terraform/src/repository
-          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_APPS_TOKEN: ${{ steps.app_token.outputs.token }}
 
       - name: Start Deployment
         if: github.ref == 'refs/heads/main'
@@ -52,7 +61,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
           working-directory: ./terraform/src/repository
-          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GITHUB_APPS_TOKEN: ${{ steps.app_token.outputs.token }}
 
       - name: Finish Deployment
         if: always() && github.ref == 'refs/heads/main'

@@ -1,3 +1,9 @@
+variable "github_token" {
+  type        = string
+  description = "GitHub token"
+  sensitive   = true
+}
+
 variable "default_branch" {
   type        = string
   description = "(Required) The repository branch to create."
@@ -70,15 +76,23 @@ variable "archived" {
 }
 
 variable "topics" {
-  type        = list(string)
   description = "(Optional) The list of topics of the repository."
+  type        = list(string)
   default     = []
+
+  validation {
+    condition = alltrue([
+      for topic in var.topics :
+      can(regex("^[a-z0-9][a-z0-9-]{0,49}$", topic))
+    ])
+    error_message = "All topics must include only lowercase alphanumeric characters or hyphens, cannot start with a hyphen, and must be 50 characters or less."
+  }
 }
 
 variable "vulnerability_alerts" {
   type        = bool
   description = "(Optional) - Set to true to enable security alerts for vulnerable dependencies. Enabling requires alerts to be enabled on the owner level. (Note for importing: GitHub enables the alerts on public repos but disables them on private repos by default.) See GitHub Documentation for details. Note that vulnerability alerts have not been successfully tested on any GitHub Enterprise instance and may be unavailable in those settings."
-  default     = false
+  default     = true
 }
 
 variable "branches_to_protect" {

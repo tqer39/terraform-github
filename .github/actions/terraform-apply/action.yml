@@ -4,11 +4,11 @@ name: Terraform Apply
 description: Terraform Apply
 
 inputs:
+  GITHUB_APPS_TOKEN:
+    description: GitHub App トークン
+    required: true
   working-directory:
     description: Terraform CLI 実行時のパス
-    required: true
-  GITHUB_TOKEN:
-    description: Terraform 実行時に利用する GitHub トークン
     required: true
 
 runs:
@@ -18,5 +18,5 @@ runs:
       run: terraform apply -auto-approve
       working-directory: ${{ inputs.working-directory }}
       env:
-        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        TF_VAR_github_token: ${{ inputs.GITHUB_APPS_TOKEN }}
       shell: bash
