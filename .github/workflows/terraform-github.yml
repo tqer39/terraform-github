@@ -45,7 +45,7 @@ jobs:
       - uses: ./.github/actions/terraform-plan
         with:
           working-directory: ./terraform/src/repository
-          GITHUB_TOKEN: ${{ steps.app_token.outputs.token }}
+          TF_VAR_github_token: ${{ steps.app_token.outputs.token }}
 
       - name: Start Deployment
         if: github.ref == 'refs/heads/main'
@@ -60,7 +60,7 @@ jobs:
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
           working-directory: ./terraform/src/repository
-          GITHUB_TOKEN: ${{ steps.app_token.outputs.token }}
+          TF_VAR_github_token: ${{ steps.app_token.outputs.token }}
 
       - name: Finish Deployment
         if: always() && github.ref == 'refs/heads/main'
