@@ -76,9 +76,17 @@ variable "archived" {
 }
 
 variable "topics" {
-  type        = list(string)
   description = "(Optional) The list of topics of the repository."
+  type        = list(string)
   default     = []
+
+  validation {
+    condition = alltrue([
+      for topic in var.topics :
+      can(regex("^[a-z0-9][a-z0-9-]{0,49}$", topic))
+    ])
+    error_message = "All topics must include only lowercase alphanumeric characters or hyphens, cannot start with a hyphen, and must be 50 characters or less."
+  }
 }
 
 variable "vulnerability_alerts" {
