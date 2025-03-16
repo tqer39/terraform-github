@@ -119,7 +119,7 @@ module "openai_generate_pr_description" {
   github_token   = var.github_token
   repository     = "openai-generate-pr-description"
   default_branch = "main"
-  topics         = [""]
+  topics         = ["openai"]
   description    = "Generate Pull Request description with OpenAI."
   branches_to_protect = {
     "main" = {
