@@ -1,6 +1,8 @@
 module "tqer39" {
   source = "../../modules/repository"
 
+  github_token = var.github_token
+
   repository     = "tqer39"
   default_branch = "main"
   topics         = ["profile"]
@@ -18,6 +20,8 @@ module "tqer39" {
 module "renovate_config" {
   source = "../../modules/repository"
 
+  github_token = var.github_token
+
   repository     = "renovate-config"
   default_branch = "main"
   topics         = ["renovate"]
@@ -33,13 +37,12 @@ module "renovate_config" {
 }
 
 module "terraform_aws" {
-  source = "../../modules/repository"
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "terraform-aws"
   default_branch = "main"
   topics         = ["aws"]
   description    = "Configure AWS resources with Terraform."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -50,13 +53,12 @@ module "terraform_aws" {
 }
 
 module "terraform_github" {
-  source = "../../modules/repository"
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "terraform-github"
   default_branch = "main"
   topics         = ["github"]
   description    = "Configure GitHub resources with Terraform."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -67,13 +69,12 @@ module "terraform_github" {
 }
 
 module "terraform_vercel" {
-  source = "../../modules/repository"
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "terraform-vercel"
   default_branch = "main"
   topics         = ["vercel"]
   description    = "Configure Vercel resources with Terraform."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -83,13 +84,12 @@ module "terraform_vercel" {
 }
 
 module "blog" {
-  source = "../../modules/repository"
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "blog"
   default_branch = "main"
   topics         = ["blog"]
   description    = "Configure blog resources with Terraform."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -100,11 +100,11 @@ module "blog" {
 
 module "time_capsule" {
   source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "time-capsule"
   default_branch = "main"
   topics         = ["time-capsule", "nextjs"]
   description    = "Create a time capsule repository."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -116,11 +116,11 @@ module "time_capsule" {
 
 module "openai_generate_pr_description" {
   source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "openai-generate-pr-description"
   default_branch = "main"
   topics         = [""]
   description    = "Generate Pull Request description with OpenAI."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
