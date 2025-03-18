@@ -139,8 +139,3 @@ import {
   id = openai_generate_pr_description
   to = module.openai_generate_pr_description.github_branch_protection.this["main"]
 }
-
-import {
-  id = openai_generate_pr_description
-  to = module.openai_generate_pr_description.github_repository.this
-}
