@@ -1,8 +1,6 @@
 module "tqer39" {
-  source = "../../modules/repository"
-
-  github_token = var.github_token
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "tqer39"
   default_branch = "main"
   topics         = ["profile"]
@@ -18,15 +16,12 @@ module "tqer39" {
 }
 
 module "renovate_config" {
-  source = "../../modules/repository"
-
-  github_token = var.github_token
-
+  source         = "../../modules/repository"
+  github_token   = var.github_token
   repository     = "renovate-config"
   default_branch = "main"
   topics         = ["renovate"]
   description    = "Renovate Configuration."
-
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
@@ -41,7 +36,7 @@ module "terraform_aws" {
   github_token   = var.github_token
   repository     = "terraform-aws"
   default_branch = "main"
-  topics         = ["aws"]
+  topics         = ["terraform", "aws"]
   description    = "Configure AWS resources with Terraform."
   branches_to_protect = {
     "main" = {
@@ -57,7 +52,7 @@ module "terraform_github" {
   github_token   = var.github_token
   repository     = "terraform-github"
   default_branch = "main"
-  topics         = ["github"]
+  topics         = ["terraform", "github"]
   description    = "Configure GitHub resources with Terraform."
   branches_to_protect = {
     "main" = {
@@ -73,7 +68,7 @@ module "terraform_vercel" {
   github_token   = var.github_token
   repository     = "terraform-vercel"
   default_branch = "main"
-  topics         = ["vercel"]
+  topics         = ["terraform", "vercel"]
   description    = "Configure Vercel resources with Terraform."
   branches_to_protect = {
     "main" = {
