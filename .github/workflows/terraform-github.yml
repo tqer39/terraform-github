@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: read
+      contents: write
       deployments: write # Required for bobheadxi/deployments
       id-token: write # Required for aws-actions/configure-aws-credentials
       pull-requests: write # Required for bobheadxi/deployments
