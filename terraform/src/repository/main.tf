@@ -126,15 +126,15 @@ module "openai_generate_pr_description" {
   }
 }
 
-import {
-  id = "tqer39/openai-generate-pr-description"
-  to = module.openai_generate_pr_description.github_repository.this
-}
+# import {
+#   id = "tqer39/openai-generate-pr-description"
+#   to = module.openai_generate_pr_description.github_repository.this
+# }
 
-import {
-  id = "tqer39/blog"
-  to = module.blog.github_repository.this
-}
+# import {
+#   id = "tqer39/blog"
+#   to = module.blog.github_repository.this
+# }
 
 
 # import {
