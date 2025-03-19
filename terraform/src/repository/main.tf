@@ -85,6 +85,7 @@ module "blog" {
   default_branch = "main"
   topics         = ["blog"]
   description    = "Configure blog resources with Terraform."
+  homepage_url   = "https://blog-tqer39s-projects.vercel.app"
   branches_to_protect = {
     "main" = {
       required_status_checks        = true

@@ -124,3 +124,9 @@ variable "verified_allowed" {
   description = "(Optional) Whether actions in GitHub Marketplace from verified creators are allowed. Set to true to allow all GitHub Marketplace actions by verified creators."
   default     = true
 }
+
+variable "homepage_url" {
+  type        = string
+  description = "(Optional) URL of the repository homepage."
+  default     = null
+}
