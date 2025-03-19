@@ -126,16 +126,19 @@ module "openai_generate_pr_description" {
 }
 
 import {
-  id = openai_generate_pr_description
+  id = "tqer39/openai-generate-pr-description"
   to = module.openai_generate_pr_description.github_repository.this
 }
 
-import {
-  id = openai_generate_pr_description
-  to = module.openai_generate_pr_description.github_branch_default.this
-}
 
-import {
-  id = openai_generate_pr_description
-  to = module.openai_generate_pr_description.github_branch_protection.this["main"]
-}
+# import {
+#   id = openai_generate_pr_description
+#   to = module.openai_generate_pr_description.github_branch_default.this
+# }
+
+# import {
+#   id = openai_generate_pr_description
+#   to = module.openai_generate_pr_description.github_branch_protection.this["main"]
+# }
+
+# aws-vault exec portfolio -- terraform -chdir=./terraform/src/repository import "module.github_branch_default.this[\"main\"]" openai_generate_pr_description/main
