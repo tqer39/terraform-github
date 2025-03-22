@@ -11,6 +11,7 @@ module "tqer39" {
       # GitHub Action のワークフローで main に push するために必要
       allows_force_pushes           = true
       required_pull_request_reviews = true
+      status_check_contexts         = ["pre-commit"]
     }
   }
 }
