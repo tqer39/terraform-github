@@ -1,5 +1,3 @@
-
-
 module "time_capsule" {
   source         = "../../modules/repository"
   github_token   = var.github_token
