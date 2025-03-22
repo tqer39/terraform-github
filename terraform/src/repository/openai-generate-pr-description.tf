@@ -1,10 +1,10 @@
-module "time_capsule" {
+module "openai_generate_pr_description" {
   source         = "../../modules/repository"
   github_token   = var.github_token
-  repository     = "time-capsule"
+  repository     = "openai-generate-pr-description"
   default_branch = "main"
-  topics         = ["time-capsule", "nextjs"]
-  description    = "Create a time capsule repository."
+  topics         = ["openai"]
+  description    = "Generate Pull Request description with OpenAI."
   branches_to_protect = {
     "main" = {
       required_status_checks        = true
