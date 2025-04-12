@@ -3,7 +3,7 @@ module "anime_tweet_bot" {
   github_token   = var.github_token
   repository     = "anime-tweet-bot"
   default_branch = "main"
-  topics         = ["X", "bot"]
+  topics         = ["x", "bot"]
   description    = "A bot for tweeting about anime."
   branches_to_protect = {
     "main" = {
