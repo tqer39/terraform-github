@@ -28,5 +28,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          openai-model: "gpt-4o"
-          locale: "ja" # 日本語で出力するためのオプションを修正
+          openai-model: 'gpt-4o'
+          locale: 'ja' # 日本語で出力するためのオプションを修正
