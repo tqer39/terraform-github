@@ -3,7 +3,7 @@ name: Update License Year
 
 on:
   schedule:
-    - cron: "0 0 1 1 *" # 毎年1月1日に実行
+    - cron: '0 0 1 1 *' # 毎年1月1日に実行
   workflow_dispatch:
 
 concurrency:
