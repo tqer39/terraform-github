@@ -16,7 +16,7 @@
       ],
       "env": {
         "FASTMCP_LOG_LEVEL": "ERROR",
-        "AWS_PROFILE": "dev",
+        "AWS_PROFILE": "portfolio",
         "AWS_REGION": "ap-northeast-1"
       }
     }
