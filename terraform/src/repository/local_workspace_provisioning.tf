@@ -3,7 +3,6 @@ module "local_workspace_provisioning" {
   github_token   = var.github_token
   repository     = "local-workspace-provisioning"
   default_branch = "main"
-  topics         = [""]
   description    = "Local workspace provisioning repository."
   branches_to_protect = {
     "main" = {
