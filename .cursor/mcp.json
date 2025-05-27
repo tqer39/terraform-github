@@ -19,6 +19,15 @@
         "AWS_PROFILE": "portfolio",
         "AWS_REGION": "ap-northeast-1"
       }
+    },
+    "hashicorp.terraform-mcp-server": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
     }
   }
 }
