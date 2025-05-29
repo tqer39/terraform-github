@@ -4,7 +4,7 @@ module "dotfiles" {
   repository     = "dotfiles"
   default_branch = "main"
   description    = "My dotfiles repository"
-  visibility     = "private" # 必要に応じて "public" も可
+  visibility     = "public"
 
   branches_to_protect = {
     "main" = {
