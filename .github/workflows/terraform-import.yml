@@ -1,0 +1,47 @@
+name: Terraform Import
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: 'Terraform module name (例: local_workspace_provisioning)'
+        required: true
+        type: string
+      repo:
+        description: 'GitHub repository name (例: local-workspace-provisioning)'
+        required: true
+        type: string
+
+jobs:
+  terraform-import:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
+          aws-region: ap-northeast-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=./terraform/src/repository init -reconfigure
+
+      - name: Terraform Import (repository, branch_default, actions_repository_permissions, branch_protection)
+        env:
+          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+        run: |
+          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_repository.this" "${{ github.event.inputs.repo }}"
+          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_default.this" "${{ github.event.inputs.repo }}:main"
+          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_actions_repository_permissions.this" "${{ github.event.inputs.repo }}"
+          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_protection.this[\"main\"]" "${{ github.event.inputs.repo }}:main"
