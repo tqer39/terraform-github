@@ -30,6 +30,18 @@ This workflow is used to import existing GitHub repositories into Terraform mana
 - The `terraform-import` workflow allows you to import existing GitHub repositories and branch protection settings into the Terraform state.
 - It is executed manually (`workflow_dispatch`) by specifying the target module name and repository name.
 
+### Flow
+
+```mermaid
+graph TD
+  A[Select Import workflow in Actions tab] --> B[Enter module and repo then run]
+  B --> C[Checkout repository]
+  C --> D[Configure AWS credentials]
+  D --> E[Initialize Terraform]
+  E --> F[Import repository info to state]
+  F --> G[Done]
+```
+
 ### Parameters
 
 - `module`: Terraform module name (e.g., `local-workspace-provisioning`, `terraform-aws`, `boilerplate-saas`, etc.)

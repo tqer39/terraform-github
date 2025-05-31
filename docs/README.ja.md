@@ -38,6 +38,18 @@ aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE apply -auto-approve
 - `terraform-import` ワークフローは、既存のGitHubリポジトリやブランチ保護設定などをTerraformのstateに取り込むために利用します。
 - 手動実行（workflow_dispatch）で、対象のmodule名とリポジトリ名を指定して実行します。
 
+### 処理フロー
+
+```mermaid
+graph TD
+  A[ActionsタブでImportワークフロー選択] --> B[moduleとrepoを入力して実行]
+  B --> C[リポジトリをCheckout]
+  C --> D[AWS認証の設定]
+  D --> E[Terraformの初期化]
+  E --> F[リポジトリ情報をstateにインポート]
+  F --> G[完了]
+```
+
 ### パラメータ
 
 - `module`: Terraformモジュール名（例: `local-workspace-provisioning`, `terraform-aws`, `boilerplate-saas` など）
