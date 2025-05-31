@@ -1,4 +1,4 @@
-module "time_capsule" {
+module "time-capsule" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "time-capsule"

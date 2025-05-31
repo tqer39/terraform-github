@@ -1,4 +1,4 @@
-module "renovate_config" {
+module "renovate-config" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "renovate-config"

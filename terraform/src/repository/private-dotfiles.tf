@@ -1,4 +1,4 @@
-module "private_dotfiles" {
+module "private-dotfiles" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "private-dotfiles"

@@ -1,4 +1,4 @@
-module "terraform_github" {
+module "terraform-github" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "terraform-github"
