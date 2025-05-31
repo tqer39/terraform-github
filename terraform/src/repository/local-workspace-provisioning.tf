@@ -1,4 +1,4 @@
-module "local_workspace_provisioning" {
+module "local-workspace-provisioning" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "local-workspace-provisioning"
