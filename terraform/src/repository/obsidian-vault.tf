@@ -1,4 +1,4 @@
-module "obsidian_vault" {
+module "obsidian-vault" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "obsidian-vault"

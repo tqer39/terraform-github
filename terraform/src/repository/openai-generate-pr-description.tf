@@ -1,4 +1,4 @@
-module "openai_generate_pr_description" {
+module "openai-generate-pr-description" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "openai-generate-pr-description"

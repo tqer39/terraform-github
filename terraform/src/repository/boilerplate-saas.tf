@@ -1,4 +1,4 @@
-module "boilerplate_saas" {
+module "boilerplate-saas" {
   source       = "../../modules/repository"
   github_token = var.github_token
 
