@@ -13,12 +13,16 @@ This repository is for deploying repositories to GitHub using Terraform and GitH
 5. The [`terraform-apply`](.github/actions/terraform-apply/action.yml) action is executed to apply the Terraform plan.
 
 ```mermaid
-graph LR
-  A[GitHub Actions Trigger] --> B[setup-terraform]
-  B --> C[terraform-plan]
-  C --> D[terraform-apply]
-  D --> E[Infrastructure is deployed]
-  E --> F[Changes are reflected in the GitHub repository]
+graph TD
+  A[actions/checkout] --> B[AWS credential (aws-credential)]
+  B --> C[Generate GitHub App token]
+  C --> D[Terraform Plan]
+  D --> E[Start Deployment]
+  E --> F{push or workflow_dispatch?}
+  F -- Yes --> G[Terraform Apply]
+  F -- No --> H[Skip]
+  G --> I[Finish Deployment]
+  H --> I
 ```
 
 ## How to use the terraform-import workflow

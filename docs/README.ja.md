@@ -10,12 +10,16 @@
 2. [`set-matrix`](.github/actions/set-matrix/action.yml)アクションが実行され、Terraformの実行対象ディレクトリのリストを作成します。
 
 ```mermaid
-graph LR
-  A[GitHub Actions Trigger] --> B[setup-terraform]
-  B --> C[terraform-plan]
-  C --> D[terraform-apply]
-  D --> E[Infrastructure is deployed]
-  E --> F[Changes are reflected in the GitHub repository]
+graph TD
+  A[actions/checkout] --> B[AWS認証（aws-credential）]
+  B --> C[GitHub Appトークン生成]
+  C --> D[Terraform Plan]
+  D --> E[Start Deployment]
+  E --> F{pushまたはworkflow_dispatch?}
+  F -- Yes --> G[Terraform Apply]
+  F -- No --> H[スキップ]
+  G --> I[Finish Deployment]
+  H --> I
 ```
 
 ## ローカルで `terraform plan` する方法
