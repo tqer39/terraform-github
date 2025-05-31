@@ -14,11 +14,11 @@ This repository is for deploying repositories to GitHub using Terraform and GitH
 
 ```mermaid
 graph TD
-  A[actions/checkout] --> B[AWS credential（aws-credential）]
+  A[actions checkout] --> B[AWS credential aws-credential]
   B --> C[Generate GitHub App token]
   C --> D[Terraform Plan]
   D --> E[Start Deployment]
-  E --> F{push or workflow_dispatch?}
+  E --> F{push or workflow_dispatch}
   F -- Yes --> G[Terraform Apply]
   F -- No --> H[Skip]
   G --> I[Finish Deployment]

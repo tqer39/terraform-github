@@ -11,11 +11,11 @@
 
 ```mermaid
 graph TD
-  A[actions/checkout] --> B[AWS認証（aws-credential）]
+  A[actions checkout] --> B[AWS認証 aws-credential]
   B --> C[GitHub Appトークン生成]
   C --> D[Terraform Plan]
   D --> E[Start Deployment]
-  E --> F{pushまたはworkflow_dispatch?}
+  E --> F{pushまたはworkflow_dispatch}
   F -- Yes --> G[Terraform Apply]
   F -- No --> H[スキップ]
   G --> I[Finish Deployment]
