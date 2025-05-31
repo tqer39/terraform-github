@@ -39,7 +39,7 @@ jobs:
 
       - name: Terraform Import (repository, branch_default, actions_repository_permissions, branch_protection)
         env:
-          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          TF_VAR_github_token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
         run: |
           terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_repository.this" "${{ github.event.inputs.repo }}"
           terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_default.this" "${{ github.event.inputs.repo }}:main"
