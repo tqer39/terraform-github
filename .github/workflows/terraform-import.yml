@@ -42,6 +42,6 @@ jobs:
           TF_VAR_github_token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
         run: |
           terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_repository.this" "${{ github.event.inputs.repo }}"
-          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_default.this" "${{ github.event.inputs.repo }}:main"
+          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_default.this" "${{ github.event.inputs.repo }}"
           terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_actions_repository_permissions.this" "${{ github.event.inputs.repo }}"
           terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_protection.this[\"main\"]" "${{ github.event.inputs.repo }}:main"
