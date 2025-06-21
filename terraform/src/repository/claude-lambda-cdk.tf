@@ -81,7 +81,7 @@ module "claude_lambda_cdk" {
 
       conditions = {
         ref_name = {
-          include = ["refs/heads/**"] # All branches
+          include = ["refs/heads/**"]                             # All branches
           exclude = ["~DEFAULT_BRANCH", "refs/heads/renovate/**"] # Except main and renovate branches
         }
       }
