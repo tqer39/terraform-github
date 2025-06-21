@@ -113,6 +113,12 @@ variable "branch_rulesets" {
   description = "GitHub repository rulesets for branch protection. Rulesets provide more flexible and powerful branch protection than traditional branch protection rules."
 }
 
+variable "configure_actions_permissions" {
+  type        = bool
+  description = "(Optional) Whether to configure GitHub Actions permissions for the repository. Set to false if the repository doesn't exist yet to avoid 404 errors during planning."
+  default     = true
+}
+
 variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
