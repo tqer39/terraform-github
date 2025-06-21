@@ -67,16 +67,19 @@ module "my_repo" {
 ## Key Features
 
 ### 1. Flexible Targeting
+
 - Target specific branches using patterns
 - Include/exclude specific refs
 
 ### 2. Comprehensive Rules
+
 - **Pull Request Requirements**: Review counts, code owner reviews, thread resolution
 - **Status Checks**: Required CI/CD checks with strict mode
 - **Branch Protection**: Prevent deletion, force pushes, require linear history
 - **Commit Patterns**: Enforce commit message, author email, or branch name patterns
 
 ### 3. Bypass Options
+
 - Allow specific users, teams, or apps to bypass rules
 - Configure bypass mode (always or only for pull requests)
 
