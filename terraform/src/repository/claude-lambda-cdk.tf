@@ -14,10 +14,44 @@ module "claude_lambda_cdk" {
   allow_auto_merge       = true
   allow_update_branch    = true
   delete_branch_on_merge = true
-  branches_to_protect = {
+
+  # Temporarily disable actions permissions configuration to avoid 404 error
+  # Enable this after the repository is created
+  configure_actions_permissions = false
+
+  # Use traditional branch protection
+  # branches_to_protect = {
+  #   "main" = {
+  #     required_status_checks          = true
+  #     required_pull_request_reviews   = true
+  #     dismiss_stale_reviews           = true
+  #     required_approving_review_count = 1
+  #     require_last_push_approval      = true
+  #   }
+  # }
+  branch_rulesets = {
     "main" = {
-      required_status_checks        = true
-      required_pull_request_reviews = true
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/main"]
+          exclude = []
+        }
+      }
+      rules = {
+        # Require pull requests before merging
+        pull_request = {
+          required_approving_review_count = 1
+          dismiss_stale_reviews_on_push   = true
+          require_last_push_approval      = true
+        }
+        # Require status checks to pass before merging
+        required_status_checks = {
+          strict_required_status_checks_policy = false
+          required_checks                      = []
+        }
+        # Require linear history
+        required_linear_history = true
+      }
     }
   }
 }

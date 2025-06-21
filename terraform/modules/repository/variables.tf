@@ -107,6 +107,12 @@ variable "branches_to_protect" {
   description = "github_branch_protection variables. See https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection#argument-reference"
 }
 
+variable "configure_actions_permissions" {
+  type        = bool
+  description = "(Optional) Whether to configure GitHub Actions permissions for the repository. Set to false if the repository doesn't exist yet to avoid 404 errors during planning."
+  default     = true
+}
+
 variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
@@ -135,4 +141,10 @@ variable "homepage_url" {
   type        = string
   description = "(Optional) URL of the repository homepage."
   default     = null
+}
+
+variable "branch_rulesets" {
+  description = "A map of branch rulesets to apply to the repository."
+  type        = any
+  default     = {}
 }

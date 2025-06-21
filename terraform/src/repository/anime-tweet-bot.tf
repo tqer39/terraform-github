@@ -1,3 +1,8 @@
+moved {
+  from = module.anime-tweet-bot.github_actions_repository_permissions.this
+  to   = module.anime-tweet-bot.github_actions_repository_permissions.this[0]
+}
+
 module "anime-tweet-bot" {
   source         = "../../modules/repository"
   github_token   = var.github_token

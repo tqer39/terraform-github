@@ -1,4 +1,6 @@
 resource "github_actions_repository_permissions" "this" {
+  count = var.configure_actions_permissions ? 1 : 0
+
   repository      = github_repository.this.name
   allowed_actions = var.allowed_actions
 

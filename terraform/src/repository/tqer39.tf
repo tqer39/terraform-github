@@ -1,3 +1,8 @@
+moved {
+  from = module.tqer39.github_actions_repository_permissions.this
+  to   = module.tqer39.github_actions_repository_permissions.this[0]
+}
+
 module "tqer39" {
   source         = "../../modules/repository"
   github_token   = var.github_token

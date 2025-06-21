@@ -1,3 +1,8 @@
+moved {
+  from = module.private-dotfiles.github_actions_repository_permissions.this
+  to   = module.private-dotfiles.github_actions_repository_permissions.this[0]
+}
+
 module "private-dotfiles" {
   source         = "../../modules/repository"
   github_token   = var.github_token

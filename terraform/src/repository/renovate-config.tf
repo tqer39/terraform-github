@@ -1,3 +1,8 @@
+moved {
+  from = module.renovate-config.github_actions_repository_permissions.this
+  to   = module.renovate-config.github_actions_repository_permissions.this[0]
+}
+
 module "renovate-config" {
   source         = "../../modules/repository"
   github_token   = var.github_token
