@@ -27,7 +27,7 @@ resource "github_repository_ruleset" "this" {
 
     # Require status checks
     dynamic "required_status_checks" {
-      for_each = try(each.value.rules.required_status_checks, null) != null ? [each.value.rules.required_status_checks] : []
+      for_each = try(each.value.rules.required_status_checks, null) != null && length(try(each.value.rules.required_status_checks.required_checks, [])) > 0 ? [each.value.rules.required_status_checks] : []
       content {
         dynamic "required_check" {
           for_each = try(required_status_checks.value.required_checks, [])
