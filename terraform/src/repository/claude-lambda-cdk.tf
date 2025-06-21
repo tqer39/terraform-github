@@ -19,7 +19,7 @@ module "claude_lambda_cdk" {
   # Enable this after the repository is created
   configure_actions_permissions = false
 
-  # Use traditional branch protection instead of rulesets for now
+  # Use traditional branch protection
   branches_to_protect = {
     "main" = {
       required_status_checks          = true
