@@ -14,7 +14,7 @@ module "claude_lambda_cdk" {
   allow_auto_merge       = true
   allow_update_branch    = true
   delete_branch_on_merge = true
-  
+
   # Temporarily disable actions permissions configuration to avoid 404 error
   # Enable this after the repository is created
   configure_actions_permissions = false
