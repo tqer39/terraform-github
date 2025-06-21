@@ -1,3 +1,8 @@
+moved {
+  from = module.terraform-aws.github_actions_repository_permissions.this
+  to   = module.terraform-aws.github_actions_repository_permissions.this[0]
+}
+
 module "terraform-aws" {
   source         = "../../modules/repository"
   github_token   = var.github_token

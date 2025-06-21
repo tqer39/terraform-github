@@ -1,3 +1,8 @@
+moved {
+  from = module.openai-generate-pr-description.github_actions_repository_permissions.this
+  to   = module.openai-generate-pr-description.github_actions_repository_permissions.this[0]
+}
+
 module "openai-generate-pr-description" {
   source         = "../../modules/repository"
   github_token   = var.github_token
