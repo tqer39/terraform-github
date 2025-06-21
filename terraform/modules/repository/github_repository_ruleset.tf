@@ -1,0 +1,96 @@
+resource "github_repository_ruleset" "this" {
+  for_each    = var.branch_rulesets
+  repository  = github_repository.this.name
+  name        = each.key
+  target      = try(each.value.target, "branch")
+  enforcement = try(each.value.enforcement, "active")
+
+  dynamic "conditions" {
+    for_each = try(each.value.conditions, null) != null ? [each.value.conditions] : []
+    content {
+      ref_name {
+        include = try(conditions.value.ref_name.include, [])
+        exclude = try(conditions.value.ref_name.exclude, [])
+      }
+    }
+  }
+
+  dynamic "rules" {
+    for_each = try(each.value.rules, null) != null ? [each.value.rules] : []
+    content {
+      # Require pull requests before merging
+      dynamic "pull_request" {
+        for_each = try(rules.value.pull_request, null) != null ? [rules.value.pull_request] : []
+        content {
+          require_code_owner_review         = try(pull_request.value.require_code_owner_review, false)
+          require_last_push_approval        = try(pull_request.value.require_last_push_approval, false)
+          dismiss_stale_reviews_on_push     = try(pull_request.value.dismiss_stale_reviews_on_push, false)
+          required_approving_review_count   = try(pull_request.value.required_approving_review_count, 1)
+          required_review_thread_resolution = try(pull_request.value.required_review_thread_resolution, false)
+        }
+      }
+
+      # Require status checks
+      dynamic "required_status_checks" {
+        for_each = try(rules.value.required_status_checks, null) != null ? [rules.value.required_status_checks] : []
+        content {
+          dynamic "required_check" {
+            for_each = try(required_status_checks.value.required_checks, [])
+            content {
+              context        = required_check.value.context
+              integration_id = try(required_check.value.integration_id, null)
+            }
+          }
+          strict_required_status_checks_policy = try(required_status_checks.value.strict, true)
+        }
+      }
+
+      # Branch protection rules
+      deletion                = try(rules.value.deletion, false)
+      non_fast_forward        = try(rules.value.non_fast_forward, false)
+      required_linear_history = try(rules.value.required_linear_history, true)
+      required_signatures     = try(rules.value.required_signatures, false)
+
+      # Additional rules
+      dynamic "commit_message_pattern" {
+        for_each = try(rules.value.commit_message_pattern, null) != null ? [rules.value.commit_message_pattern] : []
+        content {
+          pattern  = commit_message_pattern.value.pattern
+          operator = commit_message_pattern.value.operator
+          negate   = try(commit_message_pattern.value.negate, false)
+        }
+      }
+
+      dynamic "commit_author_email_pattern" {
+        for_each = try(rules.value.commit_author_email_pattern, null) != null ? [rules.value.commit_author_email_pattern] : []
+        content {
+          pattern  = commit_author_email_pattern.value.pattern
+          operator = commit_author_email_pattern.value.operator
+          negate   = try(commit_author_email_pattern.value.negate, false)
+        }
+      }
+
+      dynamic "branch_name_pattern" {
+        for_each = try(rules.value.branch_name_pattern, null) != null ? [rules.value.branch_name_pattern] : []
+        content {
+          pattern  = branch_name_pattern.value.pattern
+          operator = branch_name_pattern.value.operator
+          negate   = try(branch_name_pattern.value.negate, false)
+        }
+      }
+    }
+  }
+
+  dynamic "bypass_actors" {
+    for_each = try(each.value.bypass_actors, [])
+    content {
+      actor_id    = bypass_actors.value.actor_id
+      actor_type  = bypass_actors.value.actor_type
+      bypass_mode = try(bypass_actors.value.bypass_mode, "always")
+    }
+  }
+
+  depends_on = [
+    github_repository.this,
+  ]
+}
