@@ -94,7 +94,7 @@ module "claude_lambda_cdk" {
         # Enforce branch naming pattern
         branch_name_pattern = {
           pattern  = "^(feature|fix|chore|docs|style|refactor|perf|test|build|ci)/[a-z0-9-]+$"
-          operator = "regex"
+          operator = "contains"
           negate   = false
         }
       }
