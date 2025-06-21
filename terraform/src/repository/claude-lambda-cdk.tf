@@ -1,6 +1,7 @@
 module "claude_lambda_cdk" {
   source         = "../../modules/repository"
   github_token   = var.github_token
+  owner          = "AIPairStudio"
   repository     = "claude-lambda-cdk"
   default_branch = "main"
   topics         = ["aws", "cdk", "lambda", "typescript", "serverless"]
