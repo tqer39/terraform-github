@@ -4,6 +4,12 @@ variable "github_token" {
   sensitive   = true
 }
 
+variable "owner" {
+  type        = string
+  description = "(Optional) The GitHub organization or user account that will own the repository."
+  default     = null
+}
+
 variable "default_branch" {
   type        = string
   description = "(Required) The repository branch to create."
