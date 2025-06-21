@@ -46,7 +46,7 @@ jobs:
         with:
           working-directory: ./terraform/src/repository
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_APPS_TOKEN: ${{ steps.app_token.outputs.token }}
+          GITHUB_APPS_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }} # PAT を使用するように変更
 
       - name: Start Deployment
         if: github.ref == 'refs/heads/main'
