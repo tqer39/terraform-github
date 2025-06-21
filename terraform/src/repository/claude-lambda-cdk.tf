@@ -22,9 +22,9 @@ module "claude_lambda_cdk" {
   # Use traditional branch protection
   branches_to_protect = {
     "main" = {
-      required_status_checks          = true
-      required_pull_request_reviews   = true
-      status_check_contexts           = [
+      required_status_checks        = true
+      required_pull_request_reviews = true
+      status_check_contexts = [
         "pre-commit",
         "terraform-plan",
         "cdk-build",
