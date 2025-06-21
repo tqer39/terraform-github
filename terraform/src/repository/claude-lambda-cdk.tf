@@ -1,8 +1,3 @@
-moved {
-  from = module.claude_lambda_cdk.github_actions_repository_permissions.this
-  to   = module.claude_lambda_cdk.github_actions_repository_permissions.this[0]
-}
-
 module "claude_lambda_cdk" {
   source                 = "../../modules/repository"
   github_token           = var.github_token
