@@ -107,6 +107,12 @@ variable "branches_to_protect" {
   description = "github_branch_protection variables. See https://registry.terraform.io/providers/integrations/github/latest/docs/resources/branch_protection#argument-reference"
 }
 
+variable "branch_rulesets" {
+  type        = any
+  default     = {}
+  description = "GitHub repository rulesets for branch protection. Rulesets provide more flexible and powerful branch protection than traditional branch protection rules."
+}
+
 variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
