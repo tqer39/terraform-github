@@ -142,3 +142,9 @@ variable "homepage_url" {
   description = "(Optional) URL of the repository homepage."
   default     = null
 }
+
+variable "branch_rulesets" {
+  description = "A map of branch rulesets to apply to the repository."
+  type        = any
+  default     = {}
+}
