@@ -20,13 +20,38 @@ module "claude_lambda_cdk" {
   configure_actions_permissions = false
 
   # Use traditional branch protection
-  branches_to_protect = {
+  # branches_to_protect = {
+  #   "main" = {
+  #     required_status_checks          = true
+  #     required_pull_request_reviews   = true
+  #     dismiss_stale_reviews           = true
+  #     required_approving_review_count = 1
+  #     require_last_push_approval      = true
+  #   }
+  # }
+  branch_rulesets = {
     "main" = {
-      required_status_checks          = true
-      required_pull_request_reviews   = true
-      dismiss_stale_reviews           = true
-      required_approving_review_count = 1
-      require_last_push_approval      = true
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/main"]
+          exclude = []
+        }
+      }
+      rules = {
+        # Require pull requests before merging
+        pull_request = {
+          required_approving_review_count = 1
+          dismiss_stale_reviews_on_push   = true
+          require_last_push_approval      = true
+        }
+        # Require status checks to pass before merging
+        required_status_checks = {
+          strict_required_status_checks_policy = false
+          required_checks                      = []
+        }
+        # Require linear history
+        required_linear_history = true
+      }
     }
   }
 }
