@@ -58,13 +58,6 @@ module "claude_lambda_cdk" {
         non_fast_forward        = false # Prevent force pushes
         required_linear_history = true  # Require linear history
         required_signatures     = false # Don't require signed commits for now
-
-        # Optional: Enforce conventional commits
-        commit_message_pattern = {
-          pattern  = "^(feat|fix|docs|style|refactor|perf|test|chore|build|ci)(\\(.+\\))?: .{1,100}"
-          operator = "starts_with"
-          negate   = false
-        }
       }
 
       # Allow specific actors to bypass rules if needed
@@ -76,28 +69,6 @@ module "claude_lambda_cdk" {
         #   bypass_mode = "pull_request"  # Only bypass for PRs
         # }
       ]
-    }
-
-    # Additional ruleset for feature branches
-    "Feature branch naming" = {
-      target      = "branch"
-      enforcement = "active"
-
-      conditions = {
-        ref_name = {
-          include = ["refs/heads/**"]                             # All branches
-          exclude = ["~DEFAULT_BRANCH", "refs/heads/renovate/**"] # Except main and renovate branches
-        }
-      }
-
-      rules = {
-        # Enforce branch naming pattern
-        branch_name_pattern = {
-          pattern  = "^(feature|fix|chore|docs|style|refactor|perf|test|build|ci)/[a-z0-9-]+$"
-          operator = "contains"
-          negate   = false
-        }
-      }
     }
   }
 }
