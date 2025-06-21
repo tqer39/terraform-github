@@ -2,7 +2,7 @@ module "dialogue_character_system" {
   source         = "../../modules/repository"
   github_token   = var.github_token
   repository     = "dialogue-character-system"
-  organization   = "AIPairStudio"
+  owner          = "AIPairStudio"
   default_branch = "main"
   visibility     = "private"
   topics = [
