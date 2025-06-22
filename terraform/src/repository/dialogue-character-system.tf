@@ -22,17 +22,42 @@ module "dialogue_character_system" {
   has_projects = true
   has_issues   = true
   has_wiki     = false
-  branches_to_protect = {
+  branch_rulesets = {
     "main" = {
-      required_status_checks          = true
-      required_pull_request_reviews   = true
-      dismiss_stale_reviews           = true
-      require_code_owner_reviews      = false
-      required_approving_review_count = 1
+      enforcement = "active"
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/main"]
+          exclude = []
+        }
+      }
+      rules = {
+        pull_request = {
+          required_approving_review_count = 1
+          dismiss_stale_reviews_on_push   = true
+          require_code_owner_review       = false
+        }
+        required_status_checks = {
+          strict_required_status_checks_policy = true
+          required_checks                      = []
+        }
+        deletion                = false
+        non_fast_forward        = false
+        required_linear_history = false
+      }
     }
     "development" = {
-      required_status_checks        = false
-      required_pull_request_reviews = false
+      enforcement = "active"
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/development"]
+          exclude = []
+        }
+      }
+      rules = {
+        deletion         = false
+        non_fast_forward = false
+      }
     }
   }
 }
