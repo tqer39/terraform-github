@@ -89,7 +89,7 @@ resource "github_repository_ruleset" "this" {
   dynamic "bypass_actors" {
     for_each = var.enable_owner_bypass ? [1] : []
     content {
-      actor_id    = data.github_user.tqer39.id
+      actor_id    = tonumber(data.github_user.tqer39.id)
       actor_type  = "User"
       bypass_mode = "pull_request"
     }
