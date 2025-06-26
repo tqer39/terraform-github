@@ -4,13 +4,14 @@ moved {
 }
 
 module "obsidian-vault" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "obsidian-vault"
-  default_branch = "main"
-  topics         = ["obsidian", "vault", "docs"]
-  description    = "A repository for managing Obsidian Vault configurations."
-  visibility     = "private"
+  source                 = "../../modules/repository"
+  github_token           = var.github_token
+  repository             = "obsidian-vault"
+  default_branch         = "main"
+  topics                 = ["obsidian", "vault", "docs"]
+  description            = "A repository for managing Obsidian Vault configurations."
+  visibility             = "private"
+  delete_branch_on_merge = false
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -24,7 +25,7 @@ module "obsidian-vault" {
         pull_request = {
           dismiss_stale_reviews_on_push     = true
           require_code_owner_review         = false
-          required_approving_review_count   = 1
+          required_approving_review_count   = 0
           required_review_thread_resolution = true
         }
         required_status_checks = {
@@ -35,6 +36,19 @@ module "obsidian-vault" {
           ]
           strict_required_status_checks_policy = true
         }
+      }
+    }
+    "obsidian-git-sync" = {
+      enforcement = "active"
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/obsidian-git-sync"]
+          exclude = []
+        }
+      }
+      rules = {
+        deletion         = false
+        non_fast_forward = false
       }
     }
   }
