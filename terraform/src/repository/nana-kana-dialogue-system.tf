@@ -28,17 +28,33 @@ module "nana_kana_dialogue_system" {
   has_projects = true
   has_issues   = true
   has_wiki     = false
-  branches_to_protect = {
+  branch_rulesets = {
     "main" = {
-      required_status_checks          = true
-      required_pull_request_reviews   = true
-      dismiss_stale_reviews           = true
-      require_code_owner_reviews      = false
-      required_approving_review_count = 1
+      enforcement = "active"
+      conditions = {
+        ref_name = {
+          include = ["~DEFAULT_BRANCH"]
+          exclude = []
+        }
+      }
+      rules = {
+        pull_request = {
+          dismiss_stale_reviews_on_push     = true
+          require_code_owner_review         = false
+          required_approving_review_count   = 1
+          required_review_thread_resolution = true
+        }
+      }
     }
     "development" = {
-      required_status_checks        = false
-      required_pull_request_reviews = false
+      enforcement = "active"
+      conditions = {
+        ref_name = {
+          include = ["refs/heads/development"]
+          exclude = []
+        }
+      }
+      rules = {}
     }
   }
 }

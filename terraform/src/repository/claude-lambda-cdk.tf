@@ -19,16 +19,6 @@ module "claude_lambda_cdk" {
   # Enable this after the repository is created
   configure_actions_permissions = false
 
-  # Use traditional branch protection
-  # branches_to_protect = {
-  #   "main" = {
-  #     required_status_checks          = true
-  #     required_pull_request_reviews   = true
-  #     dismiss_stale_reviews           = true
-  #     required_approving_review_count = 1
-  #     require_last_push_approval      = true
-  #   }
-  # }
   branch_rulesets = {
     "main" = {
       conditions = {
