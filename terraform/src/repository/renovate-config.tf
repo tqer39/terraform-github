@@ -4,12 +4,14 @@ moved {
 }
 
 module "renovate-config" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "renovate-config"
-  default_branch = "main"
-  topics         = ["renovate"]
-  description    = "Renovate Configuration."
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "renovate-config"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  topics              = ["renovate"]
+  description         = "Renovate Configuration."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

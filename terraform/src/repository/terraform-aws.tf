@@ -4,12 +4,14 @@ moved {
 }
 
 module "terraform-aws" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "terraform-aws"
-  default_branch = "main"
-  topics         = ["terraform", "aws"]
-  description    = "Configure AWS resources with Terraform."
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "terraform-aws"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  topics              = ["terraform", "aws"]
+  description         = "Configure AWS resources with Terraform."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

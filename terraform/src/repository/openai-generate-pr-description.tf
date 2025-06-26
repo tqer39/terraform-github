@@ -4,12 +4,14 @@ moved {
 }
 
 module "openai-generate-pr-description" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "openai-generate-pr-description"
-  default_branch = "main"
-  topics         = ["openai"]
-  description    = "Generate Pull Request description with OpenAI."
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "openai-generate-pr-description"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  topics              = ["openai"]
+  description         = "Generate Pull Request description with OpenAI."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

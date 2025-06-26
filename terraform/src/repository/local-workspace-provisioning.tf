@@ -4,11 +4,13 @@ moved {
 }
 
 module "local-workspace-provisioning" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "local-workspace-provisioning"
-  default_branch = "main"
-  description    = "Local workspace provisioning repository."
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "local-workspace-provisioning"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  description         = "Local workspace provisioning repository."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

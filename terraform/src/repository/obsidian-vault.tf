@@ -7,7 +7,9 @@ module "obsidian-vault" {
   source                 = "../../modules/repository"
   github_token           = var.github_token
   repository             = "obsidian-vault"
+  owner                  = "tqer39"
   default_branch         = "main"
+  enable_owner_bypass    = true
   topics                 = ["obsidian", "vault", "docs"]
   description            = "A repository for managing Obsidian Vault configurations."
   visibility             = "private"

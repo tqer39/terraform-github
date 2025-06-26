@@ -75,12 +75,23 @@ resource "github_repository_ruleset" "this" {
     }
   }
 
+  # Custom bypass actors from configuration
   dynamic "bypass_actors" {
     for_each = try(each.value.bypass_actors, [])
     content {
       actor_id    = bypass_actors.value.actor_id
       actor_type  = bypass_actors.value.actor_type
       bypass_mode = try(bypass_actors.value.bypass_mode, "always")
+    }
+  }
+
+  # tqer39 bypass when enabled
+  dynamic "bypass_actors" {
+    for_each = var.enable_owner_bypass ? [1] : []
+    content {
+      actor_id    = data.github_user.tqer39.node_id
+      actor_type  = "Integration"
+      bypass_mode = "pull_request"
     }
   }
 
