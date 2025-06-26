@@ -80,8 +80,8 @@ resource "github_repository_ruleset" "this" {
     for_each = concat(
       try(each.value.bypass_actors, []),
       var.enable_owner_bypass ? [{
-        actor_id    = tonumber(data.github_user.tqer39.id)
-        actor_type  = "User"
+        actor_id    = 5 # Admin role ID
+        actor_type  = "RepositoryRole"
         bypass_mode = "pull_request"
       }] : []
     )

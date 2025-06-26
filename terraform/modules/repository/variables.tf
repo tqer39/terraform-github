@@ -151,6 +151,6 @@ variable "branch_rulesets" {
 
 variable "enable_owner_bypass" {
   type        = bool
-  description = "(Optional) Whether to allow tqer39 to bypass branch protection rules."
+  description = "(Optional) Whether to allow repository admins to bypass branch protection rules."
   default     = false
 }
