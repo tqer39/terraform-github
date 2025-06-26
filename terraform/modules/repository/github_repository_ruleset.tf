@@ -75,23 +75,20 @@ resource "github_repository_ruleset" "this" {
     }
   }
 
-  # Custom bypass actors from configuration
+  # Bypass actors configuration
   dynamic "bypass_actors" {
-    for_each = try(each.value.bypass_actors, [])
+    for_each = concat(
+      try(each.value.bypass_actors, []),
+      var.enable_owner_bypass ? [{
+        actor_id    = tonumber(data.github_user.tqer39.id)
+        actor_type  = "User"
+        bypass_mode = "pull_request"
+      }] : []
+    )
     content {
       actor_id    = bypass_actors.value.actor_id
       actor_type  = bypass_actors.value.actor_type
       bypass_mode = try(bypass_actors.value.bypass_mode, "always")
-    }
-  }
-
-  # tqer39 bypass when enabled
-  dynamic "bypass_actors" {
-    for_each = var.enable_owner_bypass ? [1] : []
-    content {
-      actor_id    = tonumber(data.github_user.tqer39.id)
-      actor_type  = "User"
-      bypass_mode = "pull_request"
     }
   }
 
