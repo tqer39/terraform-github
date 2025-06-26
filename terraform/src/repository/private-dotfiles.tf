@@ -4,12 +4,14 @@ moved {
 }
 
 module "private-dotfiles" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "private-dotfiles"
-  default_branch = "main"
-  description    = "My private dotfiles repository"
-  visibility     = "private"
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "private-dotfiles"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  description         = "My private dotfiles repository"
+  visibility          = "private"
 
   branch_rulesets = {
     "main" = {

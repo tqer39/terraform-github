@@ -75,8 +75,16 @@ resource "github_repository_ruleset" "this" {
     }
   }
 
+  # Bypass actors configuration
   dynamic "bypass_actors" {
-    for_each = try(each.value.bypass_actors, [])
+    for_each = concat(
+      try(each.value.bypass_actors, []),
+      var.enable_owner_bypass ? [{
+        actor_id    = 5 # Admin role ID
+        actor_type  = "RepositoryRole"
+        bypass_mode = "pull_request"
+      }] : []
+    )
     content {
       actor_id    = bypass_actors.value.actor_id
       actor_type  = bypass_actors.value.actor_type

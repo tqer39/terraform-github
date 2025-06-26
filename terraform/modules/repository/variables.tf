@@ -148,3 +148,9 @@ variable "branch_rulesets" {
   type        = any
   default     = {}
 }
+
+variable "enable_owner_bypass" {
+  type        = bool
+  description = "(Optional) Whether to allow repository admins to bypass branch protection rules."
+  default     = false
+}

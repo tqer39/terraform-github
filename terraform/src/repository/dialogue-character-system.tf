@@ -18,10 +18,11 @@ module "dialogue_character_system" {
     "typescript",
     "voice-synthesis"
   ]
-  description  = "Generic dialogue character system for creating interactive AI character conversations with 3D animation and voice synthesis"
-  has_projects = true
-  has_issues   = true
-  has_wiki     = false
+  description         = "Generic dialogue character system for creating interactive AI character conversations with 3D animation and voice synthesis"
+  has_projects        = true
+  has_issues          = true
+  has_wiki            = false
+  enable_owner_bypass = true
   branch_rulesets = {
     "main" = {
       enforcement = "active"

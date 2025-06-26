@@ -4,12 +4,14 @@ moved {
 }
 
 module "terraform-vercel" {
-  source         = "../../modules/repository"
-  github_token   = var.github_token
-  repository     = "terraform-vercel"
-  default_branch = "main"
-  topics         = ["terraform", "vercel"]
-  description    = "Configure Vercel resources with Terraform."
+  source              = "../../modules/repository"
+  github_token        = var.github_token
+  repository          = "terraform-vercel"
+  owner               = "tqer39"
+  default_branch      = "main"
+  enable_owner_bypass = true
+  topics              = ["terraform", "vercel"]
+  description         = "Configure Vercel resources with Terraform."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

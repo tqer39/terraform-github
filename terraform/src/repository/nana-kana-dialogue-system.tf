@@ -24,10 +24,11 @@ module "nana_kana_dialogue_system" {
     "three-js",
     "typescript"
   ]
-  description  = "女子高生ナナと社会人カナによる対話型コンテンツ制作システム - 3D Animation + TTS + Ghost CMS"
-  has_projects = true
-  has_issues   = true
-  has_wiki     = false
+  description         = "女子高生ナナと社会人カナによる対話型コンテンツ制作システム - 3D Animation + TTS + Ghost CMS"
+  has_projects        = true
+  has_issues          = true
+  has_wiki            = false
+  enable_owner_bypass = true
   branch_rulesets = {
     "main" = {
       enforcement = "active"
