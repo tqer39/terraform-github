@@ -231,3 +231,24 @@ module "my_legacy_repo" {
 目標達成に絶対必要でない限り、ファイルを作成しないこと。
 常に新しいファイルを作成するよりも既存のファイルを編集することを優先する。
 ドキュメントファイル（*.md）やREADMEファイルを積極的に作成しないこと。ユーザーから明示的に要求された場合のみドキュメントファイルを作成する。
+
+## リポジトリ削除時の手順
+
+- `aws-vault exec portfolio` を使用して、適切な AWS 認証情報を取得し、Terraform の tfstate からリソース・モジュール削除します。
+- `portfolio` は `~/.aws/config` で設定された SSO ロールの AWS プロファイル名です。
+
+```shell
+aws-vault exec portfolio -- terraform -chdir=./terraform/src/repository state rm  module.sample-repository
+Removed module.sample-repository.data.github_user.tqer39
+Removed module.sample-repository.github_actions_repository_permissions.this[0]
+Removed module.sample-repository.github_branch_default.this
+Removed module.sample-repository.github_repository.this
+Successfully removed 4 resource instance(s).
+```
+
+- 関連ソースコード `terraform/src/repository/sample-repository.tf` を削除します。
+- GitHub リポジトリを削除します。
+
+```shell
+gh repo delete tqer39/sample-repository --confirm
+```
