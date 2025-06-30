@@ -24,12 +24,6 @@ module "obsidian-vault" {
         }
       }
       rules = {
-        pull_request = {
-          dismiss_stale_reviews_on_push     = true
-          require_code_owner_review         = false
-          required_approving_review_count   = 0
-          required_review_thread_resolution = true
-        }
         required_status_checks = {
           required_check = [
             {
