@@ -40,18 +40,5 @@ module "obsidian-vault" {
         }
       }
     }
-    "obsidian-git-sync" = {
-      enforcement = "active"
-      conditions = {
-        ref_name = {
-          include = ["refs/heads/obsidian-git-sync"]
-          exclude = []
-        }
-      }
-      rules = {
-        deletion         = false
-        non_fast_forward = false
-      }
-    }
   }
 }
