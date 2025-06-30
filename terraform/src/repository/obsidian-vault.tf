@@ -13,7 +13,7 @@ module "obsidian-vault" {
   topics                 = ["obsidian", "vault", "docs"]
   description            = "A repository for managing Obsidian Vault configurations."
   visibility             = "private"
-  delete_branch_on_merge = false
+  delete_branch_on_merge = true
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -24,12 +24,6 @@ module "obsidian-vault" {
         }
       }
       rules = {
-        pull_request = {
-          dismiss_stale_reviews_on_push     = true
-          require_code_owner_review         = false
-          required_approving_review_count   = 0
-          required_review_thread_resolution = true
-        }
         required_status_checks = {
           required_check = [
             {
@@ -38,19 +32,6 @@ module "obsidian-vault" {
           ]
           strict_required_status_checks_policy = true
         }
-      }
-    }
-    "obsidian-git-sync" = {
-      enforcement = "active"
-      conditions = {
-        ref_name = {
-          include = ["refs/heads/obsidian-git-sync"]
-          exclude = []
-        }
-      }
-      rules = {
-        deletion         = false
-        non_fast_forward = false
       }
     }
   }
