@@ -13,7 +13,7 @@ module "obsidian-vault" {
   topics                 = ["obsidian", "vault", "docs"]
   description            = "A repository for managing Obsidian Vault configurations."
   visibility             = "private"
-  delete_branch_on_merge = false
+  delete_branch_on_merge = true
   branch_rulesets = {
     "main" = {
       enforcement = "active"
