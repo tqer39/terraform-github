@@ -7,7 +7,7 @@ module "notifications" {
   enable_owner_bypass    = true
   topics                 = ["notifications", "api"]
   description            = "A repository for managing notification services."
-  visibility             = "private"
+  visibility             = "public"
   delete_branch_on_merge = true
   branch_rulesets = {
     "main" = {
