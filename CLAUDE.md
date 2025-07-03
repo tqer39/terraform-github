@@ -1,102 +1,102 @@
 # CLAUDE.md
 
-このファイルは、Claude Code (claude.ai/code) がこのリポジトリのコードを扱う際のガイダンスを提供します。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## リポジトリ概要
+## Repository Overview
 
-これは、TerraformとGitHub Actionsを使用してGitHubリポジトリを管理するためのTerraform Infrastructure as Code (IaC) プロジェクトです。このリポジトリは、モジュラーアーキテクチャを使用して、複数のGitHubリポジトリの作成、設定、保護を自動化します。
+This is a Terraform Infrastructure as Code (IaC) project that manages GitHub repositories using Terraform and GitHub Actions. The repository uses a modular architecture to automate the creation, configuration, and protection of multiple GitHub repositories.
 
-## アーキテクチャ
+## Architecture
 
-### モジュールベース設計
+### Module-Based Design
 
-コードベースは、再利用可能なモジュールとリポジトリ固有の設定を明確に分離しています：
+The codebase clearly separates reusable modules from repository-specific configurations:
 
-- **`terraform/modules/repository/`**: GitHubリポジトリ管理のための中核となる再利用可能なTerraformモジュール
-  - `github_repository.tf`: リポジトリの作成と設定
-  - `github_branch_protection.tf`: 従来のブランチ保護（レガシー、段階的に廃止予定）
-  - `github_repository_ruleset.tf`: 最新のリポジトリルールセット（推奨アプローチ）
-  - `github_actions_repository_permissions.tf`: GitHub Actionsの権限管理
-  - `github_branch.tf` & `github_branch_default.tf`: ブランチ作成とデフォルトブランチ管理
+- **`terraform/modules/repository/`**: Core reusable Terraform module for GitHub repository management
+  - `github_repository.tf`: Repository creation and configuration
+  - `github_branch_protection.tf`: Traditional branch protection (legacy, being phased out)
+  - `github_repository_ruleset.tf`: Modern repository rulesets (recommended approach)
+  - `github_actions_repository_permissions.tf`: GitHub Actions permission management
+  - `github_branch.tf` & `github_branch_default.tf`: Branch creation and default branch management
 
-- **`terraform/src/repository/`**: リポジトリ固有の設定
-  - 各`.tf`ファイルは単一のGitHubリポジトリを表す
-  - リポジトリ固有のパラメータでコアモジュールを使用
-  - `terraform.tf`: S3ステート保存を使用したバックエンド設定
-  - `moved`ブロックはアンダースコアからハイフンへの命名規則のリファクタリングを示す
+- **`terraform/src/repository/`**: Repository-specific configurations
+  - Each `.tf` file represents a single GitHub repository
+  - Uses the core module with repository-specific parameters
+  - `terraform.tf`: Backend configuration with S3 state storage
+  - `moved` blocks indicate refactoring from underscore to hyphen naming convention
 
-### CI/CD統合
+### CI/CD Integration
 
-- **`.github/workflows/`**: GitHub Actionsワークフロー
-  - `terraform-github.yml`: plan/applyのメインワークフロー（PRトリガー）
-  - `terraform-import.yml`: 既存リポジトリのインポート
-  - `pre-commit.yml`: コード品質チェック
+- **`.github/workflows/`**: GitHub Actions workflows
+  - `terraform-github.yml`: Main workflow for plan/apply (PR-triggered)
+  - `terraform-import.yml`: Import existing repositories
+  - `pre-commit.yml`: Code quality checks
 
-- **`.github/actions/`**: 再利用可能なアクションコンポーネント
-  - `setup-terraform`: 初期化とフォーマットチェック
-  - `terraform-validate`: 検証とリンティング
-  - `terraform-plan`: tfcmtによるPRコメント付きプラン
-  - `terraform-apply`: デプロイメント追跡付き変更適用
+- **`.github/actions/`**: Reusable action components
+  - `setup-terraform`: Initialization and format checking
+  - `terraform-validate`: Validation and linting
+  - `terraform-plan`: Planning with PR comments via tfcmt
+  - `terraform-apply`: Change application with deployment tracking
 
-## 一般的なコマンド
+## Common Commands
 
-### Terraformオペレーション
+### Terraform Operations
 
 ```bash
-# すべてのTerraformファイルをフォーマット
+# Format all Terraform files
 terraform fmt -recursive
 
-# Terraformの初期化（terraform/src/repository/で実行する必要があります）
+# Initialize Terraform (must be run in terraform/src/repository)
 cd terraform/src/repository
 terraform init -upgrade
 
-# 設定の検証
+# Validate configuration
 terraform validate
 
-# 変更のプラン
+# Plan changes
 terraform plan
 
-# 変更の適用（主にGitHub Actions経由で実行）
+# Apply changes (primarily done via GitHub Actions)
 terraform apply -auto-approve
 
-# 既存リポジトリリソースのインポート
+# Import existing repository resources
 terraform import module.<module_name>.github_repository.this <repo_name>
 terraform import module.<module_name>.github_branch_default.this <repo_name>
 terraform import module.<module_name>.github_actions_repository_permissions.this <repo_name>
 terraform import module.<module_name>.github_branch_protection.this[\"<branch_name>\"] <repo_name>:<branch_name>
 ```
 
-### コード品質
+### Code Quality
 
 ```bash
-# すべてのpre-commitフックを実行
+# Run all pre-commit hooks
 pre-commit run --all-files
 
-# 特定のフックを実行
+# Run specific hooks
 pre-commit run terraform_fmt --all-files
 pre-commit run terraform_validate --all-files
 pre-commit run terraform_tflint --all-files
 pre-commit run yamllint --all-files
 pre-commit run markdownlint --all-files
 
-# モジュールサポート付きTFLint
+# TFLint with module support
 tflint --init
 tflint --chdir=terraform/src/repository --call-module-type=all
 ```
 
-### リポジトリ管理
+### Repository Management
 
 ```bash
-# リポジトリ間で共通シークレットを設定
+# Set common secrets across repositories
 ./scripts/set-common-github-secrets.sh <github_owner>
 ```
 
-## 新しいリポジトリの追加
+## Adding New Repositories
 
-1. `terraform/src/repository/`に新しい`.tf`ファイルを作成（例：`my-new-repo.tf`）
-2. ニーズに基づいて適切なパターンを使用：
+1. Create a new `.tf` file in `terraform/src/repository/` (e.g., `my-new-repo.tf`)
+2. Use the appropriate pattern based on your needs:
 
-### 最新のアプローチ（リポジトリルールセット）
+### Modern Approach (Repository Rulesets)
 
 ```hcl
 module "my_new_repo" {
@@ -104,13 +104,13 @@ module "my_new_repo" {
 
   github_token    = var.github_token
   repository      = "my-new-repo"
-  owner           = "AIPairStudio"  # オプション：組織名
-  description     = "リポジトリの説明"
+  owner           = "AIPairStudio"  # Optional: organization name
+  description     = "Repository description"
   default_branch  = "main"
-  visibility      = "public"  # または "private"
+  visibility      = "public"  # or "private"
   topics          = ["terraform", "automation"]
 
-  # 最新のリポジトリルールセット（推奨）
+  # Modern repository rulesets (recommended)
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -133,7 +133,7 @@ module "my_new_repo" {
 }
 ```
 
-### レガシーアプローチ（ブランチ保護）
+### Legacy Approach (Branch Protection)
 
 ```hcl
 module "my_legacy_repo" {
@@ -141,11 +141,11 @@ module "my_legacy_repo" {
 
   github_token    = var.github_token
   repository      = "my-legacy-repo"
-  description     = "リポジトリの説明"
+  description     = "Repository description"
   default_branch  = "main"
   topics          = ["terraform", "automation"]
 
-  # レガシーブランチ保護（まだサポートされています）
+  # Legacy branch protection (still supported)
   branches_to_protect = {
     main = {
       required_status_checks         = true
@@ -158,120 +158,120 @@ module "my_legacy_repo" {
 }
 ```
 
-## 主要なワークフロー
+## Key Workflows
 
-### プルリクエストワークフロー
+### Pull Request Workflow
 
-1. フィーチャーブランチを作成し、リポジトリ設定を変更
-2. ブランチをプッシュしてPRを作成
-3. GitHub Actionsが自動的に：
-   - OIDC経由でAWS認証情報を取得
-   - GitHub Appトークンを生成（または個人リポジトリではPATを使用）
-   - tfcmtを使用して`terraform plan`を実行し、PRコメントとして投稿
-   - プラン結果をPRコメントとして投稿
-4. mainへのマージ後：
-   - 同じ認証フロー
-   - 自動的に`terraform apply`を実行
-   - デプロイメントステータスを追跡
+1. Create a feature branch and modify repository configurations
+2. Push the branch and create a PR
+3. GitHub Actions automatically:
+   - Acquire AWS credentials via OIDC
+   - Generate GitHub App token (or use PAT for personal repos)
+   - Run `terraform plan` using tfcmt and post as PR comment
+   - Post plan results as PR comment
+4. After merge to main:
+   - Same authentication flow
+   - Automatically run `terraform apply`
+   - Track deployment status
 
-### 既存リポジトリのインポート
+### Importing Existing Repositories
 
-1. Actionsタブ → "Terraform Import"ワークフローに移動
-2. パラメータを指定して"Run workflow"をクリック：
-   - `module`: モジュール名（例：`my_repo`）
-   - `repo`: GitHubリポジトリ名
-3. ワークフローがインポート：
-   - リポジトリ設定
-   - デフォルトブランチ
-   - Actions権限
-   - ブランチ保護ルール
+1. Go to Actions tab → "Terraform Import" workflow
+2. Click "Run workflow" with parameters:
+   - `module`: Module name (e.g., `my_repo`)
+   - `repo`: GitHub repository name
+3. Workflow imports:
+   - Repository configuration
+   - Default branch
+   - Actions permissions
+   - Branch protection rules
 
-## 認証戦略
+## Authentication Strategy
 
-プロジェクトは複数の認証方法をサポート：
+The project supports multiple authentication methods:
 
-- **GitHub Appトークン**: 組織リポジトリ用（推奨）
-- **個人アクセストークン（PAT）**: 個人リポジトリ用（`TERRAFORM_GITHUB_TOKEN`）
-- **GitHub Actionsトークン**: ワークフローオペレーション用の標準`GITHUB_TOKEN`
-- **AWS OIDC**: S3バックエンド用の一時的な認証情報（長期的なキーなし）
+- **GitHub App tokens**: For organization repositories (recommended)
+- **Personal Access Tokens (PAT)**: For personal repositories (`TERRAFORM_GITHUB_TOKEN`)
+- **GitHub Actions tokens**: Standard `GITHUB_TOKEN` for workflow operations
+- **AWS OIDC**: Temporary credentials for S3 backend (no long-term keys)
 
-## ステート管理
+## State Management
 
-- バックエンド: DynamoDBロック付きAWS S3
-- ステートファイル: `terraform/src/repository/terraform.tfstate`
-- 設定: `terraform/src/repository/terraform.tf`
-- 移行: リファクタリング用の`moved`ブロックで処理
+- Backend: AWS S3 with DynamoDB locking
+- State file: `terraform/src/repository/terraform.tfstate`
+- Configuration: `terraform/src/repository/terraform.tf`
+- Migration: Handled by `moved` blocks for refactoring
 
-## セキュリティに関する考慮事項
+## Security Considerations
 
-- すべてのトークンはGitHub Actionsシークレットとして管理
-- OIDC経由のAWS認証（静的な認証情報なし）
-- Pre-commitフックがシークレットとプライベートキーを検出
-- ブランチ保護がコードレビューを強制
-- リポジトリルールセットが細かいアクセス制御を提供
+- All tokens managed as GitHub Actions secrets
+- AWS authentication via OIDC (no static credentials)
+- Pre-commit hooks detect secrets and private keys
+- Branch protection enforces code review
+- Repository rulesets provide granular access control
 
-## モジュールパラメータリファレンス
+## Module Parameter Reference
 
-リポジトリモジュールの主要パラメータ：
+Key parameters for the repository module:
 
-- `repository`: リポジトリ名（必須）
-- `owner`: 組織名（オプション、デフォルトは個人アカウント）
-- `description`: リポジトリの説明
-- `visibility`: `public`または`private`
-- `default_branch`: デフォルトブランチ名（通常は`main`）
-- `topics`: リポジトリのトピック/タグのリスト
-- `branch_rulesets`: 最新のルールベース保護（推奨）
-- `branches_to_protect`: レガシーブランチ保護（後方互換性）
-- `has_wiki`, `has_issues`, `has_projects`: 機能トグル
-- `allow_merge_commit`, `allow_squash_merge`, `allow_rebase_merge`: マージ戦略
+- `repository`: Repository name (required)
+- `owner`: Organization name (optional, defaults to personal account)
+- `description`: Repository description
+- `visibility`: `public` or `private`
+- `default_branch`: Default branch name (usually `main`)
+- `topics`: List of repository topics/tags
+- `branch_rulesets`: Modern rule-based protection (recommended)
+- `branches_to_protect`: Legacy branch protection (backward compatibility)
+- `has_wiki`, `has_issues`, `has_projects`: Feature toggles
+- `allow_merge_commit`, `allow_squash_merge`, `allow_rebase_merge`: Merge strategies
 
-## ドキュメント構造とガイドライン
+## Documentation Structure and Guidelines
 
-### ドキュメントファイルの整理方法
+### Document File Organization
 
-- **プロジェクトルート** (`*.md`): 英語でのドキュメント
-  - `README.md`: プロジェクトの概要（英語）
-  - `CONTRIBUTING.md`: 貢献ガイドライン（英語）
-  - `CHANGELOG.md`: 変更履歴（英語）
-  - `CLAUDE.md`: AI アシスタント向けガイダンス（日本語）
+- **Project Root** (`*.md`): English documentation
+  - `README.md`: Project overview (English)
+  - `CONTRIBUTING.md`: Contribution guidelines (English)
+  - `CHANGELOG.md`: Change history (English)
+  - `CLAUDE.md`: AI assistant guidance (English)
 
-- **日本語ドキュメント** (`./docs/*.ja.md`): 日本語でのドキュメント
-  - `./docs/README.ja.md`: プロジェクトの概要（日本語）
-  - `./docs/CONTRIBUTING.ja.md`: 貢献ガイドライン（日本語）
-  - `./docs/architecture.ja.md`: アーキテクチャ詳細（日本語）
-  - `./docs/troubleshooting.ja.md`: トラブルシューティング（日本語）
+- **Japanese Documentation** (`./docs/*.ja.md`): Japanese documentation
+  - `./docs/README.ja.md`: Project overview (Japanese)
+  - `./docs/CONTRIBUTING.ja.md`: Contribution guidelines (Japanese)
+  - `./docs/architecture.ja.md`: Architecture details (Japanese)
+  - `./docs/troubleshooting.ja.md`: Troubleshooting (Japanese)
 
-### ドキュメント作成時の処理ディレクトリ
+### Processing Directory for Document Creation
 
-1. **英語ドキュメント**: プロジェクトルートに配置
-2. **日本語ドキュメント**: `./docs/` ディレクトリに `.ja.md` 拡張子で配置
-3. **多言語対応**: 必要に応じて `./docs/` 内にロケール別サブディレクトリを作成
+1. **English Documentation**: Place in project root
+2. **Japanese Documentation**: Place in `./docs/` directory with `.ja.md` extension
+3. **Multi-language Support**: Create locale-specific subdirectories within `./docs/` as needed
 
-### ドキュメント管理のベストプラクティス
+### Documentation Management Best Practices
 
-- プロジェクトの主要ドキュメントは英語を標準とする
-- 日本語ドキュメントは補完的な役割として `./docs/` 内に配置
-- ファイル名は明確で一貫性を保つ
-- 更新時は対応する言語版も同期を取る
+- Use English as the standard for main project documentation
+- Japanese documentation serves a complementary role within `./docs/`
+- Maintain clear and consistent file naming
+- Keep corresponding language versions synchronized when updating
 
-### 開発日誌
+### Development Diary
 
-- **開発日誌の記録**: 開発作業を行った際は、必ず `docs/dev-diary/YYYY-MM-DD.md` 形式で開発日誌を残すこと
-- **日誌の内容**: 実施した作業、発見した問題、解決方法、今後の課題などを記録
-- **ファイル名形式**: 日付は ISO 8601 形式（例：`2024-01-15.md`）
-- **継続的な記録**: 小さな変更でも記録を残し、プロジェクトの進捗を追跡可能にする
+- **Diary Recording**: Always create development diaries in `docs/dev-diary/YYYY-MM-DD.md` format when performing development work
+- **Diary Content**: Record completed work, discovered issues, solutions, and future tasks
+- **File Naming Format**: Use ISO 8601 date format (e.g., `2024-01-15.md`)
+- **Continuous Recording**: Record even small changes to maintain project progress tracking
 
-## 重要な指示の備忘録
+## Important Instruction Reminders
 
-求められたことを実行し、それ以上でもそれ以下でもないこと。
-目標達成に絶対必要でない限り、ファイルを作成しないこと。
-常に新しいファイルを作成するよりも既存のファイルを編集することを優先する。
-ドキュメントファイル（*.md）やREADMEファイルを積極的に作成しないこと。ユーザーから明示的に要求された場合のみドキュメントファイルを作成する。
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
 
-## リポジトリ削除時の手順
+## Repository Deletion Process
 
-- `aws-vault exec portfolio` を使用して、適切な AWS 認証情報を取得し、Terraform の tfstate からリソース・モジュール削除します。
-- `portfolio` は `~/.aws/config` で設定された SSO ロールの AWS プロファイル名です。
+- Use `aws-vault exec portfolio` to obtain appropriate AWS credentials and remove resources/modules from Terraform tfstate.
+- `portfolio` is the AWS profile name for the SSO role configured in `~/.aws/config`.
 
 ```shell
 aws-vault exec portfolio -- terraform -chdir=./terraform/src/repository state rm  module.sample-repository
@@ -282,8 +282,8 @@ Removed module.sample-repository.github_repository.this
 Successfully removed 4 resource instance(s).
 ```
 
-- 関連ソースコード `terraform/src/repository/sample-repository.tf` を削除します。
-- GitHub リポジトリを削除します。
+- Delete the related source code `terraform/src/repository/sample-repository.tf`.
+- Delete the GitHub repository.
 
 ```shell
 gh repo delete tqer39/sample-repository --confirm
