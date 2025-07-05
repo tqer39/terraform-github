@@ -256,10 +256,21 @@ Key parameters for the repository module:
 
 ### Development Diary
 
-- **Diary Recording**: Always create development diaries in `docs/dev-diary/YYYY-MM-DD.md` format when performing development work
-- **Diary Content**: Record completed work, discovered issues, solutions, and future tasks
-- **File Naming Format**: Use ISO 8601 date format (e.g., `2024-01-15.md`)
-- **Continuous Recording**: Record even small changes to maintain project progress tracking
+- **Purpose**: Record major changes and their rationale, document technical decisions and implementation details, track issues encountered and solutions, and provide context for future developers
+- **Creation Rules**:
+  - Create a new diary entry when there are uncommitted changes or undocumented work from previous commits
+  - File naming follows format: `docs/dev-diary/YYYY-MM-DD.md`
+  - Automatically create a file if one for today's date doesn't exist
+  - Document all development work since the last diary entry
+- **Format Requirements**: Each diary entry should include:
+  - Overview of work
+  - Implementation details
+  - Test results
+  - Issues and solutions
+  - Future considerations
+  - Developer's mood and reflections
+  - Potential refactoring opportunities
+- **Timing**: Create the diary entry at the end of a development session or when requested
 
 ## Important Instruction Reminders
 
