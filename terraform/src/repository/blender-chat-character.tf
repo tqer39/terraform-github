@@ -20,7 +20,7 @@ module "blender_chat_character" {
     "real-time-animation"
   ]
   description  = "Interactive 3D character animation system with chat interface using Blender"
-  has_projects = true
+  has_projects = false
   has_issues   = true
   has_wiki     = false
   branch_rulesets = {
