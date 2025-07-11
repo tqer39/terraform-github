@@ -2,8 +2,8 @@
 
 # $1: GitHub owner name
 
-# Get repository list
-repos=$(gh repo list "$1" --json name -q '.[].name')
+# Get repository list (default limit is 30, so increase to handle many repos)
+repos=$(gh repo list "$1" --limit 1000 --json name -q '.[].name')
 echo "owner: $1"
 
 # Set secrets in repositories
