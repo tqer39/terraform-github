@@ -10,13 +10,6 @@
     ".pre-commit-config.yaml",
     "pyproject.toml"
   ],
-  "dictionaryDefinitions": [
-    {
-      "name": "custom-words",
-      "path": "./.cspell/custom-words.txt",
-      "addWords": true
-    }
-  ],
   "words": [
     "autobuild",
     "Autobuild",
@@ -31,6 +24,7 @@
     "codecov",
     "CODEOWNERS",
     "codeql",
+    "comfyui",
     "concat",
     "deployments",
     "FASTMCP",
