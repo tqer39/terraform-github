@@ -17,6 +17,9 @@
       "addWords": true
     }
   ],
+  "dictionaries": [
+    "custom-words"
+  ],
   "words": [
     "autobuild",
     "Autobuild",
