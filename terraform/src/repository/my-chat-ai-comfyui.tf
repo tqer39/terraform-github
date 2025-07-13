@@ -7,7 +7,6 @@ module "my-chat-ai-comfyui" {
   enable_owner_bypass = true
   topics              = ["comfyui", "chat-ai"]
   description         = "Integrate chat AI features with ComfyUI"
-  visibility          = "private"
   branch_rulesets = {
     "main" = {
       enforcement = "active"
