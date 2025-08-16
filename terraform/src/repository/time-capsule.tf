@@ -1,8 +1,3 @@
-moved {
-  from = module.time-capsule.github_actions_repository_permissions.this
-  to   = module.time-capsule.github_actions_repository_permissions.this[0]
-}
-
 module "time-capsule" {
   source              = "../../modules/repository"
   github_token        = var.github_token
