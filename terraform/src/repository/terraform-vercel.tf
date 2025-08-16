@@ -1,8 +1,3 @@
-moved {
-  from = module.terraform-vercel.github_actions_repository_permissions.this
-  to   = module.terraform-vercel.github_actions_repository_permissions.this[0]
-}
-
 module "terraform-vercel" {
   source              = "../../modules/repository"
   github_token        = var.github_token
