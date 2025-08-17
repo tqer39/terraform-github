@@ -8,6 +8,7 @@ module "boilerplate-base" {
   enable_owner_bypass = true
   topics              = ["boilerplate"]
   description         = "A base boilerplate template for projects"
+  is_template         = true
 
   branch_rulesets = {
     "main" = {
