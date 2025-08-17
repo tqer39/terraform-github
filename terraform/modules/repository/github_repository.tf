@@ -13,6 +13,7 @@ resource "github_repository" "this" {
   delete_branch_on_merge = var.delete_branch_on_merge
   vulnerability_alerts   = var.vulnerability_alerts
   archived               = var.archived
+  is_template            = var.is_template
 
   lifecycle {
     ignore_changes = [
