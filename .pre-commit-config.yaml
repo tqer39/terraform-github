@@ -50,12 +50,12 @@ repos:
         entry: textlint
         require_serial: false
         additional_dependencies:
-          - 'textlint@15.2.1'
+          - 'textlint@15.2.2'
           - 'textlint-filter-rule-allowlist@4.0.0'
           - 'textlint-rule-ja-no-space-between-full-width@2.4.2'
           - 'textlint-filter-rule-comments@1.2.2'
           - 'textlint-rule-no-dropping-the-ra@3.0.0'
-          - 'textlint-rule-terminology@5.2.14'
+          - 'textlint-rule-terminology@5.2.15'
 
   - repo: https://github.com/koalaman/shellcheck-precommit
     rev: v0.11.0
@@ -76,7 +76,7 @@ repos:
       - id: actionlint-docker
 
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 41.60.3
+    rev: 41.82.6
     hooks:
       - id: renovate-config-validator
         files: renovate.json

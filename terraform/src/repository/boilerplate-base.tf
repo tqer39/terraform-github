@@ -1,12 +1,15 @@
-module "terraform-vercel" {
-  source              = "../../modules/repository"
-  github_token        = var.github_token
-  repository          = "terraform-vercel"
+module "boilerplate-base" {
+  source       = "../../modules/repository"
+  github_token = var.github_token
+
+  repository          = "boilerplate-base"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["terraform", "vercel"]
-  description         = "Configure Vercel resources with Terraform."
+  topics              = ["boilerplate"]
+  description         = "A base boilerplate template for projects"
+  is_template         = true
+
   branch_rulesets = {
     "main" = {
       enforcement = "active"

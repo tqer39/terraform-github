@@ -1,8 +1,3 @@
-moved {
-  from = module.update-license-year.github_actions_repository_permissions.this
-  to   = module.update-license-year.github_actions_repository_permissions.this[0]
-}
-
 module "update-license-year" {
   source              = "../../modules/repository"
   github_token        = var.github_token

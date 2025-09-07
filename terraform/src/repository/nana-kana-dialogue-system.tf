@@ -1,8 +1,3 @@
-moved {
-  from = module.nana-kana-dialogue-system.github_actions_repository_permissions.this
-  to   = module.nana-kana-dialogue-system.github_actions_repository_permissions.this[0]
-}
-
 module "nana_kana_dialogue_system" {
   source         = "../../modules/repository"
   github_token   = var.github_token
