@@ -1,7 +1,7 @@
 resource "github_branch" "this" {
   for_each = { for k, v in var.branches_to_protect : k => v if k != "main" }
 
-  repository = github_repository.this.name
+  repository = local.repository_name
   branch     = each.key
 
   lifecycle {
@@ -10,5 +10,6 @@ resource "github_branch" "this" {
 
   depends_on = [
     github_repository.this,
+    github_repository.this_from_template,
   ]
 }

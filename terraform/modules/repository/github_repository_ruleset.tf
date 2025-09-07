@@ -1,6 +1,6 @@
 resource "github_repository_ruleset" "this" {
   for_each    = var.branch_rulesets
-  repository  = github_repository.this.name
+  repository  = local.repository_name
   name        = each.key
   target      = try(each.value.target, "branch")
   enforcement = try(each.value.enforcement, "active")
@@ -94,5 +94,6 @@ resource "github_repository_ruleset" "this" {
 
   depends_on = [
     github_repository.this,
+    github_repository.this_from_template,
   ]
 }

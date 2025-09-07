@@ -160,3 +160,22 @@ variable "is_template" {
   description = "(Optional) Whether the repository is a template repository."
   default     = false
 }
+
+# Template repository settings (for creating a repo from a template)
+variable "template_owner" {
+  type        = string
+  description = "(Optional) Owner of the template repository. Defaults to `owner` when null."
+  default     = null
+}
+
+variable "template_repository" {
+  type        = string
+  description = "(Optional) Name of the template repository to generate from. When set, this repository will be created from that template."
+  default     = null
+}
+
+variable "template_include_all_branches" {
+  type        = bool
+  description = "(Optional) When creating from template, include all branches instead of just the default branch."
+  default     = false
+}

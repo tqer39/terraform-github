@@ -1,5 +1,5 @@
 resource "github_branch_protection" "this" {
-  repository_id           = github_repository.this.name
+  repository_id           = local.repository_name
   for_each                = var.branches_to_protect
   pattern                 = each.key
   enforce_admins          = try(each.value.enforce_admins, false)
@@ -31,5 +31,6 @@ resource "github_branch_protection" "this" {
 
   depends_on = [
     github_repository.this,
+    github_repository.this_from_template,
   ]
 }

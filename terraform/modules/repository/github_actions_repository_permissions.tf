@@ -1,7 +1,7 @@
 resource "github_actions_repository_permissions" "this" {
   count = var.configure_actions_permissions ? 1 : 0
 
-  repository      = github_repository.this.name
+  repository      = local.repository_name
   allowed_actions = var.allowed_actions
 
   dynamic "allowed_actions_config" {
@@ -15,5 +15,6 @@ resource "github_actions_repository_permissions" "this" {
 
   depends_on = [
     github_repository.this,
+    github_repository.this_from_template,
   ]
 }
