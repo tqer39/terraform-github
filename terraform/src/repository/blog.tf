@@ -1,8 +1,3 @@
-moved {
-  from = module.blog.github_actions_repository_permissions.this
-  to   = module.blog.github_actions_repository_permissions.this[0]
-}
-
 module "blog" {
   source              = "../../modules/repository"
   github_token        = var.github_token

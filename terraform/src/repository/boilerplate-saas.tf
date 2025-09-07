@@ -1,8 +1,3 @@
-moved {
-  from = module.boilerplate-saas.github_actions_repository_permissions.this
-  to   = module.boilerplate-saas.github_actions_repository_permissions.this[0]
-}
-
 module "boilerplate-saas" {
   source       = "../../modules/repository"
   github_token = var.github_token

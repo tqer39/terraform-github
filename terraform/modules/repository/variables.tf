@@ -154,3 +154,9 @@ variable "enable_owner_bypass" {
   description = "(Optional) Whether to allow repository admins to bypass branch protection rules."
   default     = false
 }
+
+variable "is_template" {
+  type        = bool
+  description = "(Optional) Whether the repository is a template repository."
+  default     = false
+}

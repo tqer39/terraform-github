@@ -1,8 +1,3 @@
-moved {
-  from = module.blender-chat-character.github_actions_repository_permissions.this
-  to   = module.blender-chat-character.github_actions_repository_permissions.this[0]
-}
-
 module "blender_chat_character" {
   source              = "../../modules/repository"
   github_token        = var.github_token
