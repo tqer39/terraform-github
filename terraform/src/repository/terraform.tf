@@ -204,3 +204,85 @@ moved {
   from = module.private_dotfiles.github_branch_protection.this["main"]
   to   = module.private-dotfiles.github_branch_protection.this["main"]
 }
+
+# Move addresses after splitting github_repository into count-based resources
+moved {
+  from = module.anime-tweet-bot.github_repository.this
+  to   = module.anime-tweet-bot.github_repository.this[0]
+}
+moved {
+  from = module.blender_chat_character.github_repository.this
+  to   = module.blender_chat_character.github_repository.this[0]
+}
+moved {
+  from = module.blog.github_repository.this
+  to   = module.blog.github_repository.this[0]
+}
+moved {
+  from = module.boilerplate-base.github_repository.this
+  to   = module.boilerplate-base.github_repository.this[0]
+}
+moved {
+  from = module.boilerplate-saas.github_repository.this
+  to   = module.boilerplate-saas.github_repository.this[0]
+}
+moved {
+  from = module.dotfiles.github_repository.this
+  to   = module.dotfiles.github_repository.this[0]
+}
+moved {
+  from = module.local-workspace-provisioning.github_repository.this
+  to   = module.local-workspace-provisioning.github_repository.this[0]
+}
+moved {
+  from = module.my-chat-ai-comfyui.github_repository.this
+  to   = module.my-chat-ai-comfyui.github_repository.this[0]
+}
+moved {
+  from = module.nana_kana_dialogue_system.github_repository.this
+  to   = module.nana_kana_dialogue_system.github_repository.this[0]
+}
+moved {
+  from = module.notifications.github_repository.this
+  to   = module.notifications.github_repository.this[0]
+}
+moved {
+  from = module.obsidian-vault.github_repository.this
+  to   = module.obsidian-vault.github_repository.this[0]
+}
+moved {
+  from = module.openai-generate-pr-description.github_repository.this
+  to   = module.openai-generate-pr-description.github_repository.this[0]
+}
+moved {
+  from = module.private-dotfiles.github_repository.this
+  to   = module.private-dotfiles.github_repository.this[0]
+}
+moved {
+  from = module.renovate-config.github_repository.this
+  to   = module.renovate-config.github_repository.this[0]
+}
+moved {
+  from = module.terraform-aws.github_repository.this
+  to   = module.terraform-aws.github_repository.this[0]
+}
+moved {
+  from = module.terraform-github.github_repository.this
+  to   = module.terraform-github.github_repository.this[0]
+}
+moved {
+  from = module.terraform-vercel.github_repository.this
+  to   = module.terraform-vercel.github_repository.this[0]
+}
+moved {
+  from = module.time-capsule.github_repository.this
+  to   = module.time-capsule.github_repository.this[0]
+}
+moved {
+  from = module.tqer39.github_repository.this
+  to   = module.tqer39.github_repository.this[0]
+}
+moved {
+  from = module.update-license-year.github_repository.this
+  to   = module.update-license-year.github_repository.this[0]
+}
