@@ -1,8 +1,8 @@
-module "ed-games" {
+module "mathquest" {
   source       = "../../modules/repository"
   github_token = var.github_token
 
-  repository          = "ed-games"
+  repository          = "mathquest"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
