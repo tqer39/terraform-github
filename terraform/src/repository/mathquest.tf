@@ -31,6 +31,14 @@ module "mathquest" {
           required_approving_review_count   = 1
           required_review_thread_resolution = true
         }
+        required_status_checks = {
+          required_check = [
+            {
+              context = "pre-commit"
+            }
+          ]
+          strict_required_status_checks_policy = true
+        }
       }
     }
   }
