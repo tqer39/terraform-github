@@ -27,16 +27,28 @@ resource "github_repository_ruleset" "this" {
 
     # Require status checks
     dynamic "required_status_checks" {
-      for_each = try(each.value.rules.required_status_checks, null) != null && length(try(each.value.rules.required_status_checks.required_checks, [])) > 0 ? [each.value.rules.required_status_checks] : []
+      for_each = try(each.value.rules.required_status_checks, null) != null && length(try(
+        each.value.rules.required_status_checks.required_checks,
+        each.value.rules.required_status_checks.required_check,
+        []
+      )) > 0 ? [each.value.rules.required_status_checks] : []
       content {
         dynamic "required_check" {
-          for_each = try(required_status_checks.value.required_checks, [])
+          for_each = try(
+            required_status_checks.value.required_checks,
+            required_status_checks.value.required_check,
+            []
+          )
           content {
             context        = required_check.value.context
             integration_id = try(required_check.value.integration_id, null)
           }
         }
-        strict_required_status_checks_policy = try(required_status_checks.value.strict, true)
+        strict_required_status_checks_policy = try(
+          required_status_checks.value.strict,
+          required_status_checks.value.strict_required_status_checks_policy,
+          true
+        )
       }
     }
 
