@@ -34,7 +34,7 @@ module "mathquest" {
         required_status_checks = {
           required_check = [
             {
-              context = "pre-commit"
+              context = "prek"
             }
           ]
           strict_required_status_checks_policy = true
