@@ -206,16 +206,16 @@ moved {
 }
 
 moved {
-  from = module.ed-games.github_repository.this_from_template[0]
-  to   = module.mathquest.github_repository.this_from_template[0]
+  from = module.mathquest.github_repository.this_from_template[0]
+  to   = module.edu-quest.github_repository.this_from_template[0]
 }
 moved {
-  from = module.ed-games.github_branch_default.this
-  to   = module.mathquest.github_branch_default.this
+  from = module.mathquest.github_branch_default.this
+  to   = module.edu-quest.github_branch_default.this
 }
 moved {
-  from = module.ed-games.github_repository_ruleset.this["main"]
-  to   = module.mathquest.github_repository_ruleset.this["main"]
+  from = module.mathquest.github_repository_ruleset.this["main"]
+  to   = module.edu-quest.github_repository_ruleset.this["main"]
 }
 
 # Move addresses after splitting github_repository into count-based resources

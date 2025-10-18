@@ -1,8 +1,8 @@
-module "mathquest" {
+module "edu-quest" {
   source       = "../../modules/repository"
   github_token = var.github_token
 
-  repository          = "mathquest"
+  repository          = "edu-quest"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
