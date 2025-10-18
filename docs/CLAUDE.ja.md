@@ -30,7 +30,7 @@
 - **`.github/workflows/`**: GitHub Actionsワークフロー
   - `terraform-github.yml`: plan/applyのメインワークフロー（PRトリガー）
   - `terraform-import.yml`: 既存リポジトリのインポート
-  - `pre-commit.yml`: コード品質チェック
+  - `prek.yml`: コード品質チェック
 
 - **`.github/actions/`**: 再利用可能なアクションコンポーネント
   - `setup-terraform`: 初期化とフォーマットチェック
@@ -69,15 +69,15 @@ terraform import module.<module_name>.github_branch_protection.this[\"<branch_na
 ### コード品質
 
 ```bash
-# すべてのpre-commitフックを実行
-pre-commit run --all-files
+# すべてのprekフックを実行
+prek run --all-files
 
 # 特定のフックを実行
-pre-commit run terraform_fmt --all-files
-pre-commit run terraform_validate --all-files
-pre-commit run terraform_tflint --all-files
-pre-commit run yamllint --all-files
-pre-commit run markdownlint --all-files
+prek run terraform_fmt --all-files
+prek run terraform_validate --all-files
+prek run terraform_tflint --all-files
+prek run yamllint --all-files
+prek run markdownlint --all-files
 
 # モジュールサポート付きTFLint
 tflint --init

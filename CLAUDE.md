@@ -30,7 +30,7 @@ The codebase clearly separates reusable modules from repository-specific configu
 - **`.github/workflows/`**: GitHub Actions workflows
   - `terraform-github.yml`: Main workflow for plan/apply (PR-triggered)
   - `terraform-import.yml`: Import existing repositories
-  - `pre-commit.yml`: Code quality checks
+  - `prek.yml`: Code quality checks
 
 - **`.github/actions/`**: Reusable action components
   - `setup-terraform`: Initialization and format checking
@@ -69,15 +69,15 @@ terraform import module.<module_name>.github_branch_protection.this[\"<branch_na
 ### Code Quality
 
 ```bash
-# Run all pre-commit hooks
-pre-commit run --all-files
+# Run all prek hooks
+prek run --all-files
 
 # Run specific hooks
-pre-commit run terraform_fmt --all-files
-pre-commit run terraform_validate --all-files
-pre-commit run terraform_tflint --all-files
-pre-commit run yamllint --all-files
-pre-commit run markdownlint --all-files
+prek run terraform_fmt --all-files
+prek run terraform_validate --all-files
+prek run terraform_tflint --all-files
+prek run yamllint --all-files
+prek run markdownlint --all-files
 
 # TFLint with module support
 tflint --init
