@@ -26,7 +26,7 @@ module "terraform-github" {
         required_status_checks = {
           required_check = [
             {
-              context = "pre-commit"
+              context = "prek"
             },
             {
               context = "terraform-github"
