@@ -82,6 +82,6 @@ repos:
         files: renovate.json
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.101.1
+    rev: v1.103.0
     hooks:
       - id: terraform_fmt
