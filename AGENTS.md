@@ -6,14 +6,14 @@
 
 - `terraform/src/repository/`: 実体のスタック定義（各リポジトリ用の `*.tf` と `main.tf`）。
 - `terraform/modules/repository/`: 再利用モジュール（ブランチ、保護、ルールセット等）。
-- `.github/workflows/`: CI/CD（plan/apply、import、renovate、pre-commit）。
+- `.github/workflows/`: CI/CD（plan/apply、import、renovate、prek）。
 - `scripts/`: 補助スクリプト（例: `scripts/set-common-github-secrets.sh`）。
 - `docs/`: 運用ドキュメント。
 
 ## ビルド / テスト / 開発コマンド
 
-- 事前準備: `pre-commit install`
-- フォーマット＆静的チェック: `pre-commit run -a`
+- 事前準備: `prek install`
+- フォーマット＆静的チェック: `prek run --all-files`
 - Terraform 初期化: `terraform -chdir=terraform/src/repository init -reconfigure`
 - 検証: `terraform -chdir=terraform/src/repository validate`
 - 変更確認: `terraform -chdir=terraform/src/repository plan`
@@ -21,7 +21,7 @@
 
 ## コーディング規約 / 命名
 
-- Terraform(HCL): インデント2スペース、`terraform fmt` を厳守（pre-commit で自動）。
+- Terraform(HCL): インデント2スペース、`terraform fmt` を厳守（prek で自動）。
 - ディレクトリ名/モジュール名: kebab-case（例: `local-workspace-provisioning`）。
 - 変数/リソース名: snake_case（例: `repository_ruleset`）。
 - ファイル分割: 機能単位（例: `variables.tf`, `provider.tf`, `main.tf`）。
