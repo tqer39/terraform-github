@@ -6,7 +6,19 @@ module "edu-quest" {
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  description         = "Repository generated from boilerplate-base template"
+  description         = "MathQuest is an elementary-school math learning platform built on a Hono SSR app for Cloudflare Workers."
+  topics              = [
+    "cloudflare-workers",
+    "hono",
+    "ssr",
+    "elementary-math",
+    "education",
+    "pnpm",
+    "terraform",
+    "monorepo",
+    "drizzle-orm",
+    "wrangler",
+  ]
   # 新規作成時の Plan で 404 を避けるため、最初は false 推奨
   configure_actions_permissions = false
 
