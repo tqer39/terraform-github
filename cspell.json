@@ -30,6 +30,8 @@
     "fastapi",
     "FASTMCP",
     "getsentry",
+    "hono",
+    "Hono",
     "itkq",
     "kentaro",
     "linuxbrew",

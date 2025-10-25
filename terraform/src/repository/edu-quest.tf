@@ -7,7 +7,7 @@ module "edu-quest" {
   default_branch      = "main"
   enable_owner_bypass = true
   description         = "MathQuest is an elementary-school math learning platform built on a Hono SSR app for Cloudflare Workers."
-  topics              = [
+  topics = [
     "cloudflare-workers",
     "hono",
     "ssr",
