@@ -6,7 +6,7 @@ module "edu-quest" {
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  description         = "MathQuest is an elementary-school math learning platform built on a Hono SSR app for Cloudflare Workers."
+  description         = "Educational platform for elementary students featuring multiple learning quests (Math, Kanji, Clock) built with Hono SSR on Cloudflare Workers."
   topics = [
     "cloudflare-workers",
     "hono",
