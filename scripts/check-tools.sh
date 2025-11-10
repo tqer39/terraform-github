@@ -75,15 +75,15 @@ echo ""
 
 echo -e "${BLUE}Terraform Tools:${NC}"
 check_command "terraform" || ((missing_tools++))
-check_command "tflint" || ((missing_tools++))
+check_command "tflint" "false"
 echo ""
 
 echo -e "${BLUE}AWS Tools:${NC}"
 check_command "aws-vault" "false"
 echo ""
 
-echo -e "${BLUE}GitHub Tools:${NC}"
-check_command "gh" || ((missing_tools++))
+echo -e "${BLUE}GitHub Tools (optional):${NC}"
+check_command "gh" "false"
 echo ""
 
 echo -e "${BLUE}Code Quality Tools:${NC}"

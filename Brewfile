@@ -1,29 +1,18 @@
 # Brewfile for terraform-github development environment
 # Install with: brew bundle install
+# Note: Terraform is managed by mise
 
 # Taps
 tap "j178/tap"
 
-# Task runner
-brew "just"
+# Core development tools
+brew "mise" # Version manager for Terraform and other tools
+brew "just" # Command runner and task automation
+brew "git" # Version control system
+brew "j178/tap/prek" # Git hooks framework
+brew "rulesync" # Synchronize AI assistant rules
+brew "aws-vault" # AWS credential management
 
-# Pre-commit hook manager
-brew "j178/tap/prek"
-
-# Version manager (manages Terraform and other tools)
-brew "mise"
-
-# AI assistant rule synchronization
-brew "rulesync"
-
-# Terraform tools
-brew "tflint"
-
-# AWS tools
-brew "aws-vault"
-
-# GitHub CLI
-brew "gh"
-
-# Git and shell utilities
-brew "git"
+# Optional: Additional useful tools (uncomment if needed)
+# brew "gh" # GitHub CLI
+# brew "tflint" # Terraform linter

@@ -105,10 +105,11 @@ update-brew:
  @brew bundle install
  @brew upgrade
 
-# Show Terraform version
+# Show tool versions
 version:
  @terraform version
- @tflint --version
+ @mise --version
+ @just --version
 
 # Run rulesync with passthrough args
 rulesync args='':
