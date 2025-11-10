@@ -40,26 +40,39 @@ The codebase clearly separates reusable modules from repository-specific configu
 
 ## Common Commands
 
+### Initial Setup
+
+```bash
+# Install all required tools
+make bootstrap
+
+# Setup development environment
+just setup
+
+# Verify installation
+just check-tools
+```
+
 ### Terraform Operations
 
 ```bash
 # Format all Terraform files
-terraform fmt -recursive
+just fmt
 
-# Initialize Terraform (must be run in terraform/src/repository)
-cd terraform/src/repository
-terraform init -upgrade
+# Initialize Terraform
+just init
 
 # Validate configuration
-terraform validate
+just validate
 
 # Plan changes
-terraform plan
+just plan
 
-# Apply changes (primarily done via GitHub Actions)
-terraform apply -auto-approve
+# Apply changes (primarily done via GitHub Actions, use with caution locally)
+just apply
 
 # Import existing repository resources
+cd terraform/src/repository
 terraform import module.<module_name>.github_repository.this <repo_name>
 terraform import module.<module_name>.github_branch_default.this <repo_name>
 terraform import module.<module_name>.github_actions_repository_permissions.this <repo_name>
@@ -70,18 +83,32 @@ terraform import module.<module_name>.github_branch_protection.this[\"<branch_na
 
 ```bash
 # Run all prek hooks
-prek run --all-files
+just lint
 
 # Run specific hooks
-prek run terraform_fmt --all-files
-prek run terraform_validate --all-files
-prek run terraform_tflint --all-files
-prek run yamllint --all-files
-prek run markdownlint --all-files
+just lint-hook terraform_fmt
+just lint-hook terraform_validate
+just lint-hook terraform_tflint
+just lint-hook yamllint
+just lint-hook markdownlint
 
-# TFLint with module support
-tflint --init
-tflint --chdir=terraform/src/repository --call-module-type=all
+# Fix common issues
+just fix
+
+# Format staged files
+just fmt-staged
+```
+
+### Git Worktree
+
+```bash
+# Interactive worktree setup
+just worktree-setup
+
+# Manual worktree management
+git worktree add ../terraform-github-<branch-name> -b <branch-name>
+git worktree list
+git worktree remove ../terraform-github-<branch-name>
 ```
 
 ### Repository Management
@@ -89,6 +116,28 @@ tflint --chdir=terraform/src/repository --call-module-type=all
 ```bash
 # Set common secrets across repositories
 ./scripts/set-common-github-secrets.sh <github_owner>
+```
+
+### Maintenance
+
+```bash
+# Clean Terraform temporary files
+just clean
+
+# Show versions
+just version
+
+# Show mise-managed tool versions
+just status
+
+# Install tools from .tool-versions
+just install
+
+# Update mise-managed tools
+just update
+
+# Update brew packages
+just update-brew
 ```
 
 ## Adding New Repositories
