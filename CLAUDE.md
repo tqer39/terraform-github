@@ -140,6 +140,29 @@ just update
 just update-brew
 ```
 
+### AI Assistant Rules Management
+
+This project uses [rulesync](https://github.com/rulesync/rulesync) to manage AI assistant configuration files. Rules are stored in `.rulesync/rules/` and synchronized to various AI assistant config files.
+
+```bash
+# Synchronize rules to all configured targets
+just rulesync sync
+
+# Check rule status
+just rulesync status
+
+# Validate rules
+just rulesync validate
+```
+
+Rule files are located in `.rulesync/rules/` and are automatically synced to:
+
+- `CLAUDE.md` - Claude Code configuration
+- `.cursorrules` - Cursor IDE configuration
+- `.github/copilot-instructions.md` - GitHub Copilot configuration
+- `.codex/instructions.md` - OpenAI Codex configuration
+- `.gemini/instructions.md` - Google Gemini configuration
+
 ## Adding New Repositories
 
 1. Create a new `.tf` file in `terraform/src/repository/` (e.g., `my-new-repo.tf`)

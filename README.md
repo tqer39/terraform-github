@@ -21,6 +21,7 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
    This will install:
    - [just](https://github.com/casey/just) - Command runner
    - [mise](https://mise.jdx.dev/) - Universal tool version manager
+   - [rulesync](https://github.com/rulesync/rulesync) - AI assistant rules synchronization
    - [tflint](https://github.com/terraform-linters/tflint) - Terraform linter
    - [prek](https://prek.j178.dev/) - Pre-commit hook manager
    - [GitHub CLI](https://cli.github.com/)
@@ -114,6 +115,7 @@ Common tasks:
 - `just status` - Show mise-managed tool versions
 - `just install` - Install tools from .tool-versions
 - `just update` - Update mise-managed tools
+- `just rulesync <args>` - Synchronize AI assistant rules across config files
 
 ## Deployment Flow
 

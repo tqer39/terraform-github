@@ -1,0 +1,60 @@
+---
+# Rulesync configuration for terraform-github project
+
+# Source directory containing rule files
+rules_dir: .rulesync/rules
+
+# Target configurations for different AI assistants
+targets:
+  # Claude Code (claude.ai/code)
+  - name: claude-code
+    type: markdown
+    output: CLAUDE.md
+    template: |
+      # CLAUDE.md
+
+      This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+      {{content}}
+
+  # Cursor IDE
+  - name: cursor
+    type: markdown
+    output: .cursorrules
+    template: |
+      # Cursor Rules
+
+      {{content}}
+
+  # GitHub Copilot
+  - name: copilot
+    type: markdown
+    output: .github/copilot-instructions.md
+    template: |
+      # GitHub Copilot Instructions
+
+      {{content}}
+
+  # OpenAI Codex
+  - name: codex
+    type: markdown
+    output: .codex/instructions.md
+    template: |
+      # Codex Instructions
+
+      {{content}}
+
+  # Google Gemini
+  - name: gemini
+    type: markdown
+    output: .gemini/instructions.md
+    template: |
+      # Gemini Instructions
+
+      {{content}}
+
+# Optional: Specify which rules to include/exclude
+# include:
+#   - "*.md"
+# exclude:
+#   - "drafts/*"
