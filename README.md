@@ -19,12 +19,11 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
    ```
 
    This will install:
-   - [just](https://github.com/casey/just) - Command runner
    - [mise](https://mise.jdx.dev/) - Universal tool version manager
+   - [just](https://github.com/casey/just) - Command runner
+   - [git](https://git-scm.com/) - Version control system
+   - [prek](https://prek.j178.dev/) - Git hooks framework
    - [rulesync](https://github.com/rulesync/rulesync) - AI assistant rules synchronization
-   - [tflint](https://github.com/terraform-linters/tflint) - Terraform linter
-   - [prek](https://prek.j178.dev/) - Pre-commit hook manager
-   - [GitHub CLI](https://cli.github.com/)
    - [aws-vault](https://github.com/99designs/aws-vault) - AWS credential management
 
 2. Restart your terminal or reload your shell (for Homebrew PATH)
@@ -111,7 +110,7 @@ Common tasks:
 - `just plan` - Run Terraform plan
 - `just apply` - Run Terraform apply (use with caution)
 - `just clean` - Clean Terraform temporary files
-- `just version` - Show Terraform and tflint versions
+- `just version` - Show tool versions (Terraform, mise, just)
 - `just status` - Show mise-managed tool versions
 - `just install` - Install tools from .tool-versions
 - `just update` - Update mise-managed tools
