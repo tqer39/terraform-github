@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 10
     if: startsWith(github.head_ref, 'renovate/')
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Get current Terraform version
         run: echo "TERRAFORM_VERSION=$(grep terraform .tool-versions | cut -d' ' -f2)" >> "$GITHUB_ENV"
