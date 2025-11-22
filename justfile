@@ -111,16 +111,6 @@ version:
  @mise --version
  @just --version
 
-# Run rulesync with passthrough args
-rulesync args='':
- @if command -v rulesync >/dev/null 2>&1; then \
-   echo "Running: rulesync {{args}}"; \
-   rulesync {{args}}; \
- else \
-   echo "⚠ rulesync not found. Please run 'make bootstrap' or 'brew install rulesync' first."; \
-   exit 1; \
- fi
-
 # Git worktree helpers
 [private]
 worktree-add branch:
