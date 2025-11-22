@@ -321,12 +321,65 @@ Key parameters for the repository module:
   - Potential refactoring opportunities
 - **Timing**: Create the diary entry at the end of a development session or when requested
 
+## Coding Standards and Conventions
+
+### Terraform/HCL Style
+
+- Use 2-space indentation
+- Always run `terraform fmt` before committing (enforced by prek hooks)
+- Follow HashiCorp's official style guide
+
+### Naming Conventions
+
+- **Directory/Module names**: Use kebab-case (e.g., `local-workspace-provisioning`)
+- **Variable/Resource names**: Use snake_case (e.g., `repository_ruleset`)
+- **File organization**: Split by functionality (e.g., `variables.tf`, `provider.tf`, `main.tf`)
+
+### File Structure
+
+- `terraform/src/repository/`: Stack definitions (one `*.tf` file per repository)
+- `terraform/modules/repository/`: Reusable modules for repository management
+
+## Testing and Validation
+
+- Primary "tests" are `terraform validate` and `terraform plan`
+- PRs must include a summary of plan output (additions/changes/destructions)
+- Destructive changes must be clearly marked with the application method (GitHub Actions or manual)
+- Validation command: `terraform -chdir=terraform/src/repository validate`
+- Plan command: `terraform -chdir=terraform/src/repository plan`
+- With AWS authentication: `aws-vault exec portfolio -- terraform -chdir=terraform/src/repository plan`
+
+## Commit and PR Guidelines
+
+- Follow **Conventional Commits** format: `feat:`, `fix:`, `chore:`, `refactor:`, etc.
+- PRs must include:
+  - Purpose and scope
+  - Affected repositories/rules
+  - Related issues
+  - Summary of `terraform plan` output
+- Keep changes small and focused
+- No screenshots needed (use plan logs instead)
+
 ## Important Instruction Reminders
 
-Do what has been asked; nothing more, nothing less.
-NEVER create files unless they're absolutely necessary for achieving your goal.
-ALWAYS prefer editing an existing file to creating a new one.
-NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+### General Guidelines
+
+- Do what has been asked; nothing more, nothing less
+- NEVER create files unless they're absolutely necessary for achieving your goal
+- ALWAYS prefer editing an existing file to creating a new one
+- NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User
+
+### Agent-Specific Guidelines
+
+- Do not introduce unrelated changes or formatting differences
+- Strictly follow existing layout and naming conventions
+- All changes in `terraform/src/repository/` must be validated with `terraform plan`
+- Include plan summary in PR descriptions
+- When making Terraform changes:
+  1. Read existing code first to understand patterns
+  2. Make minimal, focused changes
+  3. Run `terraform validate` and `terraform plan`
+  4. Document the changes and their impact
 
 ## Repository Deletion Process
 
