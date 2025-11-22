@@ -10,7 +10,6 @@ brew "mise" # Version manager for Terraform and other tools
 brew "just" # Command runner and task automation
 brew "git" # Version control system
 brew "j178/tap/prek" # Git hooks framework
-brew "rulesync" # Synchronize AI assistant rules
 brew "aws-vault" # AWS credential management
 
 # Optional: Additional useful tools (uncomment if needed)

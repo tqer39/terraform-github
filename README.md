@@ -23,7 +23,6 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
    - [just](https://github.com/casey/just) - Command runner
    - [git](https://git-scm.com/) - Version control system
    - [prek](https://prek.j178.dev/) - Git hooks framework
-   - [rulesync](https://github.com/rulesync/rulesync) - AI assistant rules synchronization
    - [aws-vault](https://github.com/99designs/aws-vault) - AWS credential management
 
 2. Restart your terminal or reload your shell (for Homebrew PATH)
@@ -114,7 +113,6 @@ Common tasks:
 - `just status` - Show mise-managed tool versions
 - `just install` - Install tools from .tool-versions
 - `just update` - Update mise-managed tools
-- `just rulesync <args>` - Synchronize AI assistant rules across config files
 
 ## Deployment Flow
 
