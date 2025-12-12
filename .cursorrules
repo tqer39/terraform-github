@@ -1,0 +1,32 @@
+# Cursor Rules for terraform-github
+
+## プロジェクト概要
+- Terraform で GitHub リポジトリを管理する IaC リポジトリ。共通モジュールは `terraform/modules/repository/`、各リポジトリ定義は `terraform/src/repository/` に配置。S3+DynamoDB でステート管理。
+- CI/CD は `.github/workflows/terraform-github.yml`（plan/apply）、`terraform-import.yml`（既存リポジトリ import）、`prek.yml`（品質チェック）で構成。
+
+## 作業方針
+- 求められたことだけを実行し、変更は最小限に保つ。不要なリファクタやフォーマット変更を避ける。
+- 可能な限り既存ファイルを編集し、新規ファイルは目的達成に必須な場合のみ作成する（ドキュメント作成はユーザーが明示要求したときのみ）。
+- 既存のレイアウト・命名規則に従う。出力や説明は基本的に日本語。
+
+## Terraform 変更時の必須手順
+- 対象: `terraform/src/repository/` または `terraform/modules/repository/` を変更したとき。
+- コマンド: `terraform fmt -recursive` → `terraform -chdir=terraform/src/repository validate` → `terraform -chdir=terraform/src/repository plan`。結果を要約して共有。apply はユーザー指示がある場合のみ。
+- 破壊的変更は明示して注意喚起する。`branch_rulesets` を優先し、レガシー `branches_to_protect` は互換用途のみ使用。
+- リポジトリごとに 1 ファイル（kebab-case）で定義し、デフォルトブランチは原則 `main`。
+
+## スタイルと命名
+- Terraform は 2 スペースインデント。`terraform fmt` を徹底。
+- ディレクトリ/モジュール名は kebab-case、リソース/変数名は snake_case。
+
+## よく使うコマンド
+- 初期セットアップ: `make bootstrap`, `just setup`, `just check-tools`
+- 品質チェック: `just fmt`, `just validate`, `just plan`, `just lint`（prek）
+- Worktree: `just worktree-setup` または `git worktree add/list/remove`
+
+## 認証・セキュリティ
+- GitHub App トークンを推奨。個人リポジトリは PAT (`TERRAFORM_GITHUB_TOKEN`)。Actions では `GITHUB_TOKEN` を使用。AWS は OIDC 経由で取得し、長期鍵は使わない。
+- シークレットは GitHub Actions で管理。ブランチ保護/ルールセットでコードレビューを強制。
+
+## リポジトリ削除
+- `aws-vault exec portfolio -- terraform -chdir=./terraform/src/repository state rm module.<name>...` で tfstate から除去し、対応する `.tf` を削除後、GitHub リポジトリを削除。

@@ -38,6 +38,7 @@ repos:
     rev: v0.19.1
     hooks:
       - id: markdownlint-cli2
+        files: (^\.cursorrules$|\.md$|\.markdown$)
         args: ['--fix']
 
   - repo: local
