@@ -299,3 +299,7 @@ moved {
   from = module.update-license-year.github_repository.this
   to   = module.update-license-year.github_repository.this[0]
 }
+moved {
+  from = module.setup-develop-environments.github_repository.this
+  to   = module.setup-develop-environments.github_repository.this[0]
+}
