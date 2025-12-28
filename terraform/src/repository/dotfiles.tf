@@ -27,4 +27,13 @@ module "dotfiles" {
       }
     }
   }
+
+  environments = {
+    "claude-autofix" = {
+      prevent_self_review = true
+      reviewers = {
+        users = ["tqer39"]
+      }
+    }
+  }
 }
