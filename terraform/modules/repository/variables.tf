@@ -179,3 +179,9 @@ variable "template_include_all_branches" {
   description = "(Optional) When creating from template, include all branches instead of just the default branch."
   default     = false
 }
+
+variable "environments" {
+  description = "A map of GitHub repository environments to create."
+  type        = any
+  default     = {}
+}
