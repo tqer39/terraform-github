@@ -24,7 +24,7 @@ resource "github_repository_environment" "this" {
     content {
       users = try(reviewers.value.users, null) != null ? [
         for username in reviewers.value.users :
-        data.github_user.environment_reviewers[username].id
+        tonumber(data.github_user.environment_reviewers[username].id)
       ] : null
       teams = try(reviewers.value.teams, null)
     }
