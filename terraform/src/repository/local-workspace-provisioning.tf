@@ -6,6 +6,8 @@ module "local-workspace-provisioning" {
   default_branch      = "main"
   enable_owner_bypass = true
   description         = "Local workspace provisioning repository."
+  archived            = true
+  visibility          = "private"
   branch_rulesets = {
     "main" = {
       enforcement = "active"
