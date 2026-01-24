@@ -6,8 +6,8 @@ module "blog" {
   default_branch      = "main"
   enable_owner_bypass = true
   topics              = ["blog"]
-  description         = "Configure blog resources with Terraform."
-  homepage_url        = "https://blog-tqer39s-projects.vercel.app"
+  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
+  homepage_url        = "https://blog.tqer39.dev"
   branch_rulesets = {
     "main" = {
       enforcement = "active"
