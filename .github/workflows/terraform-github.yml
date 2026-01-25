@@ -11,21 +11,40 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: terraform-github-${{ github.run_id }}
+  group: terraform-github-${{ github.ref }}
   cancel-in-progress: true
 
 env:
   AWS_ENV_NAME: portfolio
 
 jobs:
-  terraform-github:
+  set-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set Matrix
+        id: set-matrix
+        uses: ./.github/actions/set-matrix
+
+  terraform:
+    needs: set-matrix
+    if: needs.set-matrix.outputs.matrix != '["_empty"]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        target: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
     permissions:
-      contents: write # Required for update the repository
-      deployments: write # Required for bobheadxi/deployments
-      id-token: write # Required for aws-actions/configure-aws-credentials
-      pull-requests: write # Required for bobheadxi/deployments
+      contents: write
+      id-token: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
 
@@ -44,32 +63,30 @@ jobs:
 
       - uses: ./.github/actions/terraform-plan
         with:
-          working-directory: ./terraform/src/repository
+          working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_APPS_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }} # PAT を使用するように変更
-
-      - name: Start Deployment
-        if: github.ref == 'refs/heads/main'
-        uses: bobheadxi/deployments@v1
-        id: deployment
-        with:
-          step: start
-          token: ${{ secrets.GITHUB_TOKEN }}
-          env: ${{ env.AWS_ENV_NAME }}
+          GITHUB_APPS_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
       # NOTE: GitHub App では個人アカウントのリポジトリを作成することが仕様上不可能なので PAT を使用する。
       - uses: ./.github/actions/terraform-apply
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         with:
-          working-directory: ./terraform/src/repository
+          working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
-      - name: Finish Deployment
-        if: always() && github.ref == 'refs/heads/main'
-        uses: bobheadxi/deployments@v1
-        with:
-          step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          env: ${{ steps.deployment.outputs.env || env.AWS_ENV_NAME }}
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+  workflow-result:
+    needs: [set-matrix, terraform]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check workflow result
+        run: |
+          if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
+            echo "No repositories to process"
+            exit 0
+          fi
+          if [ "${{ needs.terraform.result }}" == "failure" ]; then
+            echo "Terraform jobs failed"
+            exit 1
+          fi
+          echo "All jobs completed successfully"

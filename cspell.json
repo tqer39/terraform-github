@@ -27,6 +27,7 @@
     "codeql",
     "comfyui",
     "elif",
+    "exitcode",
     "concat",
     "deployments",
     "fastapi",
