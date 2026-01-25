@@ -82,6 +82,13 @@ repos:
       - id: renovate-config-validator
         files: renovate.json
 
+  - repo: https://github.com/biomejs/pre-commit
+    rev: 'v0.6.1'
+    hooks:
+      - id: biome-format
+        additional_dependencies: ['@biomejs/biome@1.9.4']
+        types: [json]
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.105.0
     hooks:
