@@ -29,7 +29,7 @@ module "this" {
               context = "prek"
             },
             {
-              context = "terraform-github"
+              context = "workflow-result"
             }
           ]
           strict_required_status_checks_policy = true
