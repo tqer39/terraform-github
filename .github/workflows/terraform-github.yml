@@ -74,15 +74,14 @@ jobs:
           working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
 
-  workflow-result:
+  delete-nochange-comments:
     needs: [set-matrix, terraform]
-    if: always()
+    if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
       - name: Delete "No changes" PR comments
-        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -93,6 +92,11 @@ jobs:
                 gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$comment_id"
               done
 
+  workflow-result:
+    needs: [set-matrix, terraform, delete-nochange-comments]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
       - name: Check workflow result
         run: |
           if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
