@@ -3,6 +3,7 @@
   "ignorePaths": [
     ".git",
     ".gitignore",
+    ".serena",
     ".vscode",
     ".pre-commit-config.yaml",
     "pyproject.toml"
