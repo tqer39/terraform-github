@@ -1,13 +1,12 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "terraform-vercel"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  topics              = ["terraform", "vercel"]
+  description         = "Configure Vercel resources with Terraform."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

@@ -33,7 +33,7 @@ runs:
     - name: Terraform Plan
       id: terraform-plan
       run: |
-        TARGET=$(echo ${{ inputs.working-directory }} | sed -e 's|^.*terraform/src/||' | cut -c 1-36)
+        TARGET=$(basename ${{ inputs.working-directory }})
         tfcmt --var target:$TARGET plan -patch -- terraform plan -no-color
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}

@@ -1,13 +1,23 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "blender-chat-character"
   owner               = "tqer39"
   default_branch      = "main"
+  visibility          = "public"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  topics = [
+    "3d-animation",
+    "blender",
+    "character-animation",
+    "chat-interface",
+    "python",
+    "real-time-animation"
+  ]
+  description  = "Interactive 3D character animation system with chat interface using Blender"
+  has_projects = false
+  has_issues   = true
+  has_wiki     = false
   branch_rulesets = {
     "main" = {
       enforcement = "active"

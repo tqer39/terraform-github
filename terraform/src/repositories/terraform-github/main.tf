@@ -1,13 +1,12 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "terraform-github"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  topics              = ["terraform", "github"]
+  description         = "Configure GitHub resources with Terraform."
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -23,6 +22,17 @@ module "blog" {
           require_code_owner_review         = false
           required_approving_review_count   = 1
           required_review_thread_resolution = true
+        }
+        required_status_checks = {
+          required_check = [
+            {
+              context = "prek"
+            },
+            {
+              context = "workflow-result"
+            }
+          ]
+          strict_required_status_checks_policy = true
         }
       }
     }

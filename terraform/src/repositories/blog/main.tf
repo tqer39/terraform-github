@@ -1,5 +1,5 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
   repository          = "blog"
   owner               = "tqer39"

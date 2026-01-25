@@ -1,13 +1,12 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "my-chat-ai-comfyui"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  topics              = ["comfyui", "chat-ai"]
+  description         = "Integrate chat AI features with ComfyUI"
   branch_rulesets = {
     "main" = {
       enforcement = "active"

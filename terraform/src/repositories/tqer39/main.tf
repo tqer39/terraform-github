@@ -1,13 +1,13 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "tqer39"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  topics              = ["profile"]
+  description         = "personal information repository"
+
   branch_rulesets = {
     "main" = {
       enforcement = "active"

@@ -1,12 +1,13 @@
-module "private-dotfiles" {
-  source              = "../../modules/repository"
-  github_token        = var.github_token
-  repository          = "private-dotfiles"
+module "this" {
+  source       = "../../../modules/repository"
+  github_token = var.github_token
+
+  repository          = "boilerplate-saas"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  description         = "My private dotfiles repository"
-  visibility          = "private"
+  topics              = ["boilerplate"]
+  description         = "A boilerplate for SaaS applications"
 
   branch_rulesets = {
     "main" = {

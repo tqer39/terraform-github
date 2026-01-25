@@ -1,13 +1,13 @@
-module "blog" {
-  source              = "../../modules/repository"
+module "this" {
+  source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "blog"
+  repository          = "dotfiles"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["blog"]
-  description         = "Personal blog monorepo powered by Next.js, Hono, and Cloudflare."
-  homepage_url        = "https://blog.tqer39.dev"
+  description         = "My dotfiles repository"
+  visibility          = "public"
+
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -24,6 +24,15 @@ module "blog" {
           required_approving_review_count   = 1
           required_review_thread_resolution = true
         }
+      }
+    }
+  }
+
+  environments = {
+    "claude-autofix" = {
+      prevent_self_review = true
+      reviewers = {
+        users = ["tqer39"]
       }
     }
   }
