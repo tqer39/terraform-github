@@ -78,7 +78,21 @@ jobs:
     needs: [set-matrix, terraform]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
+      - name: Delete "No changes" PR comments
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            --jq '.[] | select(.body | contains("No changes. Your infrastructure matches the configuration.")) | .id' \
+            | while read -r comment_id; do
+                echo "Deleting comment: $comment_id"
+                gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$comment_id"
+              done
+
       - name: Check workflow result
         run: |
           if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
