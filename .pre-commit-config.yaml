@@ -51,7 +51,7 @@ repos:
         entry: textlint
         require_serial: false
         additional_dependencies:
-          - 'textlint@15.5.0'
+          - 'textlint@15.5.1'
           - 'textlint-filter-rule-allowlist@4.0.0'
           - 'textlint-rule-ja-no-space-between-full-width@2.4.2'
           - 'textlint-filter-rule-comments@1.2.2'
@@ -72,7 +72,7 @@ repos:
           - yaml
 
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.9
+    rev: v1.7.10
     hooks:
       - id: actionlint-docker
 

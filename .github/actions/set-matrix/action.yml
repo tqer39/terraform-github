@@ -1,0 +1,58 @@
+---
+name: Set Matrix
+description: Dynamically determines which repository directories to process based on changes
+
+outputs:
+  matrix:
+    description: JSON array of repository directories to process
+    value: ${{ steps.set-matrix.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set Matrix
+      id: set-matrix
+      shell: bash
+      run: |
+        REPOS_DIR="terraform/src/repositories"
+        TARGETS=()
+
+        # Get all repository directories
+        ALL_REPOS=$(ls -d ${REPOS_DIR}/*/ 2>/dev/null | xargs -n1 basename || echo "")
+
+        if [ -z "$ALL_REPOS" ]; then
+          echo "No repositories found"
+          echo "matrix=[\"_empty\"]" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          # For PRs, only process changed repositories
+          echo "Pull request detected, checking for changes..."
+
+          for repo in $ALL_REPOS; do
+            if ${{ github.action_path }}/../../scripts/check_for_changes.sh "${REPOS_DIR}/${repo}" "${{ github.base_ref }}" "${{ github.head_ref }}"; then
+              TARGETS+=("$repo")
+              echo "Changes detected in: $repo"
+            else
+              echo "No changes in: $repo"
+            fi
+          done
+        else
+          # For push and workflow_dispatch, process all repositories
+          echo "Push or workflow_dispatch detected, processing all repositories..."
+          for repo in $ALL_REPOS; do
+            TARGETS+=("$repo")
+          done
+        fi
+
+        # Build JSON array
+        if [ ${#TARGETS[@]} -eq 0 ]; then
+          echo "No targets to process"
+          MATRIX="[\"_empty\"]"
+        else
+          MATRIX=$(printf '%s\n' "${TARGETS[@]}" | jq -R . | jq -s -c .)
+        fi
+
+        echo "Matrix: $MATRIX"
+        echo "matrix=${MATRIX}" >> $GITHUB_OUTPUT
