@@ -21,27 +21,29 @@ check_command() {
 
     if command -v "$cmd" >/dev/null 2>&1; then
         local version
+        # Note: Using awk 'NR==1' instead of 'head -n1' to avoid SIGPIPE errors
+        # when commands output multiple lines with set -o pipefail enabled
         case "$cmd" in
             terraform)
-                version=$(terraform version | head -n1 | awk '{print $2}')
+                version=$(terraform version 2>/dev/null | awk 'NR==1 {print $2}')
                 ;;
             tflint)
-                version=$(tflint --version | head -n1 | awk '{print $2}')
+                version=$(tflint --version 2>/dev/null | awk 'NR==1 {print $2}')
                 ;;
             aws-vault)
-                version=$(aws-vault --version 2>&1 | awk '{print $2}')
+                version=$(aws-vault --version 2>&1 | awk 'NR==1 {print $2}')
                 ;;
             prek)
-                version=$(prek --version 2>&1 | head -n1 | awk '{print $2}')
+                version=$(prek --version 2>&1 | awk 'NR==1 {print $2}')
                 ;;
             gh)
-                version=$(gh --version | head -n1 | awk '{print $3}')
+                version=$(gh --version 2>/dev/null | awk 'NR==1 {print $3}')
                 ;;
             git)
-                version=$(git --version | awk '{print $3}')
+                version=$(git --version 2>/dev/null | awk 'NR==1 {print $3}')
                 ;;
             make)
-                version=$(make --version | head -n1 | awk '{print $3}')
+                version=$(make --version 2>/dev/null | awk 'NR==1 {print $3}')
                 ;;
             *)
                 version="installed"
@@ -94,7 +96,7 @@ echo ""
 if [[ -f .tool-versions ]]; then
     expected_version=$(grep terraform .tool-versions | awk '{print $2}')
     if command -v terraform >/dev/null 2>&1; then
-        current_version=$(terraform version | head -n1 | awk '{print $2}' | sed 's/v//')
+        current_version=$(terraform version 2>/dev/null | awk 'NR==1 {print $2}' | sed 's/v//')
         if [[ "$current_version" == "$expected_version" ]]; then
             echo -e "${GREEN}✅ Terraform version matches .tool-versions (${expected_version})${NC}"
         else

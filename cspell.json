@@ -62,6 +62,7 @@
     "rinchsan",
     "shellcheck",
     "shellenv",
+    "SIGPIPE",
     "SSIA",
     "Takeru",
     "textlint",
