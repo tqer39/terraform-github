@@ -1,5 +1,5 @@
 module "this" {
-  source              = "../../modules/repository"
+  source              = "../../../modules/repository"
   github_token        = var.github_token
   repository          = "anime-tweet-bot"
   owner               = "tqer39"
