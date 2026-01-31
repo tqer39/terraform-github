@@ -5,5 +5,6 @@ resource "github_branch_default" "this" {
   depends_on = [
     github_repository.this,
     github_repository.this_from_template,
+    github_repository.this_from_fork,
   ]
 }

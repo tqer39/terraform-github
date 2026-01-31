@@ -185,3 +185,22 @@ variable "environments" {
   type        = any
   default     = {}
 }
+
+# Fork repository settings
+variable "fork" {
+  type        = bool
+  description = "(Optional) Set to true to create a fork of the source repository."
+  default     = false
+}
+
+variable "source_owner" {
+  type        = string
+  description = "(Optional) Owner of the source repository to fork. Required when fork = true."
+  default     = null
+}
+
+variable "source_repo" {
+  type        = string
+  description = "(Optional) Name of the source repository to fork. Required when fork = true."
+  default     = null
+}

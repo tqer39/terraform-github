@@ -1,5 +1,5 @@
 resource "github_repository" "this" {
-  count                  = var.template_repository == null ? 1 : 0
+  count                  = var.fork == false && var.template_repository == null ? 1 : 0
   name                   = var.repository
   description            = var.description
   homepage_url           = var.homepage_url
@@ -24,7 +24,7 @@ resource "github_repository" "this" {
 }
 
 resource "github_repository" "this_from_template" {
-  count                  = var.template_repository != null ? 1 : 0
+  count                  = var.fork == false && var.template_repository != null ? 1 : 0
   name                   = var.repository
   description            = var.description
   homepage_url           = var.homepage_url
@@ -47,9 +47,37 @@ resource "github_repository" "this_from_template" {
   }
 }
 
+resource "github_repository" "this_from_fork" {
+  count                  = var.fork == true ? 1 : 0
+  name                   = var.repository
+  description            = var.description
+  homepage_url           = var.homepage_url
+  visibility             = var.visibility
+  topics                 = var.topics
+  has_issues             = var.has_issues
+  has_wiki               = var.has_wiki
+  has_projects           = var.has_projects
+  allow_auto_merge       = var.allow_auto_merge
+  allow_update_branch    = var.allow_update_branch
+  delete_branch_on_merge = var.delete_branch_on_merge
+  vulnerability_alerts   = var.vulnerability_alerts
+  archived               = var.archived
+
+  source_owner = var.source_owner
+  source_repo  = var.source_repo
+
+  lifecycle {
+    precondition {
+      condition     = var.source_owner != null && var.source_repo != null
+      error_message = "source_owner and source_repo are required when fork is true."
+    }
+  }
+}
+
 locals {
   repository_name = coalescelist(
     github_repository.this[*].name,
     github_repository.this_from_template[*].name,
+    github_repository.this_from_fork[*].name,
   )[0]
 }
