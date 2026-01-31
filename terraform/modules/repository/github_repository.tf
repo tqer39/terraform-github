@@ -63,8 +63,8 @@ resource "github_repository" "this_from_fork" {
   vulnerability_alerts   = var.vulnerability_alerts
   archived               = var.archived
 
-  fork_source_owner      = var.source_owner
-  fork_source_repository = var.source_repo
+  source_owner = var.source_owner
+  source_repo  = var.source_repo
 
   lifecycle {
     precondition {
