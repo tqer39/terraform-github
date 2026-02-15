@@ -63,6 +63,36 @@ variable "allow_update_branch" {
   default     = true
 }
 
+variable "allow_merge_commit" {
+  type        = bool
+  description = "(Optional) Set to false to disable merge commits on the repository."
+  default     = true
+}
+
+variable "allow_squash_merge" {
+  type        = bool
+  description = "(Optional) Set to false to disable squash merging on the repository."
+  default     = true
+}
+
+variable "allow_rebase_merge" {
+  type        = bool
+  description = "(Optional) Set to false to disable rebase merging on the repository."
+  default     = true
+}
+
+variable "squash_merge_commit_title" {
+  type        = string
+  description = "(Optional) Default squash merge commit title. Can be PR_TITLE or COMMIT_OR_PR_TITLE."
+  default     = null
+}
+
+variable "squash_merge_commit_message" {
+  type        = string
+  description = "(Optional) Default squash merge commit message. Can be PR_BODY, COMMIT_MESSAGES, or BLANK."
+  default     = null
+}
+
 variable "delete_branch_on_merge" {
   type        = bool
   description = "(Optional) Automatically delete head branch after a pull request is merged. Defaults to false."
