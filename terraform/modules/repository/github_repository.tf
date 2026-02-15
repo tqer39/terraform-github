@@ -1,20 +1,25 @@
 resource "github_repository" "this" {
-  count                  = var.fork == false && var.template_repository == null ? 1 : 0
-  name                   = var.repository
-  description            = var.description
-  homepage_url           = var.homepage_url
-  visibility             = var.visibility
-  topics                 = var.topics
-  has_issues             = var.has_issues
-  has_wiki               = var.has_wiki
-  has_projects           = var.has_projects
-  auto_init              = var.auto_init
-  allow_auto_merge       = var.allow_auto_merge
-  allow_update_branch    = var.allow_update_branch
-  delete_branch_on_merge = var.delete_branch_on_merge
-  vulnerability_alerts   = var.vulnerability_alerts
-  archived               = var.archived
-  is_template            = var.is_template
+  count                       = var.fork == false && var.template_repository == null ? 1 : 0
+  name                        = var.repository
+  description                 = var.description
+  homepage_url                = var.homepage_url
+  visibility                  = var.visibility
+  topics                      = var.topics
+  has_issues                  = var.has_issues
+  has_wiki                    = var.has_wiki
+  has_projects                = var.has_projects
+  auto_init                   = var.auto_init
+  allow_auto_merge            = var.allow_auto_merge
+  allow_update_branch         = var.allow_update_branch
+  allow_merge_commit          = var.allow_merge_commit
+  allow_squash_merge          = var.allow_squash_merge
+  allow_rebase_merge          = var.allow_rebase_merge
+  squash_merge_commit_title   = var.squash_merge_commit_title
+  squash_merge_commit_message = var.squash_merge_commit_message
+  delete_branch_on_merge      = var.delete_branch_on_merge
+  vulnerability_alerts        = var.vulnerability_alerts
+  archived                    = var.archived
+  is_template                 = var.is_template
 
   lifecycle {
     ignore_changes = [
@@ -24,21 +29,26 @@ resource "github_repository" "this" {
 }
 
 resource "github_repository" "this_from_template" {
-  count                  = var.fork == false && var.template_repository != null ? 1 : 0
-  name                   = var.repository
-  description            = var.description
-  homepage_url           = var.homepage_url
-  visibility             = var.visibility
-  topics                 = var.topics
-  has_issues             = var.has_issues
-  has_wiki               = var.has_wiki
-  has_projects           = var.has_projects
-  allow_auto_merge       = var.allow_auto_merge
-  allow_update_branch    = var.allow_update_branch
-  delete_branch_on_merge = var.delete_branch_on_merge
-  vulnerability_alerts   = var.vulnerability_alerts
-  archived               = var.archived
-  is_template            = var.is_template
+  count                       = var.fork == false && var.template_repository != null ? 1 : 0
+  name                        = var.repository
+  description                 = var.description
+  homepage_url                = var.homepage_url
+  visibility                  = var.visibility
+  topics                      = var.topics
+  has_issues                  = var.has_issues
+  has_wiki                    = var.has_wiki
+  has_projects                = var.has_projects
+  allow_auto_merge            = var.allow_auto_merge
+  allow_update_branch         = var.allow_update_branch
+  allow_merge_commit          = var.allow_merge_commit
+  allow_squash_merge          = var.allow_squash_merge
+  allow_rebase_merge          = var.allow_rebase_merge
+  squash_merge_commit_title   = var.squash_merge_commit_title
+  squash_merge_commit_message = var.squash_merge_commit_message
+  delete_branch_on_merge      = var.delete_branch_on_merge
+  vulnerability_alerts        = var.vulnerability_alerts
+  archived                    = var.archived
+  is_template                 = var.is_template
 
   template {
     owner                = coalesce(var.template_owner, var.owner)
@@ -48,20 +58,25 @@ resource "github_repository" "this_from_template" {
 }
 
 resource "github_repository" "this_from_fork" {
-  count                  = var.fork == true ? 1 : 0
-  name                   = var.repository
-  description            = var.description
-  homepage_url           = var.homepage_url
-  visibility             = var.visibility
-  topics                 = var.topics
-  has_issues             = var.has_issues
-  has_wiki               = var.has_wiki
-  has_projects           = var.has_projects
-  allow_auto_merge       = var.allow_auto_merge
-  allow_update_branch    = var.allow_update_branch
-  delete_branch_on_merge = var.delete_branch_on_merge
-  vulnerability_alerts   = var.vulnerability_alerts
-  archived               = var.archived
+  count                       = var.fork == true ? 1 : 0
+  name                        = var.repository
+  description                 = var.description
+  homepage_url                = var.homepage_url
+  visibility                  = var.visibility
+  topics                      = var.topics
+  has_issues                  = var.has_issues
+  has_wiki                    = var.has_wiki
+  has_projects                = var.has_projects
+  allow_auto_merge            = var.allow_auto_merge
+  allow_update_branch         = var.allow_update_branch
+  allow_merge_commit          = var.allow_merge_commit
+  allow_squash_merge          = var.allow_squash_merge
+  allow_rebase_merge          = var.allow_rebase_merge
+  squash_merge_commit_title   = var.squash_merge_commit_title
+  squash_merge_commit_message = var.squash_merge_commit_message
+  delete_branch_on_merge      = var.delete_branch_on_merge
+  vulnerability_alerts        = var.vulnerability_alerts
+  archived                    = var.archived
 
   source_owner = var.source_owner
   source_repo  = var.source_repo
