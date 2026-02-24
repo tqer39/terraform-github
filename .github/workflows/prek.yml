@@ -23,7 +23,7 @@ jobs:
         run: echo "TERRAFORM_VERSION=$(grep terraform .tool-versions | awk '{print $2}')" >> "$GITHUB_ENV"
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
