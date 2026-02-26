@@ -1,105 +1,32 @@
-# CLAUDE.md
+# terraform-github
 
-Guidance for Claude Code when working with this repository.
+Terraform IaC で GitHub リポジトリを管理するプロジェクト。モジュラーアーキテクチャと GitHub Actions による自動化。
 
-## Overview
+## 主要パス
 
-Terraform IaC project managing GitHub repositories via modular architecture and GitHub Actions automation.
+| パス | 用途 |
+| ---- | ---- |
+| `terraform/modules/repository/` | 再利用モジュール（リポジトリ, Rulesets, Environments, Actions） |
+| `terraform/src/repositories/` | リポジトリ別設定（1リポジトリ1ディレクトリ） |
+| `.github/workflows/` | CI/CD（plan/apply, import, pre-commit） |
+| `.github/actions/` | 再利用アクション（setup, validate, plan, apply） |
 
-## Key Paths
+## 主要コマンド
 
-| Path | Purpose |
-| ---- | ------- |
-| `terraform/modules/repository/` | Reusable Terraform module (repository, branch protection, rulesets, actions permissions) |
-| `terraform/src/repository/` | Repository-specific configs (one `.tf` file per repo) |
-| `.github/workflows/` | CI/CD: `terraform-github.yml` (plan/apply), `terraform-import.yml`, `prek.yml` |
-| `.github/actions/` | Reusable actions: setup-terraform, terraform-validate, terraform-plan, terraform-apply |
+セットアップ: `make bootstrap && just setup` / フォーマット: `just fmt` / 検証: `just validate` / 計画: `just plan` / リント: `just lint` / クリーン: `just clean`
 
-## Quick Commands
+## 必須ルール
 
-| Task | Command |
-| ---- | ------- |
-| Setup | `make bootstrap && just setup` |
-| Format | `just fmt` |
-| Validate | `just validate` |
-| Plan | `just plan` |
-| Lint | `just lint` |
-| Clean | `just clean` |
+- 依頼されたことだけを行う。それ以上もそれ以下もしない
+- ファイルの新規作成は最小限に。既存ファイルの編集を優先する
+- 変更前に既存コードを読み、パターンを理解する
+- **Conventional Commits** に準拠（`feat:`, `fix:`, `chore:`, `refactor:`）
+- 変更時は必ず検証: `just validate && just plan`
 
-For detailed commands (import, worktree, maintenance, deletion): see `.claude/docs/commands-reference.md`
+## リファレンス
 
-## Adding Repositories
-
-1. Create `terraform/src/repository/<repo-name>.tf`
-2. Use module from `../../modules/repository` with required parameters
-3. Run `just validate && just plan`
-4. Create PR for review
-
-For HCL patterns (modern rulesets vs legacy branch protection): see `.claude/docs/terraform-patterns.md`
-
-## PR Workflow
-
-1. Create feature branch, modify configs
-2. Push and create PR -> GitHub Actions runs `terraform plan`, posts as comment
-3. After merge to main -> auto `terraform apply`
-
-## Authentication
-
-- **GitHub App tokens**: Organization repos (recommended)
-- **PAT**: Personal repos (`TERRAFORM_GITHUB_TOKEN`)
-- **AWS OIDC**: S3 backend (no static credentials)
-
-## State Management
-
-Backend: AWS S3 with DynamoDB locking. Migration via `moved` blocks.
-
-## Module Parameters
-
-Key parameters: `repository` (required), `owner`, `description`, `visibility`, `default_branch`, `topics`, `branch_rulesets` (recommended), `branches_to_protect` (legacy)
-
-Full reference: see `.claude/docs/terraform-patterns.md`
-
-## Coding Standards
-
-### Naming Conventions
-
-- **Directories/Modules**: kebab-case (e.g., `local-workspace-provisioning`)
-- **Variables/Resources**: snake_case (e.g., `repository_ruleset`)
-
-### HCL Style
-
-- 2-space indentation
-- Always run `terraform fmt` before committing
-- Follow HashiCorp style guide
-
-## Validation
-
-```bash
-just validate                    # Validate configuration
-just plan                        # Plan changes (shows additions/changes/destructions)
-aws-vault exec portfolio -- just plan  # With AWS auth
-```
-
-PRs must include plan output summary. Destructive changes must be clearly marked.
-
-## Commit Guidelines
-
-Follow **Conventional Commits**: `feat:`, `fix:`, `chore:`, `refactor:`, etc.
-
-PRs must include: purpose/scope, affected repos/rules, related issues, plan summary.
-
-## Critical Instructions
-
-- Do what has been asked; nothing more, nothing less
-- NEVER create files unless absolutely necessary
-- ALWAYS prefer editing existing files over creating new ones
-- NEVER proactively create documentation files unless explicitly requested
-- Read existing code first to understand patterns before making changes
-- Make minimal, focused changes
-- All changes in `terraform/src/repository/` must be validated with `terraform plan`
-
-## References
-
-- Detailed commands: `.claude/docs/commands-reference.md`
-- HCL patterns: `.claude/docs/terraform-patterns.md`
-- Documentation guidelines: `.claude/docs/documentation-guidelines.md`
+- [コマンドリファレンス](docs/commands-reference.md): import, worktree, メンテナンス, 削除
+- [Terraform パターン](docs/terraform-patterns.md): HCL パターン, モジュールパラメータ
+- [ワークフローと認証](docs/workflow.md): PR ワークフロー, 認証, State 管理
+- [コーディング規約](docs/coding-standards.md): 命名規則, HCL スタイル, コミット規約
+- [ドキュメントガイドライン](docs/documentation-guidelines.md): ファイル構成, 開発日記
