@@ -19,13 +19,13 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       shell: bash
 
-    - uses: actions/cache@v5
+    - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
       with:
         path: ~/.tflint.d/plugins
         key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
     - name: Setup TFLint
-      uses: terraform-linters/setup-tflint@v6
+      uses: terraform-linters/setup-tflint@b480b8fcdaa6f2c577f8e4fa799e89e756bb7c93 # v6
       with:
         tflint_version: latest
 

@@ -28,7 +28,7 @@ runs:
         working-directory: ${{ inputs.working-directory }}
 
     - name: Setup tfcmt
-      uses: itkq/actions-tfcmt/setup@main
+      uses: itkq/actions-tfcmt/setup@96a8e30f0403d8db60d94c73be26debb87fda65d # main
 
     - name: Terraform Plan
       id: terraform-plan
