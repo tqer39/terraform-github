@@ -21,10 +21,10 @@ jobs:
     # Check if the PR is not created by 'renovate' or 'tqer39-apps'
     if: contains(fromJSON('["renovate[bot]", "tqer39-apps[bot]"]'), github.event.pull_request.user.login) == false
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
-      - uses: tqer39/openai-generate-pr-description@v1.0.5
+      - uses: tqer39/openai-generate-pr-description@977556fce9daa5707ddb6f23cb6bb2bd6ba27410 # v1.0.5
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
