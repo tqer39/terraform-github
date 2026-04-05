@@ -1,12 +1,12 @@
 module "this" {
   source              = "../../../modules/repository"
   github_token        = var.github_token
-  repository          = "openai-generate-pr-description"
+  repository          = "generate-pr-description"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true
-  topics              = ["openai"]
-  description         = "Generate Pull Request description with OpenAI."
+  topics              = []
+  description         = "Generate Pull Request description."
   branch_rulesets = {
     "main" = {
       enforcement = "active"
@@ -26,7 +26,7 @@ module "this" {
         required_status_checks = {
           required_check = [
             {
-              context = "pre-commit"
+              context = "prek"
             }
           ]
           strict_required_status_checks_policy = true
