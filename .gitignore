@@ -263,4 +263,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+### Serena ###
+.serena/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,visualstudiocode,vim,intellij,terraform
