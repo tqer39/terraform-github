@@ -8,7 +8,7 @@ terraform {
   }
   backend "s3" {
     bucket  = "terraform-tfstate-tqer39-072693953877-ap-northeast-1"
-    key     = "terraform-github/repositories/claude-code-config.tfstate"
+    key     = "terraform-github/repositories/claude-code-marketplace.tfstate"
     region  = "ap-northeast-1"
     encrypt = true
   }
