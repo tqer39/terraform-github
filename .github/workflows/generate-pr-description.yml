@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
+      contents: read # uses: actions/checkout
       pull-requests: write # uses: tqer39/generate-pr-description
     # Check if the PR is not created by 'renovate' or 'tqer39-apps'
     if: contains(fromJSON('["renovate[bot]", "tqer39-apps[bot]"]'), github.event.pull_request.user.login) == false
@@ -24,9 +25,9 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
-      - uses: tqer39/generate-pr-description@977556fce9daa5707ddb6f23cb6bb2bd6ba27410 # v1.0.5
+      - uses: tqer39/generate-pr-description@90dbc0ef9ea813159242481eaa1f63d97263f1c1 # v2.0.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          openai-model: 'gpt-4o'
-          locale: 'ja' # 日本語で出力するためのオプションを修正
+          api-key: ${{ secrets.OPENROUTER_API_KEY }}
+          model: 'openai/gpt-4o-mini'
+          locale: 'ja'
