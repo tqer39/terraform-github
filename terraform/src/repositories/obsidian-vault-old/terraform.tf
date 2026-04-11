@@ -8,7 +8,7 @@ terraform {
   }
   backend "s3" {
     bucket  = "terraform-tfstate-tqer39-072693953877-ap-northeast-1"
-    key     = "terraform-github/repositories/obsidian-vault-2.tfstate"
+    key     = "terraform-github/repositories/obsidian-vault-old.tfstate"
     region  = "ap-northeast-1"
     encrypt = true
   }

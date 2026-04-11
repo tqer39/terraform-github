@@ -9,25 +9,5 @@ module "this" {
   description            = "A repository for managing Obsidian Vault configurations."
   visibility             = "private"
   delete_branch_on_merge = true
-  branch_rulesets = {
-    "main" = {
-      enforcement = "active"
-      conditions = {
-        ref_name = {
-          include = ["~DEFAULT_BRANCH"]
-          exclude = []
-        }
-      }
-      rules = {
-        required_status_checks = {
-          required_check = [
-            {
-              context = "pre-commit"
-            }
-          ]
-          strict_required_status_checks_policy = true
-        }
-      }
-    }
-  }
+  branch_rulesets        = {}
 }
