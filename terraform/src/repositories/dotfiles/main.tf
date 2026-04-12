@@ -27,9 +27,7 @@ module "this" {
         required_status_checks = {
           required_check = [
             { context = "prek" },
-            { context = "Minimal - ubuntu-latest" },
-            { context = "Minimal - macos-latest" },
-            { context = "Minimal - Windows" },
+            { context = "workflow-result" },
           ]
           strict_required_status_checks_policy = true
         }
