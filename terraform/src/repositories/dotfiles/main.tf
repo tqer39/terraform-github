@@ -24,6 +24,15 @@ module "this" {
           required_approving_review_count   = 1
           required_review_thread_resolution = true
         }
+        required_status_checks = {
+          required_check = [
+            { context = "prek" },
+            { context = "Minimal - ubuntu-latest" },
+            { context = "Minimal - macos-latest" },
+            { context = "Minimal - Windows" },
+          ]
+          strict_required_status_checks_policy = true
+        }
       }
     }
   }
