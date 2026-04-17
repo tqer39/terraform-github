@@ -157,4 +157,11 @@ resource "github_repository_ruleset" "default_main_protection" {
     github_repository.this,
     github_repository.this_from_template,
   ]
+
+  lifecycle {
+    precondition {
+      condition     = var.disable_default_main_protection || !contains(keys(var.branch_rulesets), "main")
+      error_message = "default_main_protection と branch_rulesets[\"main\"] は共存できない。disable_default_main_protection = true にするか branch_rulesets から main を外すこと。"
+    }
+  }
 }
