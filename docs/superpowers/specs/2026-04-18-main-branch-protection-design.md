@@ -76,13 +76,13 @@ resource "github_repository_ruleset" "default_main_protection" {
     content {
       actor_id    = 5 # RepositoryRole: Admin
       actor_type  = "RepositoryRole"
-      bypass_mode = "always"
+      bypass_mode = "pull_request" # PR 経由の approvals を bypass 可能。直 push や force push は bypass 不可
     }
   }
 }
 ```
 
-実装時の検証ステップ: `actor_id = 5` は GitHub Provider の仕様上 Admin role を指すが、実装着手時に既存 28 repo の `github_repository_ruleset.this["main"].bypass_actors[0].actor_id` の値と一致することを確認する（現状の `enable_owner_bypass = true` が同じ actor_id を生成している前提）。
+既存モジュールの `enable_owner_bypass = true` は `bypass_mode = "pull_request"` を生成している（`terraform/modules/repository/github_repository_ruleset.tf:97`）。新標準もこれに合わせることで、migration 時の差分を最小化する。
 
 ### 不変条件
 
