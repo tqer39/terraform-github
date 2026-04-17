@@ -185,6 +185,18 @@ variable "enable_owner_bypass" {
   default     = false
 }
 
+variable "disable_default_main_protection" {
+  type        = bool
+  description = "(Optional) true にすると、標準 main ブランチ保護 ruleset を無効化する。obsidian-vault など保護不要な repo 用。"
+  default     = false
+}
+
+variable "default_main_protection_owner_bypass" {
+  type        = bool
+  description = "(Optional) 標準 main ブランチ保護で、リポジトリ所有者による bypass を許可するか。既存 enable_owner_bypass と同じ semantics（bypass_mode = pull_request）。"
+  default     = true
+}
+
 variable "is_template" {
   type        = bool
   description = "(Optional) Whether the repository is a template repository."
