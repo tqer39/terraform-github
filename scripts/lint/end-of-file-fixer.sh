@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ensure each text file ends with exactly one newline. Modifies in place.
+# Append a trailing newline if the file does not already end with one. Modifies in place.
 set -euo pipefail
 
 for f in "$@"; do

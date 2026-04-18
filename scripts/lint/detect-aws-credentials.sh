@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Detect AWS Access Key IDs in staged files.
+# cspell:ignore AKIA ASIA
 # --allow-missing-credentials: kept for compatibility; we do not read ~/.aws.
 set -euo pipefail
 
