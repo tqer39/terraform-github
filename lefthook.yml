@@ -26,7 +26,7 @@ pre-commit:
     # ── リンタ系 ──
     yamllint:
       glob: "*.{yml,yaml}"
-      run: yamllint {staged_files}
+      run: yamllint --no-warnings {staged_files}
     actionlint:
       glob: ".github/workflows/*.{yml,yaml}"
       run: actionlint {staged_files}
