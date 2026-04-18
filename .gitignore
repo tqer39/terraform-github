@@ -266,6 +266,9 @@ $RECYCLE.BIN/
 ### Serena ###
 .serena/
 
+### Node ###
+node_modules/
+
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,visualstudiocode,vim,intellij,terraform
 
 # Git worktrees
