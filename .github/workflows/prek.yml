@@ -19,6 +19,11 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
       - name: Get current Terraform version
         run: echo "TERRAFORM_VERSION=$(grep terraform .tool-versions | awk '{print $2}')" >> "$GITHUB_ENV"
 
