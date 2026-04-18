@@ -14,7 +14,7 @@
 
 ## File Structure
 
-- Create: `.cspell/project-words.txt` — 外部辞書ファイル（73 語）
+- Create: `.cspell/project-words.txt` — 外部辞書ファイル（75 語）
 - Modify: `cspell.json` — `words` 配列を削除し `dictionaryDefinitions` / `dictionaries` を追加
 
 ---
@@ -25,20 +25,24 @@
 
 - Create: `.cspell/project-words.txt`
 
-**Context:** 既存 `cspell.json` の `words` 配列（83 語）から、ケース違い重複 10 語を除去した 73 語を、大文字小文字を区別しないアルファベット順で並べる。
+**Context:** 既存 `cspell.json` の `words` 配列（83 語）から、ケース違い重複 9 語を除去し、プラン/スペック内で使用する `tolower` を追加して 75 語を、大文字小文字を区別しないアルファベット順で並べる。
 
-除去した 10 語とその統合先:
+除去した 9 語とその統合先:
 
 - `Autobuild` → `autobuild`
 - `Hono` → `hono`
 - `Jellyfin` → `jellyfin`
 - `Komga` → `komga`
 - `Audiobookshelf` → `audiobookshelf`
-- `O'oyama` → `ooyama`
 - `oidc` → `OIDC`（頭字語なので大文字を維持）
 - `Vercel` → `vercel`
 - `vits` → `VITS`（頭字語なので大文字を維持）
 - `Worktrees` → `worktrees`
+
+`O'oyama` は `LICENSE` で使用されており、かつ cspell がアポストロフィを語分離子として扱うため `ooyama` ではカバーできないので維持する。
+追加する 1 語:
+
+- `tolower` — Step 3 の awk コマンドで使用
 
 - [ ] **Step 1: `.cspell/` ディレクトリを作成**
 
@@ -90,6 +94,7 @@ nextjs
 nochange
 nodenv
 noreply
+O'oyama
 OIDC
 oneline
 ooyama
@@ -113,6 +118,7 @@ tfcmt
 tfenv
 tflint
 tfstate
+tolower
 toplevel
 tqer
 vercel
@@ -135,7 +141,7 @@ file .cspell/project-words.txt
 
 Expected:
 
-- `wc -l` の出力が `73 .cspell/project-words.txt`
+- `wc -l` の出力が `75 .cspell/project-words.txt`
 - `file` コマンドで `UTF-8` または `ASCII` テキストと表示される
 - CRLF が含まれないこと
 
@@ -247,14 +253,14 @@ Run: `git show --stat HEAD`
 
 Expected:
 
-- `.cspell/project-words.txt` が 73 行追加
+- `.cspell/project-words.txt` が 75 行追加
 - `cspell.json` の差分が `words` 配列削除と `dictionaryDefinitions` / `dictionaries` の追加
 
 ---
 
 ## Completion Criteria
 
-- `.cspell/project-words.txt` が 73 語・UTF-8・LF・末尾改行ありで存在する
+- `.cspell/project-words.txt` が 75 語・UTF-8・LF・末尾改行ありで存在する
 - `cspell.json` に `words` 配列が存在せず、`dictionaryDefinitions` と `dictionaries` で外部辞書を参照している
 - `just lint` が pass する
 - 上記 2 変更が 1 コミットにまとまっている

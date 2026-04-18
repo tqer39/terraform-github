@@ -41,6 +41,7 @@ nextjs
 nochange
 nodenv
 noreply
+O'oyama
 OIDC
 oneline
 ooyama
@@ -64,6 +65,7 @@ tfcmt
 tfenv
 tflint
 tfstate
+tolower
 toplevel
 tqer
 vercel
