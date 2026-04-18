@@ -44,7 +44,7 @@ pre-commit:
       run: pnpm exec cspell lint --no-progress --no-must-find-files {staged_files}
     renovate-config-validator:
       glob: "renovate.json5"
-      run: pnpm dlx --package renovate renovate-config-validator {staged_files}
+      run: npx --yes --package=renovate -- renovate-config-validator {staged_files}
 
     # ── フォーマッタ系 ──
     biome-format:
