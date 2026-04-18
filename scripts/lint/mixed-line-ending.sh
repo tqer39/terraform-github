@@ -20,6 +20,8 @@ for f in "${files[@]}"; do
   [[ -f "$f" ]] || continue
   grep -Iq . "$f" || continue
   if grep -q $'\r' "$f"; then
-    tr -d '\r' <"$f" >"$f.tmp" && mv "$f.tmp" "$f"
+    tr -d '\r' <"$f" >"$f.tmp"
+    cat "$f.tmp" >"$f"
+    rm -f "$f.tmp"
   fi
 done
