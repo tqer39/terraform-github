@@ -1,4 +1,3 @@
----
 name: Set Matrix
 description: Dynamically determines which repository directories to process based on changes
 
