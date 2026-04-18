@@ -108,13 +108,13 @@ check_command "actionlint" || ((missing_tools++))
 check_command "shellcheck" || ((missing_tools++))
 echo ""
 
-# Check Terraform version matches .tool-versions
-if [[ -f .tool-versions ]]; then
-    expected_version=$(grep terraform .tool-versions | awk '{print $2}')
+# Check Terraform version matches mise.toml
+if [[ -f mise.toml ]]; then
+    expected_version=$(grep '^terraform' mise.toml | awk -F'"' '{print $2}')
     if command -v terraform >/dev/null 2>&1; then
         current_version=$(terraform version 2>/dev/null | awk 'NR==1 {print $2}' | sed 's/v//')
         if [[ "$current_version" == "$expected_version" ]]; then
-            echo -e "${GREEN}✅ Terraform version matches .tool-versions (${expected_version})${NC}"
+            echo -e "${GREEN}✅ Terraform version matches mise.toml (${expected_version})${NC}"
         else
             echo -e "${YELLOW}⚠️  Terraform version mismatch:${NC}"
             echo -e "   Expected: ${expected_version}"

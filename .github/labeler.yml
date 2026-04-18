@@ -33,9 +33,10 @@ rules:
       - markdownlint
 
   - matchers:
-      - '**/.tool-versions'
+      - '**/mise.toml'
+      - '**/.mise.toml'
     labels:
-      - asdf
+      - mise
 
   - matchers:
       - '.github/workflows/actionlint.yml'

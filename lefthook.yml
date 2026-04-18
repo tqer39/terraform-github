@@ -13,6 +13,8 @@ pre-commit:
       run: scripts/lint/detect-aws-credentials.sh --allow-missing-credentials {staged_files}
     detect-private-key:
       run: scripts/lint/detect-private-key.sh {staged_files}
+    betterleaks:
+      run: betterleaks dir --no-banner --redact --exit-code 1 {staged_files}
     end-of-file-fixer:
       run: scripts/lint/end-of-file-fixer.sh {staged_files}
       stage_fixed: true

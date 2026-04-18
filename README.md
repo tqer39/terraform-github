@@ -22,8 +22,8 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
    - [mise](https://mise.jdx.dev/) - Universal tool version manager
    - [just](https://github.com/casey/just) - Command runner
    - [git](https://git-scm.com/) - Version control system
-   - [prek](https://prek.j178.dev/) - Git hooks framework
    - [aws-vault](https://github.com/99designs/aws-vault) - AWS credential management
+   - [betterleaks](https://github.com/betterleaks/betterleaks) - Secrets scanner
 
 2. Restart your terminal or reload your shell (for Homebrew PATH)
 
@@ -34,8 +34,9 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
    ```
 
    This will:
-   - Install tools defined in `.tool-versions` via mise (Terraform v1.13.3)
-   - Set up pre-commit hooks using prek
+   - Install tools defined in `mise.toml` via mise (Terraform v1.14.8, lefthook, yamllint, actionlint, shellcheck)
+   - Install Node.js dev dependencies via `pnpm install`
+   - Install Git hooks using [lefthook](https://lefthook.dev/)
    - Initialize Terraform
 
 ### Verify Installation
@@ -56,7 +57,7 @@ This project supports parallel development using git worktree. This allows you t
 just worktree-setup
 ```
 
-This will guide you through creating a new worktree. Worktrees are created in the parent directory with the pattern: `terraform-github-<branch-name>`
+This will guide you through creating a new worktree. Worktrees are created under `.worktrees/<branch-name>/` within the repository.
 
 #### Manual Worktree Management
 
@@ -64,10 +65,10 @@ Create a new worktree:
 
 ```bash
 # For a new branch
-git worktree add ../terraform-github-feature-name -b feature/feature-name
+git worktree add .worktrees/feature-name -b feature/feature-name
 
 # For an existing branch
-git worktree add ../terraform-github-feature-name feature/feature-name
+git worktree add .worktrees/feature-name feature/feature-name
 ```
 
 List all worktrees:
@@ -79,7 +80,7 @@ git worktree list
 Remove a worktree:
 
 ```bash
-git worktree remove ../terraform-github-feature-name
+git worktree remove .worktrees/feature-name
 ```
 
 ### Available Commands
@@ -104,14 +105,14 @@ Common tasks:
 - `just worktree-setup` - Interactive git worktree setup
 - `just fmt` - Format all Terraform files
 - `just validate` - Validate Terraform configuration
-- `just lint` - Run all linters (prek)
+- `just lint` - Run all linters (lefthook)
 - `just init` - Initialize Terraform
 - `just plan` - Run Terraform plan
 - `just apply` - Run Terraform apply (use with caution)
 - `just clean` - Clean Terraform temporary files
 - `just version` - Show tool versions (Terraform, mise, just)
 - `just status` - Show mise-managed tool versions
-- `just install` - Install tools from .tool-versions
+- `just install` - Install tools from mise.toml
 - `just update` - Update mise-managed tools
 
 ## Deployment Flow
@@ -171,6 +172,6 @@ graph TD
 
 ### Notes
 
-- For `module`, specify the module name under `terraform/src/repository/`.
+- For `module`, specify the module name under `terraform/src/repositories/`.
 - For `repo`, specify the repository name on GitHub.
 - Make sure that `secrets.TERRAFORM_GITHUB_TOKEN` is set as required.

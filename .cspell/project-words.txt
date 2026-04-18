@@ -5,6 +5,7 @@ autofix
 automerge
 autoupdate
 awslabs
+betterleaks
 bobheadxi
 Brewfile
 buildscript

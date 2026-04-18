@@ -63,7 +63,7 @@ git worktree remove ../terraform-github-<branch>      # 削除
 | `just clean` | Terraform 一時ファイルを削除 |
 | `just version` | バージョン表示 |
 | `just status` | mise 管理ツールのバージョン表示 |
-| `just install` | .tool-versions からツールをインストール |
+| `just install` | mise.toml からツールをインストール |
 | `just update` | mise 管理ツールを更新 |
 | `just update-brew` | brew パッケージを更新 |
 
