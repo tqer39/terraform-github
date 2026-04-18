@@ -5,6 +5,7 @@ autofix
 automerge
 autoupdate
 awslabs
+betterleaks
 bobheadxi
 Brewfile
 buildscript
@@ -49,6 +50,7 @@ oneline
 ooyama
 openclaw
 OPENROUTER
+pipefail
 prek
 pyenv
 pyproject
