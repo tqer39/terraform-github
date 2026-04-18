@@ -21,7 +21,6 @@ jobs:
       - name: Setup mise
         uses: jdx/mise-action@v2
         with:
-          version: latest
           install: true
 
       - name: Setup pnpm
