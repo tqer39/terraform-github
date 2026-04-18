@@ -2,7 +2,6 @@
 .git/
 .github/
 .gitignore
-.pre-commit-config.yaml
 .textlintcache
 .vscode/
 .yamllint.yml
