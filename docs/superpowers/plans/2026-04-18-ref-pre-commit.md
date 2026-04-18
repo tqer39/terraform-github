@@ -381,7 +381,9 @@ dd if=/dev/zero of="$tmpdir/big.bin" bs=1024 count=1024 2>/dev/null
 ./scripts/lint/check-added-large-files.sh --max-kb=512 "$tmpdir/big.bin" && echo "FAIL: large file passed" || echo "OK: large file flagged"
 
 # detect-private-key
-printf -- '-----BEGIN TEST PRIVATE KEY-----\nabc\n-----END TEST PRIVATE KEY-----\n' >"$tmpdir/key.txt"
+printf -- '%s TEST %s\n' '-----BEGIN' 'PRIVATE KEY-----' >"$tmpdir/key.txt"
+printf -- 'abc\n' >>"$tmpdir/key.txt"
+printf -- '%s TEST %s\n' '-----END' 'PRIVATE KEY-----' >>"$tmpdir/key.txt"
 ./scripts/lint/detect-private-key.sh "$tmpdir/key.txt" && echo "FAIL: key passed" || echo "OK: key flagged"
 
 # trailing-whitespace

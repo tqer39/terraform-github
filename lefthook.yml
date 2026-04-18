@@ -1,0 +1,59 @@
+# Lefthook configuration.
+# See https://lefthook.dev/configuration/ for details.
+pre-commit:
+  parallel: true
+  commands:
+    # ── セーフティ系 (pre-commit-hooks 相当) ──
+    check-added-large-files:
+      run: scripts/lint/check-added-large-files.sh --max-kb=512 {staged_files}
+    check-json:
+      glob: "*.json"
+      run: scripts/lint/check-json.sh {staged_files}
+    detect-aws-credentials:
+      run: scripts/lint/detect-aws-credentials.sh --allow-missing-credentials {staged_files}
+    detect-private-key:
+      run: scripts/lint/detect-private-key.sh {staged_files}
+    end-of-file-fixer:
+      run: scripts/lint/end-of-file-fixer.sh {staged_files}
+      stage_fixed: true
+    mixed-line-ending:
+      run: scripts/lint/mixed-line-ending.sh --fix=lf {staged_files}
+      stage_fixed: true
+    trailing-whitespace:
+      run: scripts/lint/trailing-whitespace.sh {staged_files}
+      stage_fixed: true
+
+    # ── リンタ系 ──
+    yamllint:
+      glob: "*.{yml,yaml}"
+      run: yamllint {staged_files}
+    actionlint:
+      glob: ".github/workflows/*.{yml,yaml}"
+      run: actionlint {staged_files}
+    shellcheck:
+      glob: "*.sh"
+      run: shellcheck {staged_files}
+    markdownlint:
+      glob: "*.{md,markdown}"
+      run: pnpm exec markdownlint-cli2 --fix {staged_files}
+      stage_fixed: true
+    textlint:
+      glob: "*.{md,markdown,txt}"
+      run: pnpm exec textlint {staged_files}
+    cspell:
+      run: pnpm exec cspell lint --no-progress --no-must-find-files {staged_files}
+    renovate-config-validator:
+      glob: "renovate.json5"
+      run: pnpm dlx --package=renovate renovate-config-validator {staged_files}
+
+    # ── フォーマッタ系 ──
+    biome-format:
+      glob: "*.json"
+      run: pnpm exec biome format --write {staged_files}
+      stage_fixed: true
+    terraform-fmt:
+      glob: "*.tf"
+      run: terraform fmt {staged_files}
+      stage_fixed: true
+
+# commit-msg / pre-push は現状不要。必要時にここへ追加。
