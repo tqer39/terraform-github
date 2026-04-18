@@ -5,7 +5,8 @@
     ".gitignore",
     ".serena",
     ".vscode",
-    ".pre-commit-config.yaml",
+    "package.json",
+    "pnpm-lock.yaml",
     "pyproject.toml"
   ],
   "dictionaryDefinitions": [

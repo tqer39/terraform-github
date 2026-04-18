@@ -21,8 +21,10 @@ setup:
    echo "⚠ mise not found. Please run 'make bootstrap' first."; \
    exit 1; \
  fi
- @echo "→ Installing prek hooks..."
- @prek install
+ @echo "→ Installing node dev dependencies with pnpm..."
+ @pnpm install --frozen-lockfile
+ @echo "→ Installing lefthook git hooks..."
+ @lefthook install
  @echo "→ Initializing Terraform..."
  @cd {{terraform_dir}} && terraform init -upgrade
  @echo "✓ Setup complete!"
@@ -45,14 +47,14 @@ validate:
  @echo "✅ Validating Terraform configuration..."
  @cd {{terraform_dir}} && terraform validate
 
-# Run all linters (prek)
+# Run all linters (lefthook)
 lint:
  @echo "🔍 Running linters..."
- @prek run --all-files
+ @lefthook run pre-commit --all-files
 
-# Run specific prek hook
+# Run specific lefthook command
 lint-hook hook:
- @prek run {{hook}}
+ @lefthook run pre-commit --commands {{hook}} --all-files
 
 # Initialize Terraform
 init:
@@ -71,13 +73,13 @@ apply:
 
 # Format staged files (typical git commit flow)
 fmt-staged:
- @prek run terraform_fmt
+ @lefthook run pre-commit --commands terraform-fmt
 
 # Fix common formatting issues
 fix:
- @prek run end-of-file-fixer --all-files
- @prek run trailing-whitespace --all-files
- @prek run markdownlint-cli2 --all-files
+ @lefthook run pre-commit --commands end-of-file-fixer --all-files
+ @lefthook run pre-commit --commands trailing-whitespace --all-files
+ @lefthook run pre-commit --commands markdownlint --all-files
 
 # Clean Terraform temporary files
 clean:

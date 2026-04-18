@@ -33,8 +33,20 @@ check_command() {
             aws-vault)
                 version=$(aws-vault --version 2>&1 | awk 'NR==1 {print $2}')
                 ;;
-            prek)
-                version=$(prek --version 2>&1 | awk 'NR==1 {print $2}')
+            lefthook)
+                version=$(lefthook version 2>&1 | awk 'NR==1 {print $1}')
+                ;;
+            pnpm)
+                version=$(pnpm --version 2>&1 | awk 'NR==1 {print $1}')
+                ;;
+            yamllint)
+                version=$(yamllint --version 2>&1 | awk 'NR==1 {print $2}')
+                ;;
+            actionlint)
+                version=$(actionlint -version 2>&1 | awk 'NR==1 {print $1}')
+                ;;
+            shellcheck)
+                version=$(shellcheck --version 2>&1 | awk '$1=="version:" {print $2}')
                 ;;
             gh)
                 version=$(gh --version 2>/dev/null | awk 'NR==1 {print $3}')
@@ -89,7 +101,11 @@ check_command "gh" "false"
 echo ""
 
 echo -e "${BLUE}Code Quality Tools:${NC}"
-check_command "prek" || ((missing_tools++))
+check_command "lefthook" || ((missing_tools++))
+check_command "pnpm" || ((missing_tools++))
+check_command "yamllint" || ((missing_tools++))
+check_command "actionlint" || ((missing_tools++))
+check_command "shellcheck" || ((missing_tools++))
 echo ""
 
 # Check Terraform version matches .tool-versions

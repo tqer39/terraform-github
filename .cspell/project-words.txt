@@ -1,3 +1,4 @@
+actionlint
 audiobookshelf
 autobuild
 autofix
@@ -31,6 +32,7 @@ kentaro
 kintai
 kkhs
 komga
+lefthook
 linuxbrew
 litagin
 markdownlint
@@ -73,3 +75,4 @@ VITS
 worktree
 worktrees
 xtrade
+yamllint
