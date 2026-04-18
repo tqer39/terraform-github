@@ -1,12 +1,13 @@
 module "this" {
-  source              = "../../../modules/repository"
-  github_token        = var.github_token
-  repository          = "time-capsule"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  topics              = ["time-capsule", "nextjs"]
-  description         = "A service that sends account information to a trusted person when you pass away"
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "time-capsule"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  topics                          = ["time-capsule", "nextjs"]
+  description                     = "A service that sends account information to a trusted person when you pass away"
   branch_rulesets = {
     "main" = {
       enforcement = "active"

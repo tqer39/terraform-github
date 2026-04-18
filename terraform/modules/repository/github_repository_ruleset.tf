@@ -109,3 +109,59 @@ resource "github_repository_ruleset" "this" {
     github_repository.this_from_template,
   ]
 }
+
+resource "github_repository_ruleset" "default_main_protection" {
+  count       = var.disable_default_main_protection ? 0 : 1
+  name        = "main"
+  repository  = local.repository_name
+  target      = "branch"
+  enforcement = "active"
+
+  conditions {
+    ref_name {
+      include = ["~DEFAULT_BRANCH"]
+      exclude = []
+    }
+  }
+
+  rules {
+    deletion                = true
+    non_fast_forward        = true
+    required_linear_history = true
+
+    pull_request {
+      required_approving_review_count   = 0
+      dismiss_stale_reviews_on_push     = true
+      require_code_owner_review         = false
+      required_review_thread_resolution = true
+    }
+
+    required_status_checks {
+      strict_required_status_checks_policy = false
+      required_check {
+        context = "workflow-result"
+      }
+    }
+  }
+
+  dynamic "bypass_actors" {
+    for_each = var.default_main_protection_owner_bypass ? [1] : []
+    content {
+      actor_id    = 5 # RepositoryRole: Admin
+      actor_type  = "RepositoryRole"
+      bypass_mode = "pull_request"
+    }
+  }
+
+  depends_on = [
+    github_repository.this,
+    github_repository.this_from_template,
+  ]
+
+  lifecycle {
+    precondition {
+      condition     = var.disable_default_main_protection || !contains(keys(var.branch_rulesets), "main")
+      error_message = "default_main_protection と branch_rulesets[\"main\"] は共存できない。disable_default_main_protection = true にするか branch_rulesets から main を外すこと。"
+    }
+  }
+}

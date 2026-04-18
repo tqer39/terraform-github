@@ -1,15 +1,16 @@
 module "this" {
-  source              = "../../../modules/repository"
-  github_token        = var.github_token
-  repository          = "openclaw-ops"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  allow_merge_commit  = false
-  allow_squash_merge  = true
-  allow_rebase_merge  = false
-  topics              = ["openclaw", "ops"]
-  description         = "Configuration and operations repository for OpenClaw."
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "openclaw-ops"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  allow_merge_commit              = false
+  allow_squash_merge              = true
+  allow_rebase_merge              = false
+  topics                          = ["openclaw", "ops"]
+  description                     = "Configuration and operations repository for OpenClaw."
 
   branch_rulesets = {
     "main" = {

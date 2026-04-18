@@ -1,13 +1,14 @@
 module "this" {
-  source                 = "../../../modules/repository"
-  github_token           = var.github_token
-  repository             = "notifications"
-  owner                  = "tqer39"
-  default_branch         = "main"
-  enable_owner_bypass    = true
-  topics                 = ["notifications", "api"]
-  description            = "A repository for managing notification services."
-  delete_branch_on_merge = true
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "notifications"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  topics                          = ["notifications", "api"]
+  description                     = "A repository for managing notification services."
+  delete_branch_on_merge          = true
   branch_rulesets = {
     "main" = {
       enforcement = "active"

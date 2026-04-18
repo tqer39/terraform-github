@@ -1,12 +1,13 @@
 module "this" {
-  source              = "../../../modules/repository"
-  github_token        = var.github_token
-  repository          = "terraform-vercel"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  topics              = ["terraform", "vercel"]
-  description         = "Configure Vercel resources with Terraform."
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "terraform-vercel"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  topics                          = ["terraform", "vercel"]
+  description                     = "Configure Vercel resources with Terraform."
   branch_rulesets = {
     "main" = {
       enforcement = "active"
