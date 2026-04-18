@@ -1,12 +1,13 @@
 module "this" {
-  source              = "../../../modules/repository"
-  github_token        = var.github_token
-  repository          = "anime-tweet-bot"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  topics              = ["x", "bot"]
-  description         = "A bot for tweeting about anime."
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "anime-tweet-bot"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  topics                          = ["x", "bot"]
+  description                     = "A bot for tweeting about anime."
   branch_rulesets = {
     "main" = {
       enforcement = "active"

@@ -20,11 +20,12 @@ module "this" {
     "three-js",
     "typescript"
   ]
-  description         = "女子高生ナナと社会人カナによる対話型コンテンツ制作システム - 3D Animation + TTS + Ghost CMS"
-  has_projects        = true
-  has_issues          = true
-  has_wiki            = false
-  enable_owner_bypass = true
+  description                     = "女子高生ナナと社会人カナによる対話型コンテンツ制作システム - 3D Animation + TTS + Ghost CMS"
+  has_projects                    = true
+  has_issues                      = true
+  has_wiki                        = false
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
   branch_rulesets = {
     "main" = {
       enforcement = "active"

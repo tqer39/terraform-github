@@ -1,12 +1,13 @@
 module "this" {
-  source              = "../../../modules/repository"
-  github_token        = var.github_token
-  repository          = "kkhs-workspace"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  description         = "kkhs workspace repository"
-  visibility          = "private"
+  source                          = "../../../modules/repository"
+  github_token                    = var.github_token
+  repository                      = "kkhs-workspace"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  description                     = "kkhs workspace repository"
+  visibility                      = "private"
 
   branch_rulesets = {
     "main" = {

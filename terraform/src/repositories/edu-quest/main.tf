@@ -2,11 +2,12 @@ module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
 
-  repository          = "edu-quest"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  description         = "Educational platform for elementary students featuring multiple learning quests (Math, Kanji, Clock) built with Hono SSR on Cloudflare Workers."
+  repository                      = "edu-quest"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  description                     = "Educational platform for elementary students featuring multiple learning quests (Math, Kanji, Clock) built with Hono SSR on Cloudflare Workers."
   topics = [
     "cloudflare-workers",
     "hono",
