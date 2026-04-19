@@ -60,6 +60,8 @@ shellcheck
 shellenv
 SIGPIPE
 SSIA
+swiftdata
+swiftui
 Takeru
 textlint
 textlintcache
