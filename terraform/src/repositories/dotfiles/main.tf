@@ -27,7 +27,7 @@ module "this" {
         }
         required_status_checks = {
           required_check = [
-            { context = "prek" },
+            { context = "lint" },
             { context = "workflow-result" },
           ]
           strict_required_status_checks_policy = true
