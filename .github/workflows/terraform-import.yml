@@ -59,7 +59,11 @@ jobs:
           terraform -chdir="${WORKDIR}" import "module.this.github_repository.this[0]" "${REPO}" || true
           terraform -chdir="${WORKDIR}" import "module.this.github_branch_default.this" "${REPO}" || true
           terraform -chdir="${WORKDIR}" import "module.this.github_actions_repository_permissions.this[0]" "${REPO}" || true
-          terraform -chdir="${WORKDIR}" import 'module.this.github_branch_protection.this["main"]' "${REPO}:main" || true
+          if grep -Eq 'disable_default_main_protection[[:space:]]*=[[:space:]]*true' "${WORKDIR}/main.tf"; then
+            echo "Skip github_branch_protection import: ruleset-managed repo (disable_default_main_protection=true)"
+          else
+            terraform -chdir="${WORKDIR}" import 'module.this.github_branch_protection.this["main"]' "${REPO}:main" || true
+          fi
 
       - name: Terraform Import (rulesets)
         env:
