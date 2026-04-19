@@ -3,45 +3,75 @@ name: Terraform Import
 on:
   workflow_dispatch:
     inputs:
-      module:
-        description: 'Terraform module name (例: local_workspace_provisioning)'
-        required: true
-        type: string
       repo:
-        description: 'GitHub repository name (例: local-workspace-provisioning)'
+        description: 'GitHub repository name (例: blog)。terraform/src/repositories/<repo>/ が存在すること'
         required: true
         type: string
 
 jobs:
   terraform-import:
-    timeout-minutes: 5
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     permissions:
       id-token: write
       contents: read
 
+    env:
+      REPO: ${{ github.event.inputs.repo }}
+      WORKDIR: ./terraform/src/repositories/${{ github.event.inputs.repo }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6
+      - name: AWS Credential
+        uses: ./.github/actions/aws-credential
         with:
-          role-to-assume: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
-          aws-region: ap-northeast-1
+          oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
+
+      - name: Generate GitHub App Token
+        id: app_token
+        uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3
+        with:
+          app-id: ${{ secrets.GHA_APP_ID }}
+          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4
 
-      - name: Terraform Init
-        run: terraform -chdir=./terraform/src/repository init -reconfigure
-
-      - name: Terraform Import (repository, branch_default, actions_repository_permissions, branch_protection)
-        env:
-          TF_VAR_github_token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+      - name: Verify workdir exists
         run: |
-          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_repository.this[0]" "${{ github.event.inputs.repo }}" || true
-          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_default.this" "${{ github.event.inputs.repo }}" || true
-          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_actions_repository_permissions.this[0]" "${{ github.event.inputs.repo }}" || true
-          terraform -chdir=./terraform/src/repository import "module.${{ github.event.inputs.module }}.github_branch_protection.this[\"main\"]" "${{ github.event.inputs.repo }}:main" || true
+          if [ ! -d "${WORKDIR}" ]; then
+            echo "::error::Directory not found: ${WORKDIR}"
+            echo "Create terraform/src/repositories/${REPO}/main.tf first."
+            exit 1
+          fi
+
+      - name: Terraform Init
+        run: terraform -chdir="${WORKDIR}" init -reconfigure
+
+      - name: Terraform Import (core resources)
+        env:
+          TF_VAR_github_token: ${{ steps.app_token.outputs.token }}
+        run: |
+          terraform -chdir="${WORKDIR}" import "module.this.github_repository.this[0]" "${REPO}" || true
+          terraform -chdir="${WORKDIR}" import "module.this.github_branch_default.this" "${REPO}" || true
+          terraform -chdir="${WORKDIR}" import "module.this.github_actions_repository_permissions.this[0]" "${REPO}" || true
+          terraform -chdir="${WORKDIR}" import 'module.this.github_branch_protection.this["main"]' "${REPO}:main" || true
+
+      - name: Terraform Import (rulesets)
+        env:
+          TF_VAR_github_token: ${{ steps.app_token.outputs.token }}
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: |
+          set -euo pipefail
+          ruleset_json=$(gh api "repos/tqer39/${REPO}/rulesets" 2>/dev/null || echo "[]")
+          echo "${ruleset_json}" | jq -c '.[]' | while read -r rs; do
+            id=$(echo "${rs}" | jq -r '.id')
+            name=$(echo "${rs}" | jq -r '.name')
+            echo "Importing ruleset id=${id} name=${name}"
+            terraform -chdir="${WORKDIR}" import "module.this.github_repository_ruleset.default_main_protection[0]" "${REPO}:${id}" || true
+            terraform -chdir="${WORKDIR}" import "module.this.github_repository_ruleset.this[\"${name}\"]" "${REPO}:${id}" || true
+          done
