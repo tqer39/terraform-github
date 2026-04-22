@@ -17,6 +17,40 @@ env:
   AWS_ENV_NAME: portfolio
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup mise
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4
+        with:
+          install: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
+        with:
+          run_install: false
+
+      - name: Install node dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install betterleaks
+        env:
+          BETTERLEAKS_VERSION: 1.1.2
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/betterleaks.tar.gz
+          tar -xzf /tmp/betterleaks.tar.gz -C /tmp betterleaks
+          sudo install -m 0755 /tmp/betterleaks /usr/local/bin/betterleaks
+          betterleaks version
+
+      - name: Run lefthook
+        run: lefthook run pre-commit --all-files
+
   set-matrix:
     runs-on: ubuntu-latest
     outputs:
@@ -92,12 +126,16 @@ jobs:
               done
 
   workflow-result:
-    needs: [set-matrix, terraform, delete-nochange-comments]
+    needs: [lint, set-matrix, terraform, delete-nochange-comments]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check workflow result
         run: |
+          if [ "${{ needs.lint.result }}" == "failure" ]; then
+            echo "Lint failed"
+            exit 1
+          fi
           if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
             echo "No repositories to process"
             exit 0
