@@ -25,8 +25,6 @@ setup:
  @pnpm install --frozen-lockfile
  @echo "→ Installing lefthook git hooks..."
  @lefthook install
- @echo "→ Initializing Terraform..."
- @cd {{terraform_dir}} && terraform init -upgrade
  @echo "✓ Setup complete!"
 
 # Check if required tools are installed
