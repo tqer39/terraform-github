@@ -1,8 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": false
-  },
+  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "linter": {
     "enabled": false
   },
@@ -19,7 +17,11 @@
     }
   },
   "files": {
-    "include": ["*.json", "**/*.json"],
-    "ignore": ["**/node_modules/**", "**/.terraform/**", "**/modules.json"]
+    "includes": [
+      "**/*.json",
+      "!**/node_modules/**",
+      "!**/.terraform/**",
+      "!**/modules.json"
+    ]
   }
 }
