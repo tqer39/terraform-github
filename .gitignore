@@ -273,3 +273,7 @@ node_modules/
 
 # Git worktrees
 .worktrees/
+
+
+# superpowers workflow artifacts
+docs/superpowers/
