@@ -99,6 +99,7 @@ jobs:
           working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_APPS_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GHA_APP_ID: ${{ secrets.GHA_APP_ID }}
 
       # NOTE: GitHub App では個人アカウントのリポジトリを作成することが仕様上不可能なので PAT を使用する。
       - uses: ./.github/actions/terraform-apply
@@ -106,6 +107,7 @@ jobs:
         with:
           working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          GHA_APP_ID: ${{ secrets.GHA_APP_ID }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]

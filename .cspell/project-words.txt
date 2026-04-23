@@ -24,6 +24,7 @@ fastapi
 FASTMCP
 frontmatter
 getsentry
+goreleaser
 homelab
 hono
 itkq
