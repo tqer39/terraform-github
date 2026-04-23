@@ -18,6 +18,7 @@ for repo in $repos; do
   echo "Setting secret for $repo"
 
   gh secret set GHA_APP_ID --repo "$1/$repo" --body "$GHA_APP_ID"
+  gh secret set GHA_APP_CLIENT_ID --repo "$1/$repo" --body "$GHA_APP_CLIENT_ID"
   gh secret set GHA_APP_PRIVATE_KEY --repo "$1/$repo" --body "$GHA_APP_PRIVATE_KEY"
   gh secret set OPENROUTER_API_KEY --repo "$1/$repo" --body "$OPENROUTER_API_KEY"
 done
