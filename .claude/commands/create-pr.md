@@ -1,12 +1,13 @@
 ---
 name: create-pr
-description: 現在のブランチから PR を作成する（自動 push + claude-auto ラベル付与）
+description: 現在のブランチから PR を作成する（自動 push）
 allowed-tools: [Bash]
 ---
 
 # Create PR
 
-現在のブランチから main に対して PR を作成する。未 push なら自動で push し、`claude-auto` ラベルを付与する。
+現在のブランチから main に対して PR を作成する。未 push なら自動で push する。
+ブランチ名が `renovate/*` `worktree-*` `ccw-*` のいずれかであれば、`auto-merge.yml` が自動 approve + auto-merge を発火する（ラベル不要）。
 
 ## 手順
 
@@ -32,7 +33,7 @@ allowed-tools: [Bash]
 - 以下のコマンドで PR を作成する:
 
 ```bash
-gh pr create --base main --fill --label claude-auto
+gh pr create --base main --fill
 ```
 
 ### 5. 結果の表示
