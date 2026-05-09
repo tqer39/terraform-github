@@ -2,7 +2,7 @@
   "name": "terraform-github-devtools",
   "private": true,
   "description": "Development tool dependencies for terraform-github (run via lefthook).",
-  "packageManager": "pnpm@10.33.1",
+  "packageManager": "pnpm@10.33.2",
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
     "cspell": "10.0.0",
