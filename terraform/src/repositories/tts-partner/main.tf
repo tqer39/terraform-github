@@ -6,6 +6,7 @@ module "this" {
   default_branch                  = "main"
   enable_owner_bypass             = true
   disable_default_main_protection = true # TODO: 段階移行後に削除（PR #1555 follow-up）
+  visibility                      = "private"
   topics                          = ["tts"]
   description                     = "TTS Partner repository"
 
