@@ -17,7 +17,6 @@ resource "github_repository" "this" {
   squash_merge_commit_title   = var.squash_merge_commit_title
   squash_merge_commit_message = var.squash_merge_commit_message
   delete_branch_on_merge      = var.delete_branch_on_merge
-  vulnerability_alerts        = var.vulnerability_alerts
   archived                    = var.archived
   is_template                 = var.is_template
 
@@ -46,7 +45,6 @@ resource "github_repository" "this_from_template" {
   squash_merge_commit_title   = var.squash_merge_commit_title
   squash_merge_commit_message = var.squash_merge_commit_message
   delete_branch_on_merge      = var.delete_branch_on_merge
-  vulnerability_alerts        = var.vulnerability_alerts
   archived                    = var.archived
   is_template                 = var.is_template
 
@@ -75,7 +73,6 @@ resource "github_repository" "this_from_fork" {
   squash_merge_commit_title   = var.squash_merge_commit_title
   squash_merge_commit_message = var.squash_merge_commit_message
   delete_branch_on_merge      = var.delete_branch_on_merge
-  vulnerability_alerts        = var.vulnerability_alerts
   archived                    = var.archived
 
   source_owner = var.source_owner
