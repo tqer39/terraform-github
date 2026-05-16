@@ -101,7 +101,7 @@ case $choice in
         echo -e "  ${YELLOW}git worktree add ../${REPO_NAME}-feature-new-feature -b feature/new-feature${NC}"
         echo ""
         echo -e "  # Or use this script"
-        echo -e "  ${YELLOW}make worktree-setup${NC}"
+        echo -e "  ${YELLOW}mise run wt:setup${NC}"
         echo ""
         echo -e "${BLUE}Remove a worktree:${NC}"
         echo -e "  ${YELLOW}git worktree remove ../${REPO_NAME}-feature-new-feature${NC}"
