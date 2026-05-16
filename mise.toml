@@ -5,3 +5,106 @@ yamllint = "1.38.0"
 actionlint = "1.7.12"
 shellcheck = "0.11.0"
 node = "24"
+
+[env]
+TERRAFORM_DIR = "terraform/src/repository"
+
+# ---- フラット（最頻出 & ツール管理） ----
+[tasks.setup]
+description = "Setup development environment (mise install + pnpm + lefthook)"
+run = "./scripts/setup.sh"
+
+[tasks.check-tools]
+description = "Verify all required tools are installed"
+run = "./scripts/check-tools.sh"
+
+[tasks.install]
+description = "Install tools from mise.toml"
+run = "mise install"
+
+[tasks.update]
+description = "Upgrade mise-managed tools"
+run = "mise upgrade"
+
+[tasks.update-brew]
+description = "Update brew packages"
+run = ["brew update", "brew bundle install", "brew upgrade"]
+
+[tasks.status]
+description = "Show mise-managed tool versions"
+run = "mise list"
+
+[tasks.version]
+description = "Show tool versions"
+run = ["terraform version", "mise --version"]
+
+# ---- tf:* ----
+[tasks."tf:fmt"]
+description = "Format all Terraform files"
+run = "terraform fmt -recursive"
+
+[tasks."tf:validate"]
+description = "Validate Terraform configuration"
+dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
+run = "terraform validate"
+
+[tasks."tf:init"]
+description = "Initialize Terraform"
+dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
+run = "terraform init -upgrade"
+
+[tasks."tf:plan"]
+description = "Run Terraform plan"
+dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
+run = "terraform plan"
+
+[tasks."tf:apply"]
+description = "Run Terraform apply (use with caution)"
+dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
+run = "terraform apply"
+
+[tasks."tf:clean"]
+description = "Clean Terraform temporary files"
+run = '''
+find "$TERRAFORM_DIR" -type d -name ".terraform" -exec rm -rf {} + 2>/dev/null || true
+find "$TERRAFORM_DIR" -type f -name "*.tfstate.backup" -delete 2>/dev/null || true
+'''
+
+# ---- dev:* ----
+[tasks."dev:lint"]
+description = "Run all linters via lefthook"
+run = "lefthook run pre-commit --all-files"
+
+[tasks."dev:lint-hook"]
+description = "Run a specific lefthook command (usage: mise run dev:lint-hook -- <hook>)"
+run = 'lefthook run pre-commit --commands "$1" --all-files'
+
+[tasks."dev:fix"]
+description = "Auto-fix common formatting issues"
+run = [
+  "lefthook run pre-commit --commands end-of-file-fixer --all-files",
+  "lefthook run pre-commit --commands trailing-whitespace --all-files",
+  "lefthook run pre-commit --commands markdownlint --all-files",
+]
+
+[tasks."dev:fmt-staged"]
+description = "Format staged files"
+run = "lefthook run pre-commit --commands terraform-fmt"
+
+# ---- wt:* ----
+[tasks."wt:setup"]
+description = "Interactive git worktree setup"
+run = "./scripts/setup-worktree.sh"
+
+[tasks."wt:add"]
+description = "Add a git worktree (usage: mise run wt:add -- <branch>)"
+hide = true
+run = './scripts/setup-worktree.sh add "$1"'
+
+[tasks."wt:list"]
+hide = true
+run = "git worktree list"
+
+[tasks."wt:remove"]
+hide = true
+run = 'git worktree remove "../terraform-github-$1"'
