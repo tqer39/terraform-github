@@ -4,7 +4,7 @@
 
 1. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
 2. `../../../modules/repository` モジュールを必須パラメータ付きで使用
-3. `just validate && just plan` を実行
+3. `mise run tf:validate && mise run tf:plan` を実行
 4. PR を作成してレビュー依頼
 
 HCL パターンとモジュールパラメータの詳細: [terraform-patterns.md](terraform-patterns.md) を参照
