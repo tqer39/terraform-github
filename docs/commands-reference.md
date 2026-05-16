@@ -5,20 +5,21 @@ terraform-github リポジトリ操作の詳細コマンドリファレンス。
 ## 初期セットアップ
 
 ```bash
-make bootstrap       # 必要なツールを一括インストール
-just setup           # 開発環境のセットアップ
-just check-tools     # インストール状態の確認
+./scripts/bootstrap.sh   # 必要なツールを一括インストール (Homebrew + Brewfile)
+mise install             # mise.toml で管理されるツールをインストール
+mise run setup           # 開発環境のセットアップ
+mise run check-tools     # インストール状態の確認
 ```
 
 ## Terraform 操作
 
 | コマンド | 説明 |
 | ------- | ---- |
-| `just fmt` | 全 Terraform ファイルをフォーマット |
-| `just init` | Terraform の初期化 |
-| `just validate` | 設定の検証 |
-| `just plan` | 変更の計画 |
-| `just apply` | 変更の適用（ローカル実行は注意） |
+| `mise run tf:fmt` | 全 Terraform ファイルをフォーマット |
+| `mise run tf:init` | Terraform の初期化 |
+| `mise run tf:validate` | 設定の検証 |
+| `mise run tf:plan` | 変更の計画 |
+| `mise run tf:apply` | 変更の適用（ローカル実行は注意） |
 
 ### 既存リポジトリのインポート
 
@@ -42,30 +43,30 @@ terraform import module.this.github_repository_ruleset.this[\"<ruleset_name>\"] 
 
 | コマンド | 説明 |
 | ------- | ---- |
-| `just lint` | 全 pre-commit フックを実行 |
-| `just lint-hook <hook>` | 特定フックを実行（terraform_fmt, terraform_validate, terraform_tflint, yamllint, markdownlint） |
-| `just fix` | よくある問題を自動修正 |
-| `just fmt-staged` | ステージ済みファイルをフォーマット |
+| `mise run dev:lint` | 全 pre-commit フックを実行 |
+| `mise run dev:lint-hook -- <hook>` | 特定フックを実行（terraform_fmt, terraform_validate, terraform_tflint, yamllint, markdownlint） |
+| `mise run dev:fix` | よくある問題を自動修正 |
+| `mise run dev:fmt-staged` | ステージ済みファイルをフォーマット |
 
 ## Git Worktree
 
 ```bash
-just worktree-setup                                    # インタラクティブセットアップ
+mise run wt:setup                                       # インタラクティブセットアップ
 git worktree add ../terraform-github-<branch> -b <branch>  # 手動追加
-git worktree list                                      # 一覧表示
-git worktree remove ../terraform-github-<branch>      # 削除
+git worktree list                                       # 一覧表示
+git worktree remove ../terraform-github-<branch>       # 削除
 ```
 
 ## メンテナンス
 
 | コマンド | 説明 |
 | ------- | ---- |
-| `just clean` | Terraform 一時ファイルを削除 |
-| `just version` | バージョン表示 |
-| `just status` | mise 管理ツールのバージョン表示 |
-| `just install` | mise.toml からツールをインストール |
-| `just update` | mise 管理ツールを更新 |
-| `just update-brew` | brew パッケージを更新 |
+| `mise run tf:clean` | Terraform 一時ファイルを削除 |
+| `mise run version` | バージョン表示 |
+| `mise run status` | mise 管理ツールのバージョン表示 |
+| `mise run install` | mise.toml からツールをインストール |
+| `mise run update` | mise 管理ツールを更新 |
+| `mise run update-brew` | brew パッケージを更新 |
 
 ## リポジトリ削除手順
 
