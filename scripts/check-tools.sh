@@ -54,9 +54,6 @@ check_command() {
             git)
                 version=$(git --version 2>/dev/null | awk 'NR==1 {print $3}')
                 ;;
-            make)
-                version=$(make --version 2>/dev/null | awk 'NR==1 {print $3}')
-                ;;
             *)
                 version="installed"
                 ;;
@@ -79,8 +76,6 @@ missing_tools=0
 
 echo -e "${BLUE}Core Tools:${NC}"
 check_command "git" || ((missing_tools++))
-check_command "make" || ((missing_tools++))
-check_command "just" || ((missing_tools++))
 echo ""
 
 echo -e "${BLUE}Version Manager:${NC}"
@@ -135,6 +130,6 @@ else
     echo -e "${RED}❌ ${missing_tools} required tool(s) missing${NC}"
     echo -e "${BLUE}========================================${NC}"
     echo ""
-    echo -e "${YELLOW}Run '${BLUE}make bootstrap${YELLOW}' to install missing tools${NC}"
+    echo -e "${YELLOW}Run '${BLUE}./scripts/bootstrap.sh${YELLOW}' to install missing tools${NC}"
     exit 1
 fi

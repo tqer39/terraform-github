@@ -55,6 +55,7 @@ pipefail
 prek
 pyenv
 pyproject
+rcfile
 reviewdog
 rinchsan
 shellcheck

@@ -14,9 +14,9 @@
 ## バリデーション
 
 ```bash
-just validate                              # 設定の検証
-just plan                                  # 変更の計画
-aws-vault exec portfolio -- just plan      # AWS 認証付き
+mise run tf:validate                              # 設定の検証
+mise run tf:plan                                  # 変更の計画
+aws-vault exec portfolio -- mise run tf:plan      # AWS 認証付き
 ```
 
 ## コミット規約

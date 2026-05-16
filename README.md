@@ -15,12 +15,11 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
 1. Install Homebrew and all required tools:
 
    ```bash
-   make bootstrap
+   ./scripts/bootstrap.sh
    ```
 
    This will install:
    - [mise](https://mise.jdx.dev/) - Universal tool version manager
-   - [just](https://github.com/casey/just) - Command runner
    - [git](https://git-scm.com/) - Version control system
    - [aws-vault](https://github.com/99designs/aws-vault) - AWS credential management
    - [betterleaks](https://github.com/betterleaks/betterleaks) - Secrets scanner
@@ -30,7 +29,7 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
 3. Setup the development environment:
 
    ```bash
-   just setup
+   mise run setup
    ```
 
    This will:
@@ -44,7 +43,7 @@ This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other
 Check that all required tools are installed:
 
 ```bash
-just check-tools
+mise run check-tools
 ```
 
 ### Development with Git Worktree
@@ -54,7 +53,7 @@ This project supports parallel development using git worktree. This allows you t
 #### Setup Git Worktree
 
 ```bash
-just worktree-setup
+mise run wt:setup
 ```
 
 This will guide you through creating a new worktree. Worktrees are created under `.worktrees/<branch-name>/` within the repository.
@@ -85,35 +84,34 @@ git worktree remove .worktrees/feature-name
 
 ### Available Commands
 
-#### Bootstrap (Makefile)
+#### Bootstrap
 
-- `make bootstrap` - Install Homebrew and all required tools
-- `make help` - Show Makefile targets
+- `./scripts/bootstrap.sh` - Install Homebrew and required packages
 
-#### Development Tasks (just)
+#### Development Tasks (mise)
 
 Show all available tasks:
 
 ```bash
-just help
+mise tasks
 ```
 
 Common tasks:
 
-- `just setup` - Setup development environment (install tools and initialize)
-- `just check-tools` - Verify all required tools are installed
-- `just worktree-setup` - Interactive git worktree setup
-- `just fmt` - Format all Terraform files
-- `just validate` - Validate Terraform configuration
-- `just lint` - Run all linters (lefthook)
-- `just init` - Initialize Terraform
-- `just plan` - Run Terraform plan
-- `just apply` - Run Terraform apply (use with caution)
-- `just clean` - Clean Terraform temporary files
-- `just version` - Show tool versions (Terraform, mise, just)
-- `just status` - Show mise-managed tool versions
-- `just install` - Install tools from mise.toml
-- `just update` - Update mise-managed tools
+- `mise run setup` - Setup development environment (install tools and initialize)
+- `mise run check-tools` - Verify all required tools are installed
+- `mise run wt:setup` - Interactive git worktree setup
+- `mise run tf:fmt` - Format all Terraform files
+- `mise run tf:validate` - Validate Terraform configuration
+- `mise run dev:lint` - Run all linters (lefthook)
+- `mise run tf:init` - Initialize Terraform
+- `mise run tf:plan` - Run Terraform plan
+- `mise run tf:apply` - Run Terraform apply (use with caution)
+- `mise run tf:clean` - Clean Terraform temporary files
+- `mise run version` - Show tool versions (Terraform, mise)
+- `mise run status` - Show mise-managed tool versions
+- `mise run install` - Install tools from mise.toml
+- `mise run update` - Update mise-managed tools
 
 ## Deployment Flow
 
