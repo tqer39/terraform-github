@@ -47,6 +47,7 @@ terraform import module.this.github_repository_ruleset.this[\"<ruleset_name>\"] 
 | `mise run dev:lint-hook -- <hook>` | 特定フックを実行（terraform_fmt, terraform_validate, terraform_tflint, yamllint, markdownlint） |
 | `mise run dev:fix` | よくある問題を自動修正 |
 | `mise run dev:fmt-staged` | ステージ済みファイルをフォーマット |
+| `scripts/lint/check-terraform-lock.sh` | `terraform/src/repositories/<repo>/` 配下の `.terraform.lock.hcl` 欠落を検出（lefthook の `check-terraform-lock` フックから自動実行） |
 
 ## Git Worktree
 
