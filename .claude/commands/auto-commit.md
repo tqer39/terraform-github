@@ -33,11 +33,11 @@ allowed-tools: [Bash, Read, Glob, Grep]
 
 ### 4. Lint チェック
 
-- `just lint` を実行する
+- `mise run dev:lint` を実行する
 - 失敗した場合:
-  - エラー内容を確認し、`just fix` または手動で修正する
+  - エラー内容を確認し、`mise run dev:fix` または手動で修正する
   - 修正したファイルを再ステージング（ステップ 3 のルールに従う）
-  - `just lint` を再実行してパスを確認する
+  - `mise run dev:lint` を再実行してパスを確認する
 - **パスするまでコミットに進まない**
 
 ### 5. コミットメッセージの生成
