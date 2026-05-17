@@ -35,6 +35,9 @@ pre-commit:
     shellcheck:
       glob: "*.sh"
       run: shellcheck {staged_files}
+    check-terraform-lock:
+      glob: "terraform/src/repositories/**"
+      run: scripts/lint/check-terraform-lock.sh
     markdownlint:
       glob: "*.{md,markdown}"
       run: pnpm exec markdownlint-cli2 --fix {staged_files}
