@@ -2,7 +2,7 @@ module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
 
-  repository          = "harness-engineering-assistant"
+  repository          = "personal-ai-assistant"
   owner               = "tqer39"
   default_branch      = "main"
   enable_owner_bypass = true

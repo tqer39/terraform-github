@@ -8,7 +8,7 @@ terraform {
   }
   backend "s3" {
     bucket  = "terraform-tfstate-tqer39-072693953877-ap-northeast-1"
-    key     = "terraform-github/repositories/harness-engineering-assistant.tfstate"
+    key     = "terraform-github/repositories/personal-ai-assistant.tfstate"
     region  = "ap-northeast-1"
     encrypt = true
   }
