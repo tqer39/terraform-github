@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
           fetch-depth: 0
-      - uses: tqer39/generate-pr-description@e75104432d602e5ba39326db57ec4e4689ad7925 # v2.0.2
+      - uses: tqer39/generate-pr-description@f04a03f058ece4ef29359f8da361f127b02fa25e # v2.0.4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           api-key: ${{ secrets.OPENROUTER_API_KEY }}
