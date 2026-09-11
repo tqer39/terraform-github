@@ -4,7 +4,7 @@
   "description": "Development tool dependencies for terraform-github (run via lefthook).",
   "packageManager": "pnpm@11.22.0",
   "devDependencies": {
-    "@biomejs/biome": "2.5.10",
+    "@biomejs/biome": "2.5.11",
     "cspell": "10.1.0",
     "markdownlint-cli2": "0.23.2",
     "textlint": "15.8.0",
