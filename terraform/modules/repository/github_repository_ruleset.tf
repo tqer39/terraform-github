@@ -145,11 +145,22 @@ resource "github_repository_ruleset" "default_main_protection" {
   }
 
   dynamic "bypass_actors" {
-    for_each = var.default_main_protection_owner_bypass ? [1] : []
+    for_each = concat(
+      var.default_main_protection_owner_bypass ? [{
+        actor_id    = 5 # RepositoryRole: Admin
+        actor_type  = "RepositoryRole"
+        bypass_mode = "pull_request"
+      }] : [],
+      [for app_id in var.default_main_protection_bypass_app_ids : {
+        actor_id    = app_id
+        actor_type  = "Integration"
+        bypass_mode = "always"
+      }]
+    )
     content {
-      actor_id    = 5 # RepositoryRole: Admin
-      actor_type  = "RepositoryRole"
-      bypass_mode = "pull_request"
+      actor_id    = bypass_actors.value.actor_id
+      actor_type  = bypass_actors.value.actor_type
+      bypass_mode = bypass_actors.value.bypass_mode
     }
   }
 
