@@ -10,4 +10,7 @@ module "this" {
   visibility             = "private"
   delete_branch_on_merge = true
   branch_rulesets        = {}
+
+  # tqer39-obsidian-vault-writer の App ID（Installation ID ではない）
+  default_main_protection_bypass_app_ids = [4916965]
 }

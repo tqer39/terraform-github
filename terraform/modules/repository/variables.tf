@@ -197,6 +197,17 @@ variable "default_main_protection_owner_bypass" {
   default     = true
 }
 
+variable "default_main_protection_bypass_app_ids" {
+  type        = set(number)
+  description = "標準 main 保護を常時 bypass できる GitHub App ID。Installation ID ではない。"
+  default     = []
+
+  validation {
+    condition     = alltrue([for id in var.default_main_protection_bypass_app_ids : id > 0 && floor(id) == id])
+    error_message = "GitHub App ID は正の整数で指定してください。"
+  }
+}
+
 variable "is_template" {
   type        = bool
   description = "(Optional) Whether the repository is a template repository."

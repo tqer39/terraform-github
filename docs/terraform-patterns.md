@@ -37,6 +37,11 @@ module "my_new_repo" {
 }
 ```
 
+### GitHub App による bypass
+
+標準保護を維持して GitHub App から直接コミットする場合は、`default_main_protection_bypass_app_ids` に App ID を指定する。
+指定した App は標準 ruleset 全体を `always` で bypass するため、保存パスの制限は App 側で実装する。
+
 ### 標準保護を無効にするケース
 
 archived リポジトリや保護が不要なリポジトリは `disable_default_main_protection = true` を明示する。
@@ -130,6 +135,7 @@ module "my_legacy_repo" {
 | `topics` | No | リポジトリのトピック/タグ一覧 |
 | `disable_default_main_protection` | No | `true` にすると標準 main 保護を無効化（デフォルト: `false`） |
 | `default_main_protection_owner_bypass` | No | 標準 main 保護で所有者 bypass を許可するか（デフォルト: `true`） |
+| `default_main_protection_bypass_app_ids` | No | 標準 main 保護を常時 bypass できる GitHub App ID の集合（デフォルト: `[]`）。Installation ID は指定しない |
 | `branch_rulesets` | No | 追加 ruleset（`main` 以外や特殊な上書きに使用） |
 | `branches_to_protect` | No | レガシーブランチ保護（非推奨） |
 | `has_wiki`, `has_issues`, `has_projects` | No | 機能トグル |
