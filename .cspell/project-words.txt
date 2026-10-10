@@ -82,3 +82,6 @@ worktree
 worktrees
 xtrade
 yamllint
+katex
+micromark
+smol
