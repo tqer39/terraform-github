@@ -4,14 +4,13 @@
 
 # Taps
 tap "j178/tap"
-tap "betterleaks/tap"
 
 # Core development tools
 brew "mise" # Version manager for Terraform and other tools
 brew "git" # Version control system
 brew "j178/tap/prek" # Git hooks framework
 brew "aws-vault" # AWS credential management
-brew "betterleaks/tap/betterleaks" # Secrets scanner (gitleaks successor)
+# betterleaks is pinned in mise.toml for local development and CI.
 
 # Optional: Additional useful tools (uncomment if needed)
 # brew "gh" # GitHub CLI

@@ -67,6 +67,5 @@ if [[ "${UNAME_S}" == "Darwin" ]]; then
 else
     echo -e "  1. Reload your shell (source ~/.zshrc or ~/.bashrc)"
 fi
-echo -e "  2. Run: ${YELLOW}mise install${NC}"
-echo -e "  3. Run: ${YELLOW}mise run setup${NC}"
+echo -e "  2. Run: ${YELLOW}mise bootstrap --only tools,task${NC}"
 echo ""

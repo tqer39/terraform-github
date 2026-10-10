@@ -8,6 +8,10 @@ yaml-files:
   - '*.yml'
   - '.yamllint'
 
+# pnpm 12 generates a multi-document lockfile with required separators.
+ignore: |
+  pnpm-lock.yaml
+
 rules:
   # Disabled - Prettier handles formatting
   braces: disable

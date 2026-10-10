@@ -8,35 +8,26 @@ This repository is for deploying repositories to GitHub using Terraform and GitH
 
 ### Prerequisites
 
-This project requires [Homebrew](https://brew.sh/) for macOS or Linux. All other dependencies will be installed automatically.
+Install [mise](https://mise.jdx.dev/) and Git. The setup scripts support macOS and Linux.
+If mise is missing, `./scripts/bootstrap.sh` installs Homebrew and the packages in `Brewfile`.
 
 ### Quick Setup
 
-1. Install Homebrew and all required tools:
+```bash
+mise bootstrap --only tools,task
+```
 
-   ```bash
-   ./scripts/bootstrap.sh
-   ```
+This installs the pinned tools in `mise.toml` (including pnpm and betterleaks),
+Node.js development dependencies from the lockfile, and lefthook Git hooks.
+`mise run bootstrap` runs the same repository setup task directly; `mise run setup`
+remains available. In a non-interactive shell, set `CI=true` when replacing an existing
+`node_modules` installation. Terraform backend initialization is a separate step
+because it requires AWS credentials.
 
-   This will install:
-   - [mise](https://mise.jdx.dev/) - Universal tool version manager
-   - [git](https://git-scm.com/) - Version control system
-   - [aws-vault](https://github.com/99designs/aws-vault) - AWS credential management
-   - [betterleaks](https://github.com/betterleaks/betterleaks) - Secrets scanner
-
-2. Restart your terminal or reload your shell (for Homebrew PATH)
-
-3. Setup the development environment:
-
-   ```bash
-   mise run setup
-   ```
-
-   This will:
-   - Install tools defined in `mise.toml` via mise (Terraform v1.14.8, lefthook, yamllint, actionlint, shellcheck)
-   - Install Node.js dev dependencies via `pnpm install`
-   - Install Git hooks using [lefthook](https://lefthook.dev/)
-   - Initialize Terraform
+The betterleaks pre-commit hook scans the selected files from the Git index,
+including partially staged files. `mise run lint` scans selected tracked files from
+the working tree, runs regression tests, and runs all linters. Secret values are
+redacted and live credential validation is disabled.
 
 ### Verify Installation
 
@@ -86,7 +77,8 @@ git worktree remove .worktrees/feature-name
 
 #### Bootstrap
 
-- `./scripts/bootstrap.sh` - Install Homebrew and required packages
+- `mise bootstrap --only tools,task` - Install tools, development dependencies and Git hooks
+- `./scripts/bootstrap.sh` - Install Homebrew and base packages when mise is missing
 
 #### Development Tasks (mise)
 
@@ -98,12 +90,13 @@ mise tasks
 
 Common tasks:
 
-- `mise run setup` - Setup development environment (install tools and initialize)
+- `mise run bootstrap` / `mise run setup` - Setup tools, development dependencies and Git hooks
 - `mise run check-tools` - Verify all required tools are installed
 - `mise run wt:setup` - Interactive git worktree setup
 - `mise run tf:fmt` - Format all Terraform files
 - `mise run tf:validate` - Validate Terraform configuration
-- `mise run dev:lint` - Run all linters (lefthook)
+- `mise run lint` / `mise run dev:lint` - Run regression tests and all linters
+- `mise run dev:test` - Run regression tests
 - `mise run tf:init` - Initialize Terraform
 - `mise run tf:plan` - Run Terraform plan
 - `mise run tf:apply` - Run Terraform apply (use with caution)
@@ -115,11 +108,26 @@ Common tasks:
 
 ## Deployment Flow
 
-1. A GitHub Actions workflow is triggered (e.g., when a pull request is merged).
+1. Pull requests and pushes select only changed repository roots. Shared repository module or Terraform action changes select all roots. Manual runs require a repository root name, or the explicit value `all`.
 2. The [`set-matrix`](.github/actions/set-matrix/action.yml) action is executed to create a list of directories for Terraform execution.
 3. The [`setup-terraform`](.github/actions/setup-terraform/action.yml) action is executed to set up Terraform.
 4. The [`terraform-plan`](.github/actions/terraform-plan/action.yml) action is executed to create a Terraform plan.
-5. The [`terraform-apply`](.github/actions/terraform-apply/action.yml) action is executed to apply the Terraform plan.
+5. Pushes affecting individual roots apply the saved plan. Shared module or Terraform action changes run plan only; apply them through a manual run after reviewing every affected root. Manual runs default to plan only; set `apply` to true after reviewing the target and expected changes.
+
+Local Terraform tasks default to `terraform-github`. Select a root explicitly, for example:
+
+```bash
+AWS_PROFILE=portfolio mise run tf:init -- terraform-github -input=false
+AWS_PROFILE=portfolio mise run tf:validate -- terraform-github
+AWS_PROFILE=portfolio mise run tf:plan -- terraform-github -out=tfplan
+mise exec -- terraform -chdir=terraform/src/repositories/terraform-github show tfplan
+AWS_PROFILE=portfolio mise run tf:apply -- terraform-github tfplan
+```
+
+Set `TF_VAR_github_token` using your existing credential mechanism. Saved plans may
+contain sensitive values and must remain untracked. `TERRAFORM_DIR` can override
+the default root. Archived roots do not manage vulnerability alerts; existing
+active alert resources migrate to the indexed address without recreation.
 
 ```mermaid
 graph TD
@@ -128,8 +136,8 @@ graph TD
   C --> D[Terraform Plan]
   D --> E[Start Deployment]
   E --> F{push or workflow_dispatch}
-  F -- Yes --> G[Terraform Apply]
-  F -- No --> H[Skip]
+  F -- Apply enabled --> G[Apply saved plan]
+  F -- Plan only --> H[Skip]
   G --> I[Finish Deployment]
   H --> I
 ```
