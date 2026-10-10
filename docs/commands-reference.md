@@ -5,7 +5,7 @@ terraform-github リポジトリ操作の詳細コマンドリファレンス。
 ## 初期セットアップ
 
 ```bash
-./scripts/bootstrap.sh   # 必要なツールを一括インストール (Homebrew + Brewfile)
+./scripts/bootstrap.sh   # mise と Git をインストール (Homebrew + Brewfile)
 mise bootstrap --only tools,task # ツール、固定依存、Git フックをセットアップ
 mise run check-tools     # インストール状態の確認
 ```
@@ -62,12 +62,14 @@ terraform import module.this.github_repository_ruleset.this[\"<ruleset_name>\"] 
 | ------- | ---- |
 | `mise run lint` / `mise run dev:lint` | 回帰テストと全 pre-commit フックを実行 |
 | `mise run dev:test` | 実行対象、秘密検出、モジュールの回帰テスト |
-| `mise run dev:lint-hook -- <hook>` | 特定フックを実行（terraform_fmt, terraform_validate, terraform_tflint, yamllint, markdownlint） |
+| `mise run dev:lint-hook -- <hook>` | 特定フックを実行（terraform-fmt, oxfmt, yamllint, markdownlint） |
+| `mise run rules:sync` | LLM 向けの共通ルール参照を生成 |
+| `mise run rules:check` | 生成結果の更新漏れを検出 |
 | `mise run dev:fix` | よくある問題を自動修正 |
 | `mise run dev:fmt-staged` | ステージ済みファイルをフォーマット |
 | `scripts/lint/check-terraform-lock.sh` | `terraform/src/repositories/<repo>/` 配下の `.terraform.lock.hcl` 欠落を検出（lefthook の `check-terraform-lock` フックから自動実行） |
 
-## Git Worktree
+## Git worktree
 
 ```bash
 mise run wt:setup                                       # インタラクティブセットアップ

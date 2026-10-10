@@ -52,9 +52,9 @@ pre-commit:
       run: npx --yes --package=renovate -- renovate-config-validator {staged_files}
 
     # ── フォーマッタ系 ──
-    biome-format:
+    oxfmt:
       glob: "*.json"
-      run: pnpm exec biome format --write {staged_files}
+      run: pnpm exec oxfmt --write {staged_files}
       stage_fixed: true
     terraform-fmt:
       glob: "*.tf"

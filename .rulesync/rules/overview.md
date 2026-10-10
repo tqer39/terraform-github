@@ -1,3 +1,8 @@
+---
+root: true
+targets: [claudecode, codexcli, copilot, devin]
+---
+
 # ルールの参照
 
 回答は日本語にしてください。作業前に、次のルールごとの原本を読んでください。

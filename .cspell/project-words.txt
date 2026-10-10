@@ -85,3 +85,11 @@ yamllint
 katex
 micromark
 smol
+ByteNess
+claudecode
+codexcli
+Devin
+oxfmt
+Oxlint
+rulesync
+tldjs

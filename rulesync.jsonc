@@ -1,0 +1,13 @@
+{
+  "$schema": "https://github.com/dyoshikawa/rulesync/releases/download/v29.0.0/config-schema.json",
+  "targets": {
+    "claudecode": {
+      "rules": {
+        "includeRoot": false
+      }
+    },
+    "codexcli": ["rules"],
+    "copilot": ["rules"],
+    "devin": ["rules"]
+  }
+}

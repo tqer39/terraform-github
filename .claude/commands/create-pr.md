@@ -4,7 +4,7 @@ description: 現在のブランチから PR を作成する（自動 push）
 allowed-tools: [Bash]
 ---
 
-# Create PR
+# PR の作成
 
 現在のブランチから main に対して PR を作成する。未 push なら自動で push する。
 ブランチ名が `renovate/*` `worktree-*` `ccw-*` のいずれかであれば、`auto-merge.yml` が自動 approve + auto-merge を発火する（ラベル不要）。
