@@ -1,120 +1,140 @@
 # terraform-github
 
-## Overview
+## 概要
 
-This repository is for deploying repositories to GitHub using Terraform and GitHub Actions.
+Terraform と GitHub Actions を使い、GitHub リポジトリの設定を管理します。
+共通モジュールでリポジトリ、ブランチ保護、環境、Actions の権限を定義します。
 
-## Getting Started
+## セットアップ
 
-### Prerequisites
+### 前提条件
 
-Install [mise](https://mise.jdx.dev/) and Git. The setup scripts support macOS and Linux.
-If mise is missing, `./scripts/bootstrap.sh` installs Homebrew and the packages in `Brewfile`.
+[mise](https://mise.jdx.dev/) と Git を準備してください。
+セットアップスクリプトは macOS と Linux に対応しています。
+mise が未導入の場合は、次のスクリプトで Homebrew と `Brewfile` の基本ツールを導入します。
 
-### Quick Setup
+```bash
+./scripts/bootstrap.sh
+```
+
+`Brewfile` は環境の起動に必要な mise と Git だけを管理します。
+Terraform、aws-vault、Node.js、Python、pnpm、lefthook などは `mise.toml` で管理します。
+文書の検証、JSON の整形、LLM 向けルールの生成に使う依存は `package.json` と
+`pnpm-lock.yaml` で固定します。Git フックには lefthook を使います。
+
+### 一括セットアップ
 
 ```bash
 mise bootstrap --only tools,task
 ```
 
-This installs the pinned tools in `mise.toml` (including pnpm and betterleaks),
-Node.js development dependencies from the lockfile, and lefthook Git hooks.
-`mise run bootstrap` runs the same repository setup task directly; `mise run setup`
-remains available. In a non-interactive shell, set `CI=true` when replacing an existing
-`node_modules` installation. Terraform backend initialization is a separate step
-because it requires AWS credentials.
+mise の固定ツール、ロックファイルに従った Node.js 依存、LLM 向けルールの参照、
+lefthook の Git フックをセットアップします。
+`mise run bootstrap` と `mise run setup` も同じセットアップを実行します。
+非対話環境で既存の `node_modules` を置き換える場合は `CI=true` を指定してください。
+AWS 認証が必要な Terraform バックエンドの初期化は、別途実行します。
 
-The betterleaks pre-commit hook scans the selected files from the Git index,
-including partially staged files. `mise run lint` scans selected tracked files from
-the working tree, runs regression tests, and runs all linters. Secret values are
-redacted and live credential validation is disabled.
-
-### Verify Installation
-
-Check that all required tools are installed:
+### インストールの確認
 
 ```bash
 mise run check-tools
 ```
 
-### Development with Git Worktree
+### コード品質
 
-This project supports parallel development using git worktree. This allows you to work on multiple branches simultaneously without switching between them.
+betterleaks のコミットフックは、選択されたファイルの Git インデックスを検査します。
+部分的にステージしたファイルも対象とし、秘密の値をマスクします。
+外部 API による認証情報の有効性検証は行いません。
+`mise run lint` はルールの生成結果、回帰テスト、全リントを検証します。
+秘密検出の対象は、作業ツリー内の選択された追跡ファイルです。
 
-#### Setup Git Worktree
+JSON の整形には [Oxfmt](https://oxc.rs/docs/guide/usage/formatter.html) を使います。
+Terraform の整形は `terraform fmt`、Markdown の検証は markdownlint、textlint、
+cspell を使います。JavaScript / TypeScript のソースを持たないため、Oxlint は導入していません。
+
+## LLM 向けルール
+
+ルールごとに `docs/rules/*.md` を原本として管理します。
+[プロジェクトの構成](docs/rules/project.md)、[開発作業](docs/rules/development.md)、
+[コーディング規約](docs/rules/coding-standards.md)、
+[文書の規約](docs/rules/documentation.md) を個別の文書に配置します。
+Markdown 文書は日本語で記述し、言語別の複製を作りません。
+
+[rulesync](https://rulesync.dyoshikawa.com/) で原本への参照を生成します。
+対象は Claude Code、Codex、GitHub Copilot、Devin です。
+Codex と Devin の入口は `AGENTS.md`、Copilot は `.github/copilot-instructions.md`、
+Claude Code は `.claude/rules/*.md` です。
+Copilot と Devin にも個別ルールを生成し、各ルールから対応する原本を参照します。
+ルール以外の設定は生成しません。
+
+```bash
+mise run rules:sync
+mise run rules:check
+```
+
+## Git worktree
+
+複数のブランチを同時に作業する場合は Git worktree を使います。
+対話形式のセットアップは次のコマンドで実行します。
 
 ```bash
 mise run wt:setup
 ```
 
-This will guide you through creating a new worktree. Worktrees are created under `.worktrees/<branch-name>/` within the repository.
-
-#### Manual Worktree Management
-
-Create a new worktree:
+worktree はリポジトリ内の `.worktrees/<branch-name>/` に作成されます。
+手動で管理する場合は、次のように操作します。
 
 ```bash
-# For a new branch
+# 新しいブランチを作成する
 git worktree add .worktrees/feature-name -b feature/feature-name
 
-# For an existing branch
+# 既存ブランチを使う
 git worktree add .worktrees/feature-name feature/feature-name
-```
 
-List all worktrees:
-
-```bash
+# 一覧を確認する
 git worktree list
-```
 
-Remove a worktree:
-
-```bash
+# 削除する
 git worktree remove .worktrees/feature-name
 ```
 
-### Available Commands
+## 主要コマンド
 
-#### Bootstrap
+全タスクは `mise tasks` で確認できます。
 
-- `mise bootstrap --only tools,task` - Install tools, development dependencies and Git hooks
-- `./scripts/bootstrap.sh` - Install Homebrew and base packages when mise is missing
+| コマンド | 用途 |
+| --- | --- |
+| `mise run bootstrap` / `mise run setup` | ツール、依存、ルール、Git フックのセットアップ |
+| `mise run check-tools` | 必要なツールの確認 |
+| `mise run wt:setup` | worktree の対話形式セットアップ |
+| `mise run tf:fmt` | Terraform ファイルの整形 |
+| `mise run tf:validate` | Terraform 設定の検証 |
+| `mise run tf:init` | Terraform の初期化 |
+| `mise run tf:plan` | 変更計画の作成 |
+| `mise run tf:apply` | 変更の適用（対象と計画を事前に確認） |
+| `mise run tf:clean` | Terraform の一時ファイル削除 |
+| `mise run lint` / `mise run dev:lint` | 回帰テストと全リント |
+| `mise run dev:test` | 回帰テスト |
+| `mise run rules:sync` / `mise run rules:check` | LLM 向け参照の生成 / 更新漏れの確認 |
+| `mise run version` / `mise run status` | バージョン / mise 管理ツールの確認 |
+| `mise run install` / `mise run update` | mise 管理ツールの導入 / 更新 |
 
-#### Development Tasks (mise)
+詳しい操作は [コマンドリファレンス](docs/commands-reference.md) を参照してください。
 
-Show all available tasks:
+## デプロイの流れ
 
-```bash
-mise tasks
-```
+1. PR と push では、変更されたリポジトリの Terraform ルートだけを選択します。
+   共通モジュールや Terraform 用 Action の変更は全ルートを選択します。
+   手動実行ではルート名を指定し、全件対象にする場合は明示的に `all` を指定します。
+2. [set-matrix](.github/actions/set-matrix/action.yml) が対象ディレクトリの一覧を生成します。
+3. [setup-terraform](.github/actions/setup-terraform/action.yml) が Terraform を準備します。
+4. [terraform-plan](.github/actions/terraform-plan/action.yml) が変更計画を作成します。
+5. 個別ルートへの push は保存した plan を適用します。
+   共通モジュールや Terraform 用 Action の変更は plan のみを実行し、
+   各ルートの計画を確認した後で手動適用します。
+   手動実行の既定は plan のみです。対象と計画を確認してから `apply=true` を指定します。
 
-Common tasks:
-
-- `mise run bootstrap` / `mise run setup` - Setup tools, development dependencies and Git hooks
-- `mise run check-tools` - Verify all required tools are installed
-- `mise run wt:setup` - Interactive git worktree setup
-- `mise run tf:fmt` - Format all Terraform files
-- `mise run tf:validate` - Validate Terraform configuration
-- `mise run lint` / `mise run dev:lint` - Run regression tests and all linters
-- `mise run dev:test` - Run regression tests
-- `mise run tf:init` - Initialize Terraform
-- `mise run tf:plan` - Run Terraform plan
-- `mise run tf:apply` - Run Terraform apply (use with caution)
-- `mise run tf:clean` - Clean Terraform temporary files
-- `mise run version` - Show tool versions (Terraform, mise)
-- `mise run status` - Show mise-managed tool versions
-- `mise run install` - Install tools from mise.toml
-- `mise run update` - Update mise-managed tools
-
-## Deployment Flow
-
-1. Pull requests and pushes select only changed repository roots. Shared repository module or Terraform action changes select all roots. Manual runs require a repository root name, or the explicit value `all`.
-2. The [`set-matrix`](.github/actions/set-matrix/action.yml) action is executed to create a list of directories for Terraform execution.
-3. The [`setup-terraform`](.github/actions/setup-terraform/action.yml) action is executed to set up Terraform.
-4. The [`terraform-plan`](.github/actions/terraform-plan/action.yml) action is executed to create a Terraform plan.
-5. Pushes affecting individual roots apply the saved plan. Shared module or Terraform action changes run plan only; apply them through a manual run after reviewing every affected root. Manual runs default to plan only; set `apply` to true after reviewing the target and expected changes.
-
-Local Terraform tasks default to `terraform-github`. Select a root explicitly, for example:
+ローカルの既定対象は `terraform-github` です。引数で対象を明示できます。
 
 ```bash
 AWS_PROFILE=portfolio mise run tf:init -- terraform-github -input=false
@@ -124,60 +144,38 @@ mise exec -- terraform -chdir=terraform/src/repositories/terraform-github show t
 AWS_PROFILE=portfolio mise run tf:apply -- terraform-github tfplan
 ```
 
-Set `TF_VAR_github_token` using your existing credential mechanism. Saved plans may
-contain sensitive values and must remain untracked. `TERRAFORM_DIR` can override
-the default root. Archived roots do not manage vulnerability alerts; existing
-active alert resources migrate to the indexed address without recreation.
+認証用の `TF_VAR_github_token` は既存の認証方法で設定します。
+`TERRAFORM_DIR` で既定ルートを変更できます。
+保存した plan は秘密を含む場合があるため Git に追加しません。
+アーカイブ済みのルートでは脆弱性通知を管理しません。
+既存の有効な通知リソースは `moved` で移行し、再作成を避けます。
 
 ```mermaid
 graph TD
-  A[actions checkout] --> B[AWS credential aws-credential]
-  B --> C[Generate GitHub App token]
-  C --> D[Terraform Plan]
-  D --> E[Start Deployment]
-  E --> F{push or workflow_dispatch}
-  F -- Apply enabled --> G[Apply saved plan]
-  F -- Plan only --> H[Skip]
-  G --> I[Finish Deployment]
-  H --> I
+  A[リポジトリ取得] --> B[AWS 認証]
+  B --> C[GitHub App トークン生成]
+  C --> D[変更計画を保存]
+  D --> E{適用が有効か}
+  E -- 有効 --> F[保存した plan を適用]
+  E -- 無効 --> G[plan のみで終了]
 ```
 
-## How to use the terraform-import workflow
+## 既存リポジトリのインポート
 
-This workflow is used to import existing GitHub repositories into Terraform management.
+`terraform-import` ワークフローで既存の GitHub リポジトリを Terraform 管理下に取り込みます。
+リポジトリやブランチ保護などを state に取り込む処理を、手動実行で開始します。
 
-### Overview
+### パラメータ
 
-- The `terraform-import` workflow allows you to import existing GitHub repositories and branch protection settings into the Terraform state.
-- It is executed manually (`workflow_dispatch`) by specifying the target module name and repository name.
+- `module`: `terraform/src/repositories/` 配下の対象モジュール名
+  （例: `local-workspace-provisioning`、`terraform-aws`、`boilerplate-saas`）
+- `repo`: GitHub 上のリポジトリ名
 
-### Flow
+### 手順
 
-```mermaid
-graph TD
-  A[Select Import workflow in Actions tab] --> B[Enter module and repo then run]
-  B --> C[Checkout repository]
-  C --> D[Configure AWS credentials]
-  D --> E[Initialize Terraform]
-  E --> F[Import repository info to state]
-  F --> G[Done]
-```
+1. GitHub の Actions タブから `Terraform Import` を選択します。
+2. `Run workflow` をクリックし、`module` と `repo` を入力して実行します。
+   例: `module=terraform-aws`、`repo=terraform-aws`。
+3. ワークフローが AWS 認証と Terraform の初期化を行い、指定したリポジトリを state に取り込みます。
 
-### Parameters
-
-- `module`: Terraform module name (e.g., `local-workspace-provisioning`, `terraform-aws`, `boilerplate-saas`, etc.)
-- `repo`: GitHub repository name (e.g., `local-workspace-provisioning`, `terraform-aws`, `boilerplate-saas`, etc.)
-
-### Usage
-
-1. Go to the Actions tab in GitHub and select the `Terraform Import` workflow.
-2. Click the `Run workflow` button, enter the `module` and `repo` values, and start the workflow.
-    - Example: `module` = `local-workspace-provisioning`, `repo` = `local-workspace-provisioning`
-    - Example: `module` = `terraform-aws`, `repo` = `terraform-aws`
-3. When the workflow completes, the specified repository information will be imported into the Terraform state.
-
-### Notes
-
-- For `module`, specify the module name under `terraform/src/repositories/`.
-- For `repo`, specify the repository name on GitHub.
-- Make sure that `secrets.TERRAFORM_GITHUB_TOKEN` is set as required.
+必要な `secrets.TERRAFORM_GITHUB_TOKEN` が設定されていることを確認してください。

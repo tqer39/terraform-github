@@ -275,7 +275,3 @@ __pycache__/
 
 # Git worktrees
 .worktrees/
-
-
-# superpowers workflow artifacts
-docs/superpowers/

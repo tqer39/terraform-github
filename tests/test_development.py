@@ -25,6 +25,9 @@ class DevelopmentTests(unittest.TestCase):
             (path / "terraform.tf").write_text("terraform {}\n")
         self.git("add", "terraform")
         self.git("commit", "-qm", "initial")
+        (self.root / "mise.toml").write_text('[tools]\nterraform = "1.16.4"\nnode = "24"\n')
+        self.git("add", "mise.toml")
+        self.git("commit", "-qm", "initial tools")
         self.base = self.git("rev-parse", "HEAD").stdout.strip()
 
     def tearDown(self):
@@ -82,6 +85,46 @@ class DevelopmentTests(unittest.TestCase):
     def test_missing_history_fails(self):
         self.assertNotEqual(self.matrix(event="push", base="missing").returncode, 0)
 
+    def update_tools(self, content):
+        (self.root / "mise.toml").write_text(content)
+        self.git("add", "mise.toml")
+        self.git("commit", "-qm", "update tools")
+
+    def test_terraform_version_change_selects_all_without_auto_apply(self):
+        self.update_tools('[tools]\nterraform = "1.16.5"\nnode = "24"\n')
+        for event in ("pull_request", "push"):
+            self.assertEqual(self.matrix(event=event).returncode, 0)
+            self.assertEqual(self.result(), ["one", "two"])
+            self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
+    def test_node_and_pnpm_change_does_not_select_roots(self):
+        self.update_tools('[tools]\nterraform = "1.16.4"\nnode = "26"\n'
+                          '"aqua:pnpm/pnpm" = "12.7.0"\n')
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["_empty"])
+
+    def test_committed_terraform_version_is_not_hidden_by_worktree(self):
+        self.update_tools('[tools]\nterraform = "1.16.5"\n')
+        (self.root / "mise.toml").write_text('[tools]\nterraform = "1.16.4"\n')
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+
+    def test_removed_mise_config_selects_all(self):
+        self.git("rm", "mise.toml")
+        self.git("commit", "-qm", "remove tools")
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+
+    def test_pr_compares_terraform_version_with_merge_base(self):
+        self.git("checkout", "-qb", "feature")
+        self.update_tools('[tools]\nterraform = "1.16.4"\nnode = "26"\n')
+        self.git("checkout", "-qb", "base-update", self.base)
+        self.update_tools('[tools]\nterraform = "1.16.5"\nnode = "24"\n')
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.git("checkout", "-q", "feature")
+        self.assertEqual(self.matrix(event="pull_request", base=base).returncode, 0)
+        self.assertEqual(self.result(), ["_empty"])
+
     def scan(self, *files, all_files=False):
         env = dict(self.env)
         if all_files:
@@ -138,6 +181,65 @@ class DevelopmentTests(unittest.TestCase):
             self.assertNotEqual(self.workflow_result(terraform=state), 0)
             self.assertNotEqual(self.workflow_result(matrix='["_empty"]', lint=state), 0)
             self.assertNotEqual(self.workflow_result(matrix='["_empty"]', selection=state), 0)
+
+
+class RuleGenerationTests(unittest.TestCase):
+    """LLM の入口が原本を参照し、更新漏れを検出することを検証する。"""
+
+    def generate(self, output, check=False):
+        command = ["pnpm", "exec", "rulesync", "generate",
+                   "--config", str(PROJECT / "rulesync.jsonc"),
+                   "--input-roots", str(PROJECT / ".rulesync"),
+                   "--output-roots", str(output)]
+        if check:
+            command.append("--check")
+        return subprocess.run(command, cwd=PROJECT, text=True, capture_output=True)
+
+    def test_entries_reference_origins_without_recreating_retired_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)
+            result = self.generate(output)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            origins = ("project", "development", "coding-standards", "documentation")
+            for name in ("AGENTS.md", ".github/copilot-instructions.md"):
+                content = (output / name).read_text()
+                for origin in origins:
+                    self.assertIn(f"docs/rules/{origin}.md", content)
+            for origin in origins:
+                self.assertTrue((PROJECT / f"docs/rules/{origin}.md").is_file())
+                for name in (f".claude/rules/{origin}.md",
+                             f".github/instructions/{origin}.instructions.md",
+                             f".devin/rules/{origin}.md"):
+                    content = (output / name).read_text()
+                    self.assertIn(f"docs/rules/{origin}.md", content)
+                    self.assertNotIn("origin.md", content)
+            self.assertFalse((PROJECT / "docs/rules/origin.md").exists())
+            for name in ("CLAUDE.md", "GEMINI.md", ".mcp.json"):
+                self.assertFalse((output / name).exists())
+            self.assertEqual(self.generate(output, check=True).returncode, 0)
+            (output / "AGENTS.md").write_text("古いルール\n")
+            self.assertNotEqual(self.generate(output, check=True).returncode, 0)
+
+
+    def test_json_formatter_formats_files_with_project_ignore_rules(self):
+        with tempfile.TemporaryDirectory(dir=PROJECT) as temp:
+            target = Path(temp) / "example.json"
+            target.write_text('{"name":"検証","enabled":true}\n')
+            command = ["pnpm", "exec", "oxfmt", str(target)]
+            unformatted = subprocess.run(command + ["--check"], cwd=PROJECT,
+                                         text=True, capture_output=True)
+            self.assertEqual(unformatted.returncode, 1,
+                             unformatted.stdout + unformatted.stderr)
+            formatted = subprocess.run(command + ["--write"], cwd=PROJECT,
+                                       text=True, capture_output=True)
+            self.assertEqual(formatted.returncode, 0,
+                             formatted.stdout + formatted.stderr)
+            self.assertIn('"name": "検証"', target.read_text())
+            self.assertEqual(json.loads(target.read_text()),
+                             {"name": "検証", "enabled": True})
+            checked = subprocess.run(command + ["--check"], cwd=PROJECT,
+                                     text=True, capture_output=True)
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
 
 
 if __name__ == "__main__":

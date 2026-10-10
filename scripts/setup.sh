@@ -20,6 +20,9 @@ mise install
 echo -e "${BLUE}→ Installing node dev dependencies with pnpm...${NC}"
 mise exec -- pnpm install --frozen-lockfile
 
+echo -e "${BLUE}→ Generating LLM rules...${NC}"
+mise exec -- pnpm exec rulesync generate
+
 echo -e "${BLUE}→ Installing lefthook git hooks...${NC}"
 mise exec -- lefthook install
 

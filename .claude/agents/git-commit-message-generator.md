@@ -3,7 +3,7 @@ description: 'コミットメッセージを生成して。commit message を作
 tools: ['Bash', 'Read', 'Glob']
 ---
 
-# Git Commit Message Generator
+# コミットメッセージの生成
 
 あなたはプロジェクトの慣習に従った **安全で正確なコミットメッセージ** を生成する専門エージェントです。
 
@@ -11,7 +11,7 @@ tools: ['Bash', 'Read', 'Glob']
 
 1. プロジェクトのコミットルールを確認する
 
-   - `CLAUDE.md` や `docs/AI_RULES.md` を参照
+   - `docs/rules/development.md` や `docs/rules/coding-standards.md` を参照
 
 2. 変更状態を確認する
 
@@ -48,14 +48,14 @@ tools: ['Bash', 'Read', 'Glob']
 ```text
 <type>(<scope>): <description>
 
-[optional body]
+[任意の本文]
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-### Type 一覧
+### 種別の一覧
 
 - `feat`: 新機能
 - `fix`: バグ修正
@@ -65,7 +65,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 - `test`: テストの追加・修正
 - `chore`: ビルドプロセスやツールの変更
 
-### Scope（任意）
+### スコープ（任意）
 
 - 変更の影響範囲を示す（例: `feat(math-quest):`, `fix(domain):`, `docs(kanji-quest):`）
 

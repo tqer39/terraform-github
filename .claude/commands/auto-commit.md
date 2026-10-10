@@ -4,7 +4,7 @@ description: 変更を自動で git add & commit する（絵文字プレフィ�
 allowed-tools: [Bash, Read, Glob, Grep]
 ---
 
-# Auto Commit
+# 自動コミット
 
 変更ファイルを自動でステージングし、適切なコミットメッセージを生成してコミットする。
 
@@ -45,7 +45,7 @@ allowed-tools: [Bash, Read, Glob, Grep]
 ```text
 <emoji> <日本語の要約>
 
-[optional body]
+[任意の本文]
 ```
 
 **絵文字プレフィックス:**
