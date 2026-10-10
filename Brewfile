@@ -1,17 +1,5 @@
-# Brewfile for terraform-github development environment
-# Install with: brew bundle install
-# Note: Terraform is managed by mise
-
-# Taps
-tap "j178/tap"
-
-# Core development tools
-brew "mise" # Version manager for Terraform and other tools
-brew "git" # Version control system
-brew "j178/tap/prek" # Git hooks framework
-brew "aws-vault" # AWS credential management
-# betterleaks is pinned in mise.toml for local development and CI.
-
-# Optional: Additional useful tools (uncomment if needed)
-# brew "gh" # GitHub CLI
-# brew "tflint" # Terraform linter
+# mise と Git は開発環境を起動するために Homebrew で導入する。
+# その他の CLI ツールは mise.toml、文書・整形ツールは package.json で管理する。
+# インストール: brew bundle install
+brew "mise"
+brew "git"

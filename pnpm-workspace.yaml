@@ -1,3 +1,7 @@
 overrides:
   'markdownlint-cli2>smol-toml': 1.9.0
   'micromark-extension-math>katex': 0.18.9
+
+# tldjs は同梱データを使うため、外部データ更新の postinstall は実行しない。
+allowBuilds:
+  tldjs: false

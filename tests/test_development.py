@@ -183,5 +183,64 @@ class DevelopmentTests(unittest.TestCase):
             self.assertNotEqual(self.workflow_result(matrix='["_empty"]', selection=state), 0)
 
 
+class RuleGenerationTests(unittest.TestCase):
+    """LLM の入口が原本を参照し、更新漏れを検出することを検証する。"""
+
+    def generate(self, output, check=False):
+        command = ["pnpm", "exec", "rulesync", "generate",
+                   "--config", str(PROJECT / "rulesync.jsonc"),
+                   "--input-roots", str(PROJECT / ".rulesync"),
+                   "--output-roots", str(output)]
+        if check:
+            command.append("--check")
+        return subprocess.run(command, cwd=PROJECT, text=True, capture_output=True)
+
+    def test_entries_reference_origins_without_recreating_retired_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp)
+            result = self.generate(output)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            origins = ("project", "development", "coding-standards", "documentation")
+            for name in ("AGENTS.md", ".github/copilot-instructions.md"):
+                content = (output / name).read_text()
+                for origin in origins:
+                    self.assertIn(f"docs/rules/{origin}.md", content)
+            for origin in origins:
+                self.assertTrue((PROJECT / f"docs/rules/{origin}.md").is_file())
+                for name in (f".claude/rules/{origin}.md",
+                             f".github/instructions/{origin}.instructions.md",
+                             f".devin/rules/{origin}.md"):
+                    content = (output / name).read_text()
+                    self.assertIn(f"docs/rules/{origin}.md", content)
+                    self.assertNotIn("origin.md", content)
+            self.assertFalse((PROJECT / "docs/rules/origin.md").exists())
+            for name in ("CLAUDE.md", "GEMINI.md", ".mcp.json"):
+                self.assertFalse((output / name).exists())
+            self.assertEqual(self.generate(output, check=True).returncode, 0)
+            (output / "AGENTS.md").write_text("古いルール\n")
+            self.assertNotEqual(self.generate(output, check=True).returncode, 0)
+
+
+    def test_json_formatter_formats_files_with_project_ignore_rules(self):
+        with tempfile.TemporaryDirectory(dir=PROJECT) as temp:
+            target = Path(temp) / "example.json"
+            target.write_text('{"name":"検証","enabled":true}\n')
+            command = ["pnpm", "exec", "oxfmt", str(target)]
+            unformatted = subprocess.run(command + ["--check"], cwd=PROJECT,
+                                         text=True, capture_output=True)
+            self.assertEqual(unformatted.returncode, 1,
+                             unformatted.stdout + unformatted.stderr)
+            formatted = subprocess.run(command + ["--write"], cwd=PROJECT,
+                                       text=True, capture_output=True)
+            self.assertEqual(formatted.returncode, 0,
+                             formatted.stdout + formatted.stderr)
+            self.assertIn('"name": "検証"', target.read_text())
+            self.assertEqual(json.loads(target.read_text()),
+                             {"name": "検証", "enabled": True})
+            checked = subprocess.run(command + ["--check"], cwd=PROJECT,
+                                     text=True, capture_output=True)
+            self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

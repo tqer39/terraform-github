@@ -28,7 +28,7 @@ module "my_new_repo" {
 
   github_token   = var.github_token
   repository     = "my-new-repo"
-  description    = "Repository description"
+  description    = "リポジトリの説明"
   default_branch = "main"
   visibility     = "public"
   topics         = ["terraform", "automation"]
@@ -52,7 +52,7 @@ module "archived_repo" {
 
   github_token   = var.github_token
   repository     = "my-archived-repo"
-  description    = "Archived repository"
+  description    = "アーカイブ済みリポジトリ"
   visibility     = "private"
   archived       = true
 
@@ -71,7 +71,7 @@ module "my_new_repo" {
 
   github_token   = var.github_token
   repository     = "my-new-repo"
-  description    = "Repository description"
+  description    = "リポジトリの説明"
   default_branch = "main"
   visibility     = "public"
   topics         = ["terraform", "automation"]
@@ -107,7 +107,7 @@ module "my_legacy_repo" {
 
   github_token    = var.github_token
   repository      = "my-legacy-repo"
-  description     = "Repository description"
+  description     = "リポジトリの説明"
   default_branch  = "main"
   topics          = ["terraform", "automation"]
 
@@ -127,16 +127,16 @@ module "my_legacy_repo" {
 
 | パラメータ | 必須 | 説明 |
 | --------- | ---- | ---- |
-| `repository` | Yes | リポジトリ名 |
-| `owner` | No | Organization 名（省略時は個人アカウント） |
-| `description` | No | リポジトリの説明 |
-| `visibility` | No | `public` または `private` |
-| `default_branch` | No | デフォルトブランチ名（通常 `main`） |
-| `topics` | No | リポジトリのトピック/タグ一覧 |
-| `disable_default_main_protection` | No | `true` にすると標準 main 保護を無効化（デフォルト: `false`） |
-| `default_main_protection_owner_bypass` | No | 標準 main 保護で所有者 bypass を許可するか（デフォルト: `true`） |
-| `default_main_protection_bypass_app_ids` | No | 標準 main 保護を常時 bypass できる GitHub App ID の集合（デフォルト: `[]`）。Installation ID は指定しない |
-| `branch_rulesets` | No | 追加 ruleset（`main` 以外や特殊な上書きに使用） |
-| `branches_to_protect` | No | レガシーブランチ保護（非推奨） |
-| `has_wiki`, `has_issues`, `has_projects` | No | 機能トグル |
-| `allow_merge_commit`, `allow_squash_merge`, `allow_rebase_merge` | No | マージ戦略 |
+| `repository` | はい | リポジトリ名 |
+| `owner` | いいえ | Organization 名（省略時は個人アカウント） |
+| `description` | いいえ | リポジトリの説明 |
+| `visibility` | いいえ | `public` または `private` |
+| `default_branch` | いいえ | デフォルトブランチ名（通常 `main`） |
+| `topics` | いいえ | リポジトリのトピック/タグ一覧 |
+| `disable_default_main_protection` | いいえ | `true` にすると標準 main 保護を無効化（デフォルト: `false`） |
+| `default_main_protection_owner_bypass` | いいえ | 標準 main 保護で所有者 bypass を許可するか（デフォルト: `true`） |
+| `default_main_protection_bypass_app_ids` | いいえ | 標準 main 保護を常時 bypass できる GitHub App ID の集合（デフォルト: `[]`）。Installation ID は指定しない |
+| `branch_rulesets` | いいえ | 追加 ruleset（`main` 以外や特殊な上書きに使用） |
+| `branches_to_protect` | いいえ | レガシーブランチ保護（非推奨） |
+| `has_wiki`, `has_issues`, `has_projects` | いいえ | 機能トグル |
+| `allow_merge_commit`, `allow_squash_merge`, `allow_rebase_merge` | いいえ | マージ戦略 |

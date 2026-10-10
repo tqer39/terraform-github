@@ -8,6 +8,7 @@ node = "24"
 python = "3.14"
 "aqua:pnpm/pnpm" = "12.7.0"
 "aqua:betterleaks/betterleaks" = "1.9.0"
+"aqua:ByteNess/aws-vault" = "7.16.2"
 
 [env]
 TERRAFORM_DIR = "terraform/src/repositories/terraform-github"
@@ -82,6 +83,7 @@ find "$TERRAFORM_DIR" -type f -name "*.tfstate.backup" -delete 2>/dev/null || tr
 alias = "lint"
 description = "Run all linters via lefthook"
 run = [
+  "mise run rules:check",
   "mise run dev:test",
   "BETTERLEAKS_ALL_FILES=true lefthook run pre-commit --all-files",
 ]
@@ -127,3 +129,12 @@ run = "git worktree list"
 [tasks."wt:remove"]
 hide = true
 run = 'git worktree remove "../terraform-github-$1"'
+
+# ---- rules:* ----
+[tasks."rules:sync"]
+description = "共通ルールの参照を各 LLM 向けに生成する"
+run = "pnpm exec rulesync generate"
+
+[tasks."rules:check"]
+description = "LLM 向けルールの生成結果が最新か確認する"
+run = "pnpm exec rulesync generate --check"
