@@ -1,0 +1,5 @@
+# Parent packages still constrain these dependencies to vulnerable releases.
+# cspell:words smol micromark katex
+overrides:
+  'markdownlint-cli2>smol-toml': 1.9.0
+  'micromark-extension-math>katex': 0.18.2

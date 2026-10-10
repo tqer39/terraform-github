@@ -5,11 +5,18 @@ yamllint = "1.38.0"
 actionlint = "1.7.12"
 shellcheck = "0.11.0"
 node = "24"
+python = "3.14"
+"npm:pnpm" = "11.28.0"
+"aqua:betterleaks/betterleaks" = "1.9.0"
 
 [env]
-TERRAFORM_DIR = "terraform/src/repository"
+TERRAFORM_DIR = "terraform/src/repositories/terraform-github"
 
 # ---- フラット（最頻出 & ツール管理） ----
+[tasks.bootstrap]
+description = "Install development tools, dependencies and git hooks"
+run = "./scripts/setup.sh"
+
 [tasks.setup]
 description = "Setup development environment (mise install + pnpm + lefthook)"
 run = "./scripts/setup.sh"
@@ -45,23 +52,23 @@ run = "terraform fmt -recursive"
 
 [tasks."tf:validate"]
 description = "Validate Terraform configuration"
-dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
-run = "terraform validate"
+dir = "{{ config_root }}"
+run = '"{{ config_root }}/scripts/terraform.sh" validate "$@"'
 
 [tasks."tf:init"]
 description = "Initialize Terraform"
-dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
-run = "terraform init -upgrade"
+dir = "{{ config_root }}"
+run = '"{{ config_root }}/scripts/terraform.sh" init "$@"'
 
 [tasks."tf:plan"]
 description = "Run Terraform plan"
-dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
-run = "terraform plan"
+dir = "{{ config_root }}"
+run = '"{{ config_root }}/scripts/terraform.sh" plan "$@"'
 
 [tasks."tf:apply"]
 description = "Run Terraform apply (use with caution)"
-dir = "{{ config_root }}/{{ env.TERRAFORM_DIR }}"
-run = "terraform apply"
+dir = "{{ config_root }}"
+run = '"{{ config_root }}/scripts/terraform.sh" apply "$@"'
 
 [tasks."tf:clean"]
 description = "Clean Terraform temporary files"
@@ -72,12 +79,24 @@ find "$TERRAFORM_DIR" -type f -name "*.tfstate.backup" -delete 2>/dev/null || tr
 
 # ---- dev:* ----
 [tasks."dev:lint"]
+alias = "lint"
 description = "Run all linters via lefthook"
-run = "lefthook run pre-commit --all-files"
+run = [
+  "mise run dev:test",
+  "BETTERLEAKS_ALL_FILES=true lefthook run pre-commit --all-files",
+]
+
+[tasks."dev:test"]
+description = "Run target selection, secret scanning and module regression tests"
+run = [
+  "python3 -m unittest discover -s tests -v",
+  "terraform -chdir=terraform/modules/repository init -backend=false -lockfile=readonly",
+  "terraform -chdir=terraform/modules/repository test",
+]
 
 [tasks."dev:lint-hook"]
 description = "Run a specific lefthook command (usage: mise run dev:lint-hook -- <hook>)"
-run = 'lefthook run pre-commit --commands "$1" --all-files'
+run = 'BETTERLEAKS_ALL_FILES=true lefthook run pre-commit --commands "$1" --all-files'
 
 [tasks."dev:fix"]
 description = "Auto-fix common formatting issues"

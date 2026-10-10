@@ -97,6 +97,8 @@ echo ""
 
 echo -e "${BLUE}Code Quality Tools:${NC}"
 check_command "lefthook" || ((missing_tools++))
+check_command "betterleaks" || ((missing_tools++))
+check_command "python3" || ((missing_tools++))
 check_command "pnpm" || ((missing_tools++))
 check_command "yamllint" || ((missing_tools++))
 check_command "actionlint" || ((missing_tools++))

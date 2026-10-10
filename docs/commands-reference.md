@@ -6,8 +6,7 @@ terraform-github リポジトリ操作の詳細コマンドリファレンス。
 
 ```bash
 ./scripts/bootstrap.sh   # 必要なツールを一括インストール (Homebrew + Brewfile)
-mise install             # mise.toml で管理されるツールをインストール
-mise run setup           # 開発環境のセットアップ
+mise bootstrap --only tools,task # ツール、固定依存、Git フックをセットアップ
 mise run check-tools     # インストール状態の確認
 ```
 
@@ -20,6 +19,24 @@ mise run check-tools     # インストール状態の確認
 | `mise run tf:validate` | 設定の検証 |
 | `mise run tf:plan` | 変更の計画 |
 | `mise run tf:apply` | 変更の適用（ローカル実行は注意） |
+
+既定の root は `terraform-github`。`mise run tf:plan -- <repo-name>` のように対象を指定できる。
+`TERRAFORM_DIR` で既定 root を変更できる。対象 root に対応する AWS と GitHub 認証が必要。
+
+保存 plan を確認して適用する手順:
+
+```bash
+AWS_PROFILE=portfolio mise run tf:init -- terraform-github -input=false
+mise run tf:validate -- terraform-github
+AWS_PROFILE=portfolio mise run tf:plan -- terraform-github -out=tfplan
+mise exec -- terraform -chdir=terraform/src/repositories/terraform-github show tfplan
+AWS_PROFILE=portfolio mise run tf:apply -- terraform-github tfplan
+```
+
+手動 Actions は `repository` で1件を選択し、全件は `all` を指定する。
+`apply=false` で plan を確認し、適用時は true を指定する。
+PR と push は差分から対象を選び、共通 module / Terraform Action 変更は全 root の plan のみを処理する。
+共通変更の適用は plan 確認後の手動実行で明示する。
 
 ### 既存リポジトリのインポート
 
@@ -43,7 +60,8 @@ terraform import module.this.github_repository_ruleset.this[\"<ruleset_name>\"] 
 
 | コマンド | 説明 |
 | ------- | ---- |
-| `mise run dev:lint` | 全 pre-commit フックを実行 |
+| `mise run lint` / `mise run dev:lint` | 回帰テストと全 pre-commit フックを実行 |
+| `mise run dev:test` | 実行対象、秘密検出、モジュールの回帰テスト |
 | `mise run dev:lint-hook -- <hook>` | 特定フックを実行（terraform_fmt, terraform_validate, terraform_tflint, yamllint, markdownlint） |
 | `mise run dev:fix` | よくある問題を自動修正 |
 | `mise run dev:fmt-staged` | ステージ済みファイルをフォーマット |

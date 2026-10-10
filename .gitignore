@@ -193,6 +193,7 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+tfplan
 
 # Ignore CLI configuration files
 .terraformrc
@@ -268,6 +269,7 @@ $RECYCLE.BIN/
 
 ### Node ###
 node_modules/
+__pycache__/
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,visualstudiocode,vim,intellij,terraform
 

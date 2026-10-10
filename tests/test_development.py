@@ -1,0 +1,121 @@
+"""Regression tests for target selection and staged secret scanning."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+
+PROJECT = Path(__file__).resolve().parents[1]
+
+
+class DevelopmentTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.env = dict(os.environ, GITHUB_OUTPUT=str(self.root / "output"))
+        self.env.pop("BETTERLEAKS_ALL_FILES", None)
+        self.git("init", "-q")
+        self.git("config", "user.name", "Test")
+        self.git("config", "user.email", "test@example.com")
+        for repo in ("one", "two"):
+            path = self.root / "terraform/src/repositories" / repo
+            path.mkdir(parents=True)
+            (path / "terraform.tf").write_text("terraform {}\n")
+        self.git("add", "terraform")
+        self.git("commit", "-qm", "initial")
+        self.base = self.git("rev-parse", "HEAD").stdout.strip()
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def git(self, *args):
+        return subprocess.run(["git", *args], cwd=self.root, check=True,
+                              text=True, capture_output=True)
+
+    def matrix(self, event="workflow_dispatch", target="one", base=None):
+        env = dict(self.env, EVENT_NAME=event, TARGET_REPOSITORY=target,
+                   BASE_SHA=base or self.base, HEAD_SHA="HEAD")
+        return subprocess.run(["bash", str(PROJECT / ".github/scripts/set_matrix.sh")],
+                              cwd=self.root, env=env, text=True, capture_output=True)
+
+    def result(self):
+        return json.loads((self.root / "output").read_text().splitlines()[0].split("=", 1)[1])
+
+    def commit_file(self, name):
+        path = self.root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("change\n")
+        self.git("add", name)
+        self.git("commit", "-qm", "change")
+
+    def test_manual_single_root(self):
+        self.assertEqual(self.matrix().returncode, 0)
+        self.assertEqual(self.result(), ["one"])
+
+    def test_manual_all_roots(self):
+        self.assertEqual(self.matrix(target="all").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+
+    def test_invalid_manual_targets(self):
+        for target in ("", "unknown", "../one", "one;echo bad"):
+            self.assertNotEqual(self.matrix(target=target).returncode, 0)
+
+    def test_push_single_root(self):
+        self.commit_file("terraform/src/repositories/one/main.tf")
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertEqual(self.result(), ["one"])
+        self.assertIn("require_manual_apply=false", (self.root / "output").read_text())
+
+    def test_pr_module_change_selects_all(self):
+        self.commit_file("terraform/modules/repository/example.tf")
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+        self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
+    def test_unrelated_change_selects_none(self):
+        self.commit_file("README.md")
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertEqual(self.result(), ["_empty"])
+
+    def test_missing_history_fails(self):
+        self.assertNotEqual(self.matrix(event="push", base="missing").returncode, 0)
+
+    def scan(self, *files, all_files=False):
+        env = dict(self.env)
+        if all_files:
+            env["BETTERLEAKS_ALL_FILES"] = "true"
+        return subprocess.run(["bash", str(PROJECT / "scripts/lint/betterleaks.sh"),
+                               *files], cwd=self.root, env=env, text=True,
+                              capture_output=True)
+
+    def stage_secret(self):
+        # Generate a synthetic token at runtime, never store a real credential.
+        token = "gh" + "p_" + "a1B2c3D4e5F6g7H8i9J0k1L2m3N4o5P6q7R8"
+        (self.root / "secret file.txt").write_text("token=" + token + "\n")
+        self.git("add", "secret file.txt")
+
+    def test_partially_staged_secret_is_rejected(self):
+        self.stage_secret()
+        (self.root / "secret file.txt").write_text("safe\n")
+        (self.root / "other.txt").write_text("safe\n")
+        self.git("add", "other.txt")
+        self.assertEqual(self.scan("other.txt", "secret file.txt").returncode, 1)
+
+    def test_removed_worktree_file_does_not_hide_staged_secret(self):
+        self.stage_secret()
+        (self.root / "secret file.txt").unlink()
+        self.assertEqual(self.scan("secret file.txt").returncode, 1)
+
+    def test_all_files_checks_worktree_and_ignores_unlisted_files(self):
+        (self.root / "safe.txt").write_text("safe\n")
+        self.stage_secret()
+        self.assertEqual(self.scan("safe.txt", all_files=True).returncode, 0)
+        self.assertEqual(self.scan("safe.txt", "secret file.txt", all_files=True).returncode, 1)
+
+    def test_empty_scan_succeeds(self):
+        self.assertEqual(self.scan().returncode, 0)
+
+
+if __name__ == "__main__":
+    unittest.main()

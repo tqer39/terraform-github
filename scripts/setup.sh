@@ -18,9 +18,9 @@ echo -e "${BLUE}→ Installing tools with mise...${NC}"
 mise install
 
 echo -e "${BLUE}→ Installing node dev dependencies with pnpm...${NC}"
-pnpm install --frozen-lockfile
+mise exec -- pnpm install --frozen-lockfile
 
 echo -e "${BLUE}→ Installing lefthook git hooks...${NC}"
-lefthook install
+mise exec -- lefthook install
 
 echo -e "${GREEN}✓ Setup complete!${NC}"
