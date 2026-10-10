@@ -6,7 +6,7 @@ actionlint = "1.7.12"
 shellcheck = "0.11.0"
 node = "24"
 python = "3.14"
-"npm:pnpm" = "11.28.0"
+"npm:pnpm" = "11.28.5"
 "aqua:betterleaks/betterleaks" = "1.9.0"
 
 [env]
