@@ -3,7 +3,7 @@ module "this" {
   github_token = var.github_token
 
   visibility                      = "private"
-  archived                        = false
+  archived                        = true
   disable_default_main_protection = true
 
   repository          = "edu-quest"
