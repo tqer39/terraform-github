@@ -25,6 +25,9 @@ class DevelopmentTests(unittest.TestCase):
             (path / "terraform.tf").write_text("terraform {}\n")
         self.git("add", "terraform")
         self.git("commit", "-qm", "initial")
+        (self.root / "mise.toml").write_text('[tools]\nterraform = "1.16.4"\nnode = "24"\n')
+        self.git("add", "mise.toml")
+        self.git("commit", "-qm", "initial tools")
         self.base = self.git("rev-parse", "HEAD").stdout.strip()
 
     def tearDown(self):
@@ -81,6 +84,46 @@ class DevelopmentTests(unittest.TestCase):
 
     def test_missing_history_fails(self):
         self.assertNotEqual(self.matrix(event="push", base="missing").returncode, 0)
+
+    def update_tools(self, content):
+        (self.root / "mise.toml").write_text(content)
+        self.git("add", "mise.toml")
+        self.git("commit", "-qm", "update tools")
+
+    def test_terraform_version_change_selects_all_without_auto_apply(self):
+        self.update_tools('[tools]\nterraform = "1.16.5"\nnode = "24"\n')
+        for event in ("pull_request", "push"):
+            self.assertEqual(self.matrix(event=event).returncode, 0)
+            self.assertEqual(self.result(), ["one", "two"])
+            self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
+    def test_node_and_pnpm_change_does_not_select_roots(self):
+        self.update_tools('[tools]\nterraform = "1.16.4"\nnode = "26"\n'
+                          '"aqua:pnpm/pnpm" = "12.7.0"\n')
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["_empty"])
+
+    def test_committed_terraform_version_is_not_hidden_by_worktree(self):
+        self.update_tools('[tools]\nterraform = "1.16.5"\n')
+        (self.root / "mise.toml").write_text('[tools]\nterraform = "1.16.4"\n')
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+
+    def test_removed_mise_config_selects_all(self):
+        self.git("rm", "mise.toml")
+        self.git("commit", "-qm", "remove tools")
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertEqual(self.result(), ["one", "two"])
+
+    def test_pr_compares_terraform_version_with_merge_base(self):
+        self.git("checkout", "-qb", "feature")
+        self.update_tools('[tools]\nterraform = "1.16.4"\nnode = "26"\n')
+        self.git("checkout", "-qb", "base-update", self.base)
+        self.update_tools('[tools]\nterraform = "1.16.5"\nnode = "24"\n')
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.git("checkout", "-q", "feature")
+        self.assertEqual(self.matrix(event="pull_request", base=base).returncode, 0)
+        self.assertEqual(self.result(), ["_empty"])
 
     def scan(self, *files, all_files=False):
         env = dict(self.env)
