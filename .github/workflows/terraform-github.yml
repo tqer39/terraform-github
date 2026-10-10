@@ -39,11 +39,6 @@ jobs:
         with:
           install: true
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
-        with:
-          run_install: false
-
       - name: Install node dependencies
         run: pnpm install --frozen-lockfile
 
@@ -135,16 +130,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check workflow result
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          MATRIX_RESULT: ${{ needs.set-matrix.result }}
+          TARGET_MATRIX: ${{ needs.set-matrix.outputs.matrix }}
+          TERRAFORM_RESULT: ${{ needs.terraform.result }}
         run: |
-          if [ "${{ needs.lint.result }}" != "success" ] || [ "${{ needs.set-matrix.result }}" != "success" ]; then
+          if [ "$LINT_RESULT" != "success" ] || [ "$MATRIX_RESULT" != "success" ]; then
             echo "Lint or target selection did not succeed"
             exit 1
           fi
-          if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
+          if [ "$TARGET_MATRIX" == '["_empty"]' ]; then
             echo "No repositories to process"
             exit 0
           fi
-          if [ "${{ needs.terraform.result }}" != "success" ]; then
+          if [ "$TERRAFORM_RESULT" != "success" ]; then
             echo "Terraform jobs did not succeed"
             exit 1
           fi

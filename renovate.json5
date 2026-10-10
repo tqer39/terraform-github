@@ -5,7 +5,7 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["pnpm"],
+      "matchPackageNames": ["pnpm", "pnpm/pnpm"],
       "groupName": "pnpm toolchain"
     }
   ]

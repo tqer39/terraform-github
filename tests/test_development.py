@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import tempfile
+import textwrap
 import unittest
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -115,6 +116,28 @@ class DevelopmentTests(unittest.TestCase):
 
     def test_empty_scan_succeeds(self):
         self.assertEqual(self.scan().returncode, 0)
+
+    def workflow_result(self, matrix='["one"]', terraform="success",
+                        lint="success", selection="success"):
+        workflow = (PROJECT / ".github/workflows/terraform-github.yml").read_text()
+        script = textwrap.dedent(workflow.rsplit("        run: |\n", 1)[1])
+        env = dict(self.env, TARGET_MATRIX=matrix, TERRAFORM_RESULT=terraform,
+                   LINT_RESULT=lint, MATRIX_RESULT=selection)
+        return subprocess.run(["bash", "-e", "-c", script], env=env,
+                              text=True, capture_output=True).returncode
+
+    def test_workflow_accepts_no_targets(self):
+        self.assertEqual(self.workflow_result(matrix='["_empty"]',
+                                              terraform="skipped"), 0)
+
+    def test_workflow_accepts_successful_targets(self):
+        self.assertEqual(self.workflow_result(), 0)
+
+    def test_workflow_rejects_failed_or_cancelled_jobs(self):
+        for state in ("failure", "cancelled", "skipped"):
+            self.assertNotEqual(self.workflow_result(terraform=state), 0)
+            self.assertNotEqual(self.workflow_result(matrix='["_empty"]', lint=state), 0)
+            self.assertNotEqual(self.workflow_result(matrix='["_empty"]', selection=state), 0)
 
 
 if __name__ == "__main__":
