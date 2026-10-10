@@ -2,5 +2,11 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>tqer39/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": ["pnpm", "pnpm/pnpm"],
+      "groupName": "pnpm toolchain"
+    }
   ]
 }

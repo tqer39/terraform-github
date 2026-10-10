@@ -8,6 +8,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      repository:
+        description: Repository root name, or all for all roots
+        type: string
+        required: true
+      apply:
+        description: Apply the reviewed changes (false runs plan only)
+        type: boolean
+        default: false
 
 concurrency:
   group: terraform-github-${{ github.ref }}
@@ -26,35 +35,21 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Setup mise
-        uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4
+        uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5
         with:
           install: true
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
-        with:
-          run_install: false
 
       - name: Install node dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install betterleaks
-        env:
-          BETTERLEAKS_VERSION: 1.1.2
-        run: |
-          set -euo pipefail
-          curl -fsSL "https://github.com/betterleaks/betterleaks/releases/download/v${BETTERLEAKS_VERSION}/betterleaks_${BETTERLEAKS_VERSION}_linux_x64.tar.gz" -o /tmp/betterleaks.tar.gz
-          tar -xzf /tmp/betterleaks.tar.gz -C /tmp betterleaks
-          sudo install -m 0755 /tmp/betterleaks /usr/local/bin/betterleaks
-          betterleaks version
-
       - name: Run lefthook
-        run: lefthook run pre-commit --all-files
+        run: mise run lint
 
   set-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      require_manual_apply: ${{ steps.set-matrix.outputs.require_manual_apply }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -63,6 +58,8 @@ jobs:
       - name: Set Matrix
         id: set-matrix
         uses: ./.github/actions/set-matrix
+        with:
+          repository: ${{ inputs.repository }}
 
   terraform:
     needs: set-matrix
@@ -103,7 +100,7 @@ jobs:
 
       # NOTE: GitHub App では個人アカウントのリポジトリを作成することが仕様上不可能なので PAT を使用する。
       - uses: ./.github/actions/terraform-apply
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        if: (github.event_name == 'push' && needs.set-matrix.outputs.require_manual_apply != 'true') || (github.event_name == 'workflow_dispatch' && inputs.apply)
         with:
           working-directory: ./terraform/src/repositories/${{ matrix.target }}
           GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
@@ -133,17 +130,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check workflow result
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          MATRIX_RESULT: ${{ needs.set-matrix.result }}
+          TARGET_MATRIX: ${{ needs.set-matrix.outputs.matrix }}
+          TERRAFORM_RESULT: ${{ needs.terraform.result }}
         run: |
-          if [ "${{ needs.lint.result }}" == "failure" ]; then
-            echo "Lint failed"
+          if [ "$LINT_RESULT" != "success" ] || [ "$MATRIX_RESULT" != "success" ]; then
+            echo "Lint or target selection did not succeed"
             exit 1
           fi
-          if [ "${{ needs.set-matrix.outputs.matrix }}" == '["_empty"]' ]; then
+          if [ "$TARGET_MATRIX" == '["_empty"]' ]; then
             echo "No repositories to process"
             exit 0
           fi
-          if [ "${{ needs.terraform.result }}" == "failure" ]; then
-            echo "Terraform jobs failed"
+          if [ "$TERRAFORM_RESULT" != "success" ]; then
+            echo "Terraform jobs did not succeed"
             exit 1
           fi
           echo "All jobs completed successfully"

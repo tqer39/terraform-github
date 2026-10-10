@@ -37,7 +37,7 @@ runs:
       id: terraform-plan
       run: |
         TARGET=$(basename ${{ inputs.working-directory }})
-        tfcmt --var target:$TARGET plan -patch -- terraform plan -no-color
+        tfcmt --var target:$TARGET plan -patch -- terraform plan -input=false -no-color -out=tfplan
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         TF_VAR_github_token: ${{ inputs.GITHUB_APPS_TOKEN }}

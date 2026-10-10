@@ -4,6 +4,24 @@
 
 このリポジトリはTerraformとGitHub Actionsを使用してGitHubにリポジトリデプロイするためのものです。
 
+## セットアップ
+
+mise と Git を準備し、リポジトリ内で次を実行する。
+
+```bash
+mise bootstrap --only tools,task
+```
+
+mise 管理ツール、固定された pnpm 依存、lefthook をまとめてセットアップする。
+mise が未導入の場合は `./scripts/bootstrap.sh` で Homebrew と基本ツールを導入する。
+`mise run bootstrap` と従来の `mise run setup` も同じセットアップを実行する。
+非対話環境で既存の `node_modules` を置き換える場合は `CI=true` を指定する。
+AWS 認証が必要な Terraform 初期化は別途行う。
+
+betterleaks はコミット時に選択されたファイルの Git index を検査する。
+部分的にステージした秘密も検出し、値はマスクする。外部 API での認証確認は無効。
+`mise run lint` は作業ツリーの選択された追跡ファイル、回帰テスト、全 lint を検証する。
+
 ## デプロイフロー
 
 1. GitHub Actionsのワークフローがトリガーされます（例えば、プルリクエストがマージされたとき）。
@@ -16,22 +34,37 @@ graph TD
   C --> D[Terraform Plan]
   D --> E[Start Deployment]
   E --> F{pushまたはworkflow_dispatch}
-  F -- Yes --> G[Terraform Apply]
-  F -- No --> H[スキップ]
+  F -- 適用有効 --> G[保存した plan を適用]
+  F -- plan のみ --> H[スキップ]
   G --> I[Finish Deployment]
   H --> I
 ```
 
-## ローカルで `terraform plan` する方法
+## 実行対象とローカル plan
 
-```shell
-$AWS_PROFILE=XXXXXXXXXX
-$PIPE_LINE=terraform/src/repository
-aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE init -reconfigure
-aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE validate
-aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE plan
-aws-vault exec $AWS_PROFILE -- terraform -chdir=$PIPE_LINE apply -auto-approve
+PR と main push は変更された root だけを対象にする。
+共通モジュールまたは Terraform 用 Action の変更は全 root の plan のみを実行する。
+共通変更の適用は、各 root の plan を確認した後に手動実行で明示する。
+手動実行では `repository` に root 名を指定し、全件実行には明示的に `all` を指定する。
+`apply` の既定値は false で、まず plan と対象を確認する。
+適用する場合は対象と変更内容を確認した上で true を指定する。
+各 job は、その実行で保存した plan を適用する。
+
+ローカルタスクの既定対象は `terraform-github`。引数で別の root を指定できる。
+認証用の `TF_VAR_github_token` は既存の認証方法で設定する。
+
+```bash
+AWS_PROFILE=portfolio mise run tf:init -- terraform-github -input=false
+AWS_PROFILE=portfolio mise run tf:validate -- terraform-github
+AWS_PROFILE=portfolio mise run tf:plan -- terraform-github -out=tfplan
+mise exec -- terraform -chdir=terraform/src/repositories/terraform-github show tfplan
+AWS_PROFILE=portfolio mise run tf:apply -- terraform-github tfplan
 ```
+
+`TERRAFORM_DIR` で既定 root を変更することも可能。
+保存した plan は秘密を含む場合があるため、Git に追加しない。
+archived の root は vulnerability alerts リソースを作成しない。
+既存の非 archived リソースは `moved` で移行し、再作成を避ける。
 
 ## terraform-import ワークフローの使い方
 
@@ -69,6 +102,6 @@ graph TD
 
 ### 注意事項
 
-- `module`には`terraform/src/repository/`配下の該当するモジュール名を指定してください。
+- `module`には`terraform/src/repositories/`配下の該当するモジュール名を指定してください。
 - `repo`にはGitHub上のリポジトリ名を指定してください。
 - 必要に応じて`secrets.TERRAFORM_GITHUB_TOKEN`が設定されていることを確認してください。
