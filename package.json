@@ -5,7 +5,7 @@
   "packageManager": "pnpm@12.7.0",
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
-    "cspell": "10.3.4",
+    "cspell": "10.3.6",
     "markdownlint-cli2": "0.23.3",
     "textlint": "15.8.0",
     "textlint-filter-rule-allowlist": "4.0.0",
