@@ -2,6 +2,10 @@ module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
 
+  visibility                      = "private"
+  archived                        = true
+  disable_default_main_protection = true
+
   repository          = "edu-quest"
   owner               = "tqer39"
   default_branch      = "main"
