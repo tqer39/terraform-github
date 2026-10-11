@@ -125,13 +125,21 @@ jobs:
       - name: Delete "No changes" PR comments
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            --jq '.[] | select(.body | contains("No changes. Your infrastructure matches the configuration.")) | .id' \
-            | while read -r comment_id; do
-                echo "Deleting comment: $comment_id"
-                gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$comment_id"
-              done
+          comment_ids=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[] | select(.user.login == "github-actions[bot]") |
+              select(.body | contains("\"Program\":\"tfcmt\"")) |
+              select(.body | contains("\"Command\":\"plan\"")) |
+              select(.body | contains("<pre><code>No changes. Your infrastructure matches the configuration.</code></pre>")) |
+              select(.body | contains(":warning:") | not) |
+              select(.body | contains("<details>") | not) | .id')
+          while read -r comment_id; do
+            [[ -n "$comment_id" ]] || continue
+            echo "Deleting comment: $comment_id"
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$comment_id"
+          done <<< "$comment_ids"
 
   workflow-result:
     needs: [lint, set-matrix, terraform, delete-nochange-comments]
