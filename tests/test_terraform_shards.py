@@ -81,7 +81,7 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
         result = self.run_shard(("one",))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("one terraform plan -input=false -no-color -out=tfplan", self.calls())
-        self.assertIn("one tfcmt --var target:one plan -patch -- terraform plan "
+        self.assertIn("one tfcmt --var target:one plan -patch -skip-no-changes -- terraform plan "
                       "-input=false -no-color -out=tfplan", self.calls())
         self.assertFalse(any(" terraform apply " in call for call in self.calls()))
 
@@ -145,6 +145,32 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
         self.assertEqual(json.loads((self.root / "metrics/rate-limit-after.json").read_text()),
                          {"unavailable": True})
         self.assertEqual(self.run_shard(RATE_FAIL="true").returncode, 0)
+
+
+class PlanCommentCLITests(unittest.TestCase):
+    def test_real_tfcmt_accepts_plan_flags_and_preserves_command_result(self):
+        """CI と同じ実バイナリでオプション互換性と保存 plan・失敗伝播を確認する。"""
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            env = dict(os.environ)
+            # Local-file output never posts to GitHub; use no real credential.
+            env["GITHUB_TOKEN"] = "unused-local-output"
+            for status, output in ((0, "No changes. Your infrastructure matches the configuration."),
+                                   (0, "Plan: 0 to add, 0 to change, 0 to destroy."),
+                                   (0, "Plan: 1 to add, 0 to change, 0 to destroy."),
+                                   (1, "Error: synthetic plan failure")):
+                with self.subTest(status=status, output=output):
+                    plan = root / "tfplan"
+                    plan.unlink(missing_ok=True)
+                    result = subprocess.run(
+                        ["tfcmt", "--output", str(root / "comment.md"),
+                         "--owner", "owner", "--repo", "repo", "--pr", "123",
+                         "--var", "target:one", "plan", "-patch", "-skip-no-changes", "--",
+                         "bash", "-c", 'printf "%s\\n" "$1"; echo saved > tfplan; exit "$2"',
+                         "fixture", output, str(status)],
+                        cwd=root, env=env, text=True, capture_output=True)
+                    self.assertEqual(result.returncode, status, result.stderr)
+                    self.assertEqual(plan.read_text(), "saved\n")
 
 
 class MetricsTests(unittest.TestCase):

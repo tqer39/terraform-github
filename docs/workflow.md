@@ -153,11 +153,32 @@ runner 内の1つの Terraform process だけが更新します。
 に従い、state、`.terraform`、plan は cache や計測 artifact に含めません。
 
 root 単独の変更は main push で保存した `tfplan` を apply します。
-モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform バージョンの
+モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform・tfcmt バージョンの
 共有変更は全 root の plan を実行し、自動 apply を禁止します。
+ただし PR と main push では、比較元と変更後の両方で `main.tf` の
+`module "this"` に `archived = true` を設定済みの root を除外します。
+判定はコミット済みの設定を使い、標準形式のリテラル値だけを認識します。
+archive への変更・解除・新規追加は対象に残り、必要な plan / apply を実行します。
+GitHub の実状態は照会しないため、設定との差を確認・修復する場合は手動実行してください。
+`workflow_dispatch` の個別指定と `repository: all` は archive 済みの root も対象に含めます。
 plan を確認してから `workflow_dispatch` で `repository` と `apply: true` を指定してください。
 手動実行でも同じ実行内で新しく保存した plan だけを apply し、再計画による apply は行いません。
 PR でレビューした別 run の plan を転送する仕組みではありません。
+
+### plan コメントの抑制
+
+ローカルと CI は `mise.toml` に固定した tfcmt 4.14.19 を使用します。
+旧セットアップ Action の固定版3.2.1は抑制オプションに対応しないため、mise に統一します。
+`tfcmt plan -skip-no-changes` で、警告のない `No changes` と
+`Plan: 0 to add, 0 to change, 0 to destroy.` の個別コメントを抑制します。
+リソースのアドレス移動や output の変更だけの場合もリソース増減はゼロになるため、
+完全に変更がないとは限りません。plan の保存と必要な apply は継続し、
+実行結果は shard の job summary、詳細は CI ログで確認できます。
+警告・エラーやリソースの増減がある plan は引き続きコメントします。
+
+以前の実行や `-patch` で更新されたゼロ件コメントは CI の最後に削除します。
+全ページを取得し、このワークフローの tfcmt メタデータが付いた
+`github-actions[bot]` の plan コメントだけを対象にします。警告・エラーを含むコメントは残します。
 
 ### 性能と API 制限の計測
 

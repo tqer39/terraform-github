@@ -9,6 +9,7 @@ python = "3.14"
 "aqua:pnpm/pnpm" = "12.7.0"
 "aqua:betterleaks/betterleaks" = "1.9.0"
 "aqua:ByteNess/aws-vault" = "7.16.2"
+"aqua:suzuki-shunsuke/tfcmt" = "4.14.19"
 
 [env]
 TERRAFORM_DIR = "terraform/src/repositories/terraform-github"

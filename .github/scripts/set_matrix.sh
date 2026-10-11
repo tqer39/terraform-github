@@ -7,11 +7,29 @@ targets=()
 all_repos=()
 require_manual_apply=false
 
-# Use the same pinned version consumed by setup-terraform, from committed files.
-terraform_version() {
+# Use the pinned Terraform and comment CLI versions from committed files.
+ci_tool_versions() {
     local ref="$1"
     git cat-file -e "$ref:mise.toml" 2>/dev/null || return 0
-    git show "$ref:mise.toml" | awk -F '"' '/^terraform[[:space:]]*=/ {print $2}'
+    git show "$ref:mise.toml" | awk -F '"' '
+        /^terraform[[:space:]]*=/ {print "terraform=" $2}
+        /^"aqua:suzuki-shunsuke\/tfcmt"[[:space:]]*=/ {print "tfcmt=" $4}
+    '
+}
+
+# Recognize only the root's conventional, literal module setting. Unknown or
+# more complex HCL stays eligible, so target selection never evaluates code.
+is_archived() {
+    local ref="$1" repo="$2" config
+    config="$(git show "$ref:$repos_dir/$repo/main.tf" 2>/dev/null)" || return 1
+    awk '
+        /\/\*|<</ { unknown = 1 }
+        /^module "this" \{/ { in_module = 1; modules++ }
+        /^}/ { in_module = 0 }
+        in_module && /^  source[[:space:]]*=[[:space:]]*"\.\.\/\.\.\/\.\.\/modules\/repository"[[:space:]]*$/ { source = 1 }
+        in_module && /^  archived[[:space:]]*=[[:space:]]*true[[:space:]]*(#.*|\/\/.*)?$/ { archived = 1 }
+        END { exit !(modules == 1 && source && archived && !unknown) }
+    ' <<< "$config"
 }
 for dir in "$repos_dir"/*/; do
     [[ -f "$dir/terraform.tf" ]] || continue
@@ -50,7 +68,7 @@ else
                 require_manual_apply=true
                 ;;
             mise.toml)
-                if [[ "$(terraform_version "$diff_base")" != "$(terraform_version "$head")" ]]; then
+                if [[ "$(ci_tool_versions "$diff_base")" != "$(ci_tool_versions "$head")" ]]; then
                     require_manual_apply=true
                 fi
                 ;;
@@ -70,6 +88,18 @@ else
             done <<< "$changes"
         done
     fi
+
+    # Keep archive/unarchive transitions deployable. Only roots already archived
+    # at both ends of the comparison can skip automatic plan/apply.
+    active_targets=()
+    for repo in "${targets[@]}"; do
+        if is_archived "$diff_base" "$repo" && is_archived "$head" "$repo"; then
+            echo "Skipping archived repository: $repo"
+        else
+            active_targets+=("$repo")
+        fi
+    done
+    targets=("${active_targets[@]}")
 fi
 
 if [[ ${#targets[@]} -eq 0 ]]; then
