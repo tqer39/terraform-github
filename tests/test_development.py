@@ -160,6 +160,93 @@ class DevelopmentTests(unittest.TestCase):
     def test_empty_scan_succeeds(self):
         self.assertEqual(self.scan().returncode, 0)
 
+    def cleanup_comments(self, comments, failure=""):
+        """複数ページの GitHub API を模擬して実際の削除スクリプトを実行する。"""
+        (self.root / "comments.json").write_text(json.dumps(comments))
+        gh = self.root / "gh"
+        gh.write_text(textwrap.dedent('''\
+            #!/usr/bin/env python3
+            import json
+            import os
+            from pathlib import Path
+            import subprocess
+            import sys
+            args = sys.argv[1:]
+            if "DELETE" in args:
+                if os.environ["API_FAILURE"] == "delete":
+                    sys.exit(1)
+                with Path("deleted").open("a") as output:
+                    output.write(args[-1] + "\\n")
+            else:
+                if os.environ["API_FAILURE"] == "list":
+                    sys.exit(1)
+                comments = json.loads(Path("comments.json").read_text())
+                pages = [comments[i:i+30] for i in range(0, len(comments), 30)]
+                if "--paginate" not in args:
+                    pages = pages[:1]
+                query = args[args.index("--jq") + 1]
+                for index, page in enumerate(pages):
+                    if index > 0 and os.environ["API_FAILURE"] == "later-page":
+                        sys.exit(1)
+                    subprocess.run(["jq", "-r", query], input=json.dumps(page),
+                                   text=True, check=True)
+            '''))
+        gh.chmod(0o755)
+        workflow = (PROJECT / ".github/workflows/terraform-github.yml").read_text()
+        cleanup = workflow.split("  delete-nochange-comments:\n", 1)[1]
+        cleanup = cleanup.split("  workflow-result:\n", 1)[0]
+        script = textwrap.dedent(cleanup.split("        run: |\n", 1)[1])
+        env = dict(self.env, PATH=str(self.root) + os.pathsep + os.environ["PATH"],
+                   GH_REPO="owner/repository", PR_NUMBER="123", API_FAILURE=failure)
+        result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", script],
+                                cwd=self.root, env=env, text=True, capture_output=True)
+        deleted = self.root / "deleted"
+        return result, deleted.read_text().splitlines() if deleted.exists() else []
+
+    def test_cleanup_deletes_nochange_bot_plans_on_later_pages_only(self):
+        """30件を超えても対象を削除し、人の発言・警告・変更結果は保持する。"""
+        body = ('<pre><code>No changes. Your infrastructure matches the configuration.'
+                '</code></pre>\n<!-- github-comment: '
+                '{"Program":"tfcmt","Command":"plan"} -->')
+        comments = [{"id": i, "user": {"login": "person"}, "body": "discussion"}
+                    for i in range(30)]
+        for index, (author, content) in enumerate([
+                ("github-actions[bot]", body), ("person", body),
+                ("github-actions[bot]", body + '\n## :warning: Warnings'),
+                ("github-actions[bot]", body + '<details>Drift</details>'),
+                ("github-actions[bot]", body.replace('"plan"', '"apply"')),
+                ("github-actions[bot]", "Plan: 1 to add, 0 to change, 0 to destroy."),
+                ("github-actions[bot]", body)], 30):
+            comments.append({"id": index, "user": {"login": author}, "body": content})
+        result, deleted = self.cleanup_comments(comments)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(deleted, ["repos/owner/repository/issues/comments/30",
+                                   "repos/owner/repository/issues/comments/36"])
+
+    def test_cleanup_reports_api_failures_and_accepts_empty_comments(self):
+        """API の一覧取得と削除の失敗を成功扱いにしない。"""
+        result, deleted = self.cleanup_comments([])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(deleted, [])
+        result, _ = self.cleanup_comments([], failure="list")
+        self.assertNotEqual(result.returncode, 0)
+        comment = {"id": 1, "user": {"login": "github-actions[bot]"},
+                   "body": '<pre><code>No changes. Your infrastructure matches the '
+                           'configuration.</code></pre> "Program":"tfcmt" "Command":"plan"'}
+        result, _ = self.cleanup_comments([comment], failure="delete")
+        self.assertNotEqual(result.returncode, 0)
+
+    def test_cleanup_fetches_all_pages_before_deleting_comments(self):
+        """後続ページの取得失敗時は、取得済みページのコメントも削除しない。"""
+        comment = {"id": 1, "user": {"login": "github-actions[bot]"},
+                   "body": '<pre><code>No changes. Your infrastructure matches the '
+                           'configuration.</code></pre> "Program":"tfcmt" "Command":"plan"'}
+        comments = [comment] + [{"id": i + 2, "user": {"login": "person"},
+                                 "body": "discussion"} for i in range(30)]
+        result, deleted = self.cleanup_comments(comments, failure="later-page")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(deleted, [])
+
     def workflow_result(self, matrix='["one"]', terraform="success",
                         lint="success", selection="success"):
         workflow = (PROJECT / ".github/workflows/terraform-github.yml").read_text()
