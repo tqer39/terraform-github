@@ -143,6 +143,12 @@ variable "configure_actions_permissions" {
   default     = true
 }
 
+variable "actions_enabled" {
+  type        = bool
+  description = "(Optional) Whether GitHub Actions is enabled for the repository."
+  default     = true
+}
+
 variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
