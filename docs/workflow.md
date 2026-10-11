@@ -17,6 +17,11 @@ HCL パターンとモジュールパラメータの詳細: [terraform-patterns.
 
 PR には plan 出力のサマリを含めること。破壊的変更は明示的にマークすること。
 
+差分も警告もない `No changes` の自動 plan コメントは後続 job で削除します。
+コメント一覧は全ページ取得し、30件を超える PR でも削除漏れを防ぎます。
+削除対象は GitHub Actions bot が投稿した tfcmt の plan 結果だけです。
+人のコメント、変更・警告・drift の詳細を含む結果は保持します。
+
 ## 認証方式
 
 - **GitHub App トークン**: Organization リポジトリ（推奨）
