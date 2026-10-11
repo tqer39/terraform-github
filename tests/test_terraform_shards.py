@@ -81,7 +81,7 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
         result = self.run_shard(("one",))
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("one terraform plan -input=false -no-color -out=tfplan", self.calls())
-        self.assertIn("one tfcmt --var target:one plan -patch -- terraform plan "
+        self.assertIn("one tfcmt --var target:one plan -patch -skip-no-changes -- terraform plan "
                       "-input=false -no-color -out=tfplan", self.calls())
         self.assertFalse(any(" terraform apply " in call for call in self.calls()))
 

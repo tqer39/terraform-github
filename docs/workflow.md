@@ -113,6 +113,19 @@ plan を確認してから `workflow_dispatch` で `repository` と `apply: true
 手動実行でも同じ実行内で新しく保存した plan だけを apply し、再計画による apply は行いません。
 PR でレビューした別 run の plan を転送する仕組みではありません。
 
+### plan コメントの抑制
+
+`tfcmt plan -skip-no-changes` で、警告のない `No changes` と
+`Plan: 0 to add, 0 to change, 0 to destroy.` の個別コメントを抑制します。
+リソースのアドレス移動や output の変更だけの場合もリソース増減はゼロになるため、
+完全に変更がないとは限りません。plan の保存と必要な apply は継続し、
+実行結果は shard の job summary、詳細は CI ログで確認できます。
+警告・エラーやリソースの増減がある plan は引き続きコメントします。
+
+以前の実行や `-patch` で更新されたゼロ件コメントは CI の最後に削除します。
+全ページを取得し、このワークフローの tfcmt メタデータが付いた
+`github-actions[bot]` の plan コメントだけを対象にします。警告・エラーを含むコメントは残します。
+
 ### 性能と API 制限の計測
 
 各 shard の job summary と `terraform-metrics-<shard>` artifact に、root の結果・

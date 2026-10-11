@@ -102,12 +102,26 @@ jobs:
     permissions:
       pull-requests: write
     steps:
-      - name: Delete "No changes" PR comments
+      - name: Delete no-change Terraform plan comments
+        # cspell:ignore fromjson
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            --jq '.[] | select(.body | contains("No changes. Your infrastructure matches the configuration.")) | .id' \
+          gh api --paginate "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
+            | jq -r '.[]
+                | select(.user.login == "github-actions[bot]")
+                | . as $comment
+                | (try (.body
+                    | capture("<!-- github-comment: (?<metadata>[^\\n]+) -->")
+                    | .metadata | fromjson) catch null) as $metadata
+                | select($metadata.Program == "tfcmt" and $metadata.Command == "plan"
+                    and $metadata.WorkflowName == "Terraform - GitHub")
+                | select($comment.body
+                    | contains("No changes. Your infrastructure matches the configuration.")
+                    or contains("<pre><code>Plan: 0 to add, 0 to change, 0 to destroy.</code></pre>"))
+                | select($comment.body
+                    | test("Warning:|Error:|:warning:|:x:") | not)
+                | $comment.id' \
             | while read -r comment_id; do
                 echo "Deleting comment: $comment_id"
                 gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$comment_id"

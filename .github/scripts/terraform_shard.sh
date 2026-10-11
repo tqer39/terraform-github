@@ -61,7 +61,7 @@ for root in "${roots[@]}"; do
         echo tflint > "$stage_file"
         tflint --chdir=. --call-module-type=all
         echo plan > "$stage_file"
-        tfcmt --var "target:$root" plan -patch -- terraform plan -input=false -no-color -out=tfplan
+        tfcmt --var "target:$root" plan -patch -skip-no-changes -- terraform plan -input=false -no-color -out=tfplan
         if [[ "$apply" == true ]]; then
             echo apply > "$stage_file"
             terraform apply -input=false tfplan

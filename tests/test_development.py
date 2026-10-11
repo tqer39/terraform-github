@@ -286,6 +286,64 @@ class DevelopmentTests(unittest.TestCase):
             self.assertNotEqual(self.workflow_result(matrix='["_empty"]', lint=state), 0)
             self.assertNotEqual(self.workflow_result(matrix='["_empty"]', selection=state), 0)
 
+    def cleanup_comments(self, pages):
+        workflow = (PROJECT / ".github/workflows/terraform-github.yml").read_text()
+        section = workflow.split("  delete-nochange-comments:\n", 1)[1]
+        section = section.split("\n  workflow-result:", 1)[0]
+        script = textwrap.dedent(section.split("        run: |\n", 1)[1])
+        script = script.replace("${{ github.repository }}", "owner/repo")
+        script = script.replace("${{ github.event.pull_request.number }}", "123")
+        fixture = self.root / "comments.json"
+        fixture.write_text("\n".join(json.dumps(page) for page in pages))
+        binary = self.root / "bin"
+        binary.mkdir()
+        gh = binary / "gh"
+        gh.write_text('''#!/usr/bin/env bash
+set -euo pipefail
+if [[ "$2" == -X ]]; then
+    printf '%s\\n' "$4" >> "$DELETED"
+else
+    [[ "$2" == --paginate ]] || exit 24
+    cat "$COMMENT_FIXTURE"
+fi
+''')
+        gh.chmod(0o755)
+        deleted = self.root / "deleted"
+        result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", script],
+                                cwd=self.root, text=True, capture_output=True,
+                                env=dict(self.env, PATH=str(binary) + os.pathsep + os.environ["PATH"],
+                                         COMMENT_FIXTURE=str(fixture), DELETED=str(deleted)))
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return deleted.read_text().splitlines() if deleted.exists() else []
+
+    def test_cleanup_removes_only_our_successful_no_resource_change_plans(self):
+        zero = "<pre><code>Plan: 0 to add, 0 to change, 0 to destroy.</code></pre>"
+        no_changes = "No changes. Your infrastructure matches the configuration."
+
+        def comment(identifier, body, author="github-actions[bot]", **metadata):
+            marker = dict(Program="tfcmt", Command="plan", WorkflowName="Terraform - GitHub")
+            marker.update(metadata)
+            return dict(id=identifier, user=dict(login=author),
+                        body=body + "\n<!-- github-comment: " + json.dumps(marker) + " -->")
+
+        pages = [[comment(1, no_changes),
+                  comment(2, zero + "\n# resource has moved to resource[0]"),
+                  comment(3, zero + "\n## :warning: Warnings"),
+                  comment(4, zero + "\nWarning: deprecated argument"),
+                  comment(5, zero + "\nError: plan failed"),
+                  comment(6, "## :x: Plan Result\n" + zero),
+                  comment(7, zero, author="human"),
+                  comment(8, zero, Program="another-tool"),
+                  comment(9, zero, Command="apply"),
+                  comment(10, zero, WorkflowName="Other workflow"),
+                  comment(11, "<pre><code>Plan: 1 to add, 0 to change, 0 to destroy.</code></pre>"),
+                  dict(id=12, user=dict(login="github-actions[bot]"), body=no_changes)],
+                 [comment(31, zero), comment(32, no_changes + "\n## :warning: Errors")]]
+        self.assertEqual(self.cleanup_comments(pages),
+                         ["repos/owner/repo/issues/comments/1",
+                          "repos/owner/repo/issues/comments/2",
+                          "repos/owner/repo/issues/comments/31"])
+
 
 class RuleGenerationTests(unittest.TestCase):
     """LLM の入口が原本を参照し、更新漏れを検出することを検証する。"""
