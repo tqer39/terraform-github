@@ -93,3 +93,6 @@ oxfmt
 Oxlint
 rulesync
 tldjs
+dieub
+globby
+nodupes
