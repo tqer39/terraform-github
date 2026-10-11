@@ -36,7 +36,9 @@ runs:
         setup-only: "true"
 
     - name: Setup tfcmt
-      uses: itkq/actions-tfcmt/setup@96a8e30f0403d8db60d94c73be26debb87fda65d # main
+      uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5
+      with:
+        install_args: aqua:suzuki-shunsuke/tfcmt
 
     - name: Prepare provider cache
       shell: bash

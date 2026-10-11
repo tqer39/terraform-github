@@ -153,7 +153,7 @@ runner 内の1つの Terraform process だけが更新します。
 に従い、state、`.terraform`、plan は cache や計測 artifact に含めません。
 
 root 単独の変更は main push で保存した `tfplan` を apply します。
-モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform バージョンの
+モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform・tfcmt バージョンの
 共有変更は全 root の plan を実行し、自動 apply を禁止します。
 ただし PR と main push では、比較元と変更後の両方で `main.tf` の
 `module "this"` に `archived = true` を設定済みの root を除外します。
@@ -167,6 +167,8 @@ PR でレビューした別 run の plan を転送する仕組みではありま
 
 ### plan コメントの抑制
 
+ローカルと CI は `mise.toml` に固定した tfcmt 4.14.19 を使用します。
+旧セットアップ Action の固定版3.2.1は抑制オプションに対応しないため、mise に統一します。
 `tfcmt plan -skip-no-changes` で、警告のない `No changes` と
 `Plan: 0 to add, 0 to change, 0 to destroy.` の個別コメントを抑制します。
 リソースのアドレス移動や output の変更だけの場合もリソース増減はゼロになるため、

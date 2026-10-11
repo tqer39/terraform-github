@@ -7,11 +7,14 @@ targets=()
 all_repos=()
 require_manual_apply=false
 
-# Use the same pinned version consumed by setup-terraform, from committed files.
-terraform_version() {
+# Use the pinned Terraform and comment CLI versions from committed files.
+ci_tool_versions() {
     local ref="$1"
     git cat-file -e "$ref:mise.toml" 2>/dev/null || return 0
-    git show "$ref:mise.toml" | awk -F '"' '/^terraform[[:space:]]*=/ {print $2}'
+    git show "$ref:mise.toml" | awk -F '"' '
+        /^terraform[[:space:]]*=/ {print "terraform=" $2}
+        /^"aqua:suzuki-shunsuke\/tfcmt"[[:space:]]*=/ {print "tfcmt=" $4}
+    '
 }
 
 # Recognize only the root's conventional, literal module setting. Unknown or
@@ -65,7 +68,7 @@ else
                 require_manual_apply=true
                 ;;
             mise.toml)
-                if [[ "$(terraform_version "$diff_base")" != "$(terraform_version "$head")" ]]; then
+                if [[ "$(ci_tool_versions "$diff_base")" != "$(ci_tool_versions "$head")" ]]; then
                     require_manual_apply=true
                 fi
                 ;;

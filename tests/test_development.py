@@ -207,6 +207,14 @@ class DevelopmentTests(unittest.TestCase):
         self.assertEqual(self.matrix(event="pull_request").returncode, 0)
         self.assertEqual(self.result(), ["_empty"])
 
+    def test_tfcmt_version_change_selects_all_without_auto_apply(self):
+        self.update_tools('[tools]\nterraform = "1.16.4"\n'
+                          '"aqua:suzuki-shunsuke/tfcmt" = "4.14.19"\n')
+        for event in ("pull_request", "push"):
+            self.assertEqual(self.matrix(event=event).returncode, 0)
+            self.assertEqual(self.result(), ["one", "two"])
+            self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
     def test_committed_terraform_version_is_not_hidden_by_worktree(self):
         self.update_tools('[tools]\nterraform = "1.16.5"\n')
         (self.root / "mise.toml").write_text('[tools]\nterraform = "1.16.4"\n')
