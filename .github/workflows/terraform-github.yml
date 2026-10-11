@@ -39,6 +39,26 @@ jobs:
         with:
           install: true
 
+      - name: Get validator cache key
+        id: validator-cache-key
+        run: |
+          echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/renovate-npm" >> "$GITHUB_ENV"
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { readFileSync } from 'node:fs';
+          const hook = readFileSync('lefthook.yml', 'utf8');
+          const version = hook.match(/--package=renovate@(\d+\.\d+\.\d+) /)?.[1];
+          if (!version) throw new Error('Pinned Renovate version not found');
+          console.log(`node=${process.version}`);
+          console.log(`renovate=${version}`);
+          NODE
+
+      - name: Cache Renovate validator
+        id: validator-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/renovate-npm
+          key: renovate-npm-${{ runner.os }}-${{ runner.arch }}-${{ steps.validator-cache-key.outputs.node }}-${{ steps.validator-cache-key.outputs.renovate }}
+
       - name: Install node dependencies
         run: pnpm install --frozen-lockfile
 
