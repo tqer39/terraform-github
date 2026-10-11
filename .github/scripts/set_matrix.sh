@@ -46,7 +46,7 @@ else
     changes="$(git diff --name-only "$diff_base" "$head")"
     while IFS= read -r file; do
         case "$file" in
-            terraform/modules/repository/*|.github/actions/terraform-plan/*|.github/actions/terraform-apply/*|.github/actions/setup-terraform/*|.github/actions/terraform-validate/*)
+            terraform/modules/repository/*|.github/workflows/terraform-github.yml|.github/scripts/set_matrix.sh|.github/scripts/terraform_shard.sh|.github/actions/terraform-shard/*|.github/actions/terraform-plan/*|.github/actions/terraform-apply/*|.github/actions/setup-terraform/*|.github/actions/terraform-validate/*)
                 require_manual_apply=true
                 ;;
             mise.toml)
@@ -80,3 +80,15 @@ fi
 echo "Matrix: $matrix"
 echo "matrix=$matrix" >> "${GITHUB_OUTPUT:?GITHUB_OUTPUT is required}"
 echo "require_manual_apply=$require_manual_apply" >> "$GITHUB_OUTPUT"
+
+# Round-robin distribution is deterministic, balanced and never exceeds five runners.
+if [[ ${#targets[@]} -eq 0 ]]; then
+    shards='[]'
+else
+    shards="$(printf '%s\n' "${targets[@]}" | jq -R . | jq -sc '
+        . as $roots | ([length, 5] | min) as $count |
+        [range($count) as $id |
+            {id: $id, repositories: [$roots | to_entries[] |
+                select(.key % $count == $id) | .value]}]')"
+fi
+echo "shards=$shards" >> "$GITHUB_OUTPUT"

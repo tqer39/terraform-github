@@ -81,3 +81,56 @@ pnpm audit --json
 変更前から存在する `sprintf-js` の moderate 警告
 [GHSA-hp3w-g68c-fv3c](https://github.com/advisories/GHSA-hp3w-g68c-fv3c) は別件で残っています。
 audit 全体の終了コードはこの警告により失敗になるため、本 advisory の有無も確認してください。
+
+## Terraform CI の shard 実行
+
+対象 root を名前順で最大5つの shard に均等分配します。各 runner で checkout、
+AWS OIDC 認証、Terraform・TFLint・tfcmt のセットアップを1回だけ実行し、
+shard 内では root を順次 fmt / init / validate / lint / plan します。
+単一 root は1ジョブ、対象がなければ Terraform ジョブを省略します。
+
+state のバックエンド設定、`tfplan` の保存先、tfcmt の `target` は root ごとに保持します。
+失敗した root は後続処理へ進まず、他 root の検証を続けて shard 全体を失敗させます。
+`fail-fast: false` と `workflow-result` で、別 shard の検証と必須チェックの失敗を維持します。
+
+通常 CI は `terraform init -input=false -lockfile=readonly` で固定 provider を使います。
+依存更新の `-upgrade` は `terraform-renovate.yml` で別に実行します。
+provider cache は OS・CPU・Terraform バージョン・shard・lockfile ハッシュをキーにし、
+runner 内の1つの Terraform process だけが更新します。
+[公式の cache 仕様](https://developer.hashicorp.com/terraform/cli/config/config-file#provider-plugin-cache)
+に従い、state、`.terraform`、plan は cache や計測 artifact に含めません。
+
+root 単独の変更は main push で保存した `tfplan` を apply します。
+モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform バージョンの
+共有変更は全 root の plan を実行し、自動 apply を禁止します。
+plan を確認してから `workflow_dispatch` で `repository` と `apply: true` を指定してください。
+手動実行でも同じ実行内で新しく保存した plan だけを apply し、再計画による apply は行いません。
+PR でレビューした別 run の plan を転送する仕組みではありません。
+
+### 性能と API 制限の計測
+
+各 shard の job summary と `terraform-metrics-<shard>` artifact に、root の結果・
+最終処理段階・秒数と、provider PAT の API rate-limit の実行前後の値を保存します。
+認証トークン、state、plan 本体は保存しません。PAT は他の実行と API 予算を共有するため、
+remaining の差はこの run だけのリクエスト数ではありません。
+reset の変化、並行 run、secondary rate limit による失敗もログと併せて確認してください。
+
+[変更前 run 38014243938](https://github.com/tqer39/terraform-github/actions/runs/38014243938)
+の Issue #1754 計測値は、workflow 273秒（API の timestamp 差は272秒）、
+Terraform ジョブ群231秒、
+41ジョブ合計1001 runner秒です。変更後の全 root の PR run で、以下を比較します。
+キャッシュなしの初回と cache がある再実行を分け、root 数と plan 内容も確認してください。
+
+```bash
+gh api repos/tqer39/terraform-github/actions/runs/RUN_ID > /tmp/run.json
+gh api --paginate --slurp \
+  repos/tqer39/terraform-github/actions/runs/RUN_ID/jobs > /tmp/jobs.json
+python3 .github/scripts/ci_metrics.py /tmp/run.json /tmp/jobs.json
+gh run download RUN_ID --pattern 'terraform-metrics-*' --dir /tmp/terraform-metrics
+```
+
+workflow の時間は作成から最終ジョブ終了まで、Terraform ジョブ群の時間は最初の開始から
+最後の終了まで、runner秒は各ジョブの開始から終了までの合計で比較します。
+これは課金時間ではありません。再実行は attempt ごとに取得し、混在させないでください。
+変更前 run には PAT rate-limit の計測値がないため、過去の API 使用量は復元できません。
+最大同時実行数は5のまま維持し、API 制限の改善は新しい実測値が揃うまで断定しません。

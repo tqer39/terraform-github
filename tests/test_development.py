@@ -38,6 +38,7 @@ class DevelopmentTests(unittest.TestCase):
                               text=True, capture_output=True)
 
     def matrix(self, event="workflow_dispatch", target="one", base=None):
+        (self.root / "output").unlink(missing_ok=True)
         env = dict(self.env, EVENT_NAME=event, TARGET_REPOSITORY=target,
                    BASE_SHA=base or self.base, HEAD_SHA="HEAD")
         return subprocess.run(["bash", str(PROJECT / ".github/scripts/set_matrix.sh")],
@@ -60,6 +61,39 @@ class DevelopmentTests(unittest.TestCase):
     def test_manual_all_roots(self):
         self.assertEqual(self.matrix(target="all").returncode, 0)
         self.assertEqual(self.result(), ["one", "two"])
+
+    def shards(self):
+        lines = (self.root / "output").read_text().splitlines()
+        return json.loads(next(line.split("=", 1)[1] for line in lines
+                               if line.startswith("shards=")))
+
+    def test_shard_distribution_for_single_all_and_empty(self):
+        self.assertEqual(self.matrix().returncode, 0)
+        self.assertEqual(self.shards(), [{"id": 0, "repositories": ["one"]}])
+        for number in range(39):
+            path = self.root / "terraform/src/repositories" / f"repo-{number:02}"
+            path.mkdir()
+            (path / "terraform.tf").write_text("terraform {}\n")
+        self.assertEqual(self.matrix(target="all").returncode, 0)
+        shards = self.shards()
+        self.assertEqual(len(shards), 5)
+        roots = [root for shard in shards for root in shard["repositories"]]
+        self.assertEqual(sorted(roots), self.result())
+        self.assertEqual(len(set(roots)), 41)
+        sizes = [len(shard["repositories"]) for shard in shards]
+        self.assertEqual(sorted(sizes), [8, 8, 8, 8, 9])
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertEqual(self.shards(), [])
+
+    def test_shard_implementation_changes_select_all_without_auto_apply(self):
+        for name in (".github/scripts/terraform_shard.sh",
+                     ".github/scripts/set_matrix.sh",
+                     ".github/workflows/terraform-github.yml",
+                     ".github/actions/terraform-shard/action.yml"):
+            self.commit_file(name)
+            self.assertEqual(self.matrix(event="push").returncode, 0)
+            self.assertEqual(self.result(), ["one", "two"])
+            self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
 
     def test_invalid_manual_targets(self):
         for target in ("", "unknown", "../one", "one;echo bad"):
