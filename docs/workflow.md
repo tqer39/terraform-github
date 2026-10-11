@@ -129,8 +129,32 @@ python3 .github/scripts/ci_metrics.py /tmp/run.json /tmp/jobs.json
 gh run download RUN_ID --pattern 'terraform-metrics-*' --dir /tmp/terraform-metrics
 ```
 
-workflow の時間は作成から最終ジョブ終了まで、Terraform ジョブ群の時間は最初の開始から
+workflow の時間は attempt の開始から最終ジョブ終了まで、Terraform ジョブ群の時間は最初の開始から
 最後の終了まで、runner秒は各ジョブの開始から終了までの合計で比較します。
 これは課金時間ではありません。再実行は attempt ごとに取得し、混在させないでください。
 変更前 run には PAT rate-limit の計測値がないため、過去の API 使用量は復元できません。
 最大同時実行数は5のまま維持し、API 制限の改善は新しい実測値が揃うまで断定しません。
+
+2026-10-11 の [初回 shard run 38101259781](https://github.com/tqer39/terraform-github/actions/runs/38101259781)
+は全42 root と `workflow-result` が成功しました。
+
+| 計測項目 | 変更前 | 初回 shard | 差 |
+| --- | ---: | ---: | ---: |
+| root 数 | 41 | 42 | +1 |
+| Terraform ジョブ数 | 41 | 5 | -36 |
+| workflow 秒（API timestamp） | 272 | 110 | -162 |
+| Terraform ジョブ群の秒 | 231 | 85 | -146（約63%） |
+| Terraform runner秒 | 1001 | 406 | -595（約59%） |
+
+provider cache は5 shard とも未取得で開始し、37 root の init は同じ runner の
+cache を再利用しました。各 shard の provider cache 保存も成功しています。
+全42 root の plan のうち41 root はリソース変更なし、`blog` のみ追加2・変更2・削除0でした。
+`blog` は既存設定と実環境の差で、archive 解除・public 化などを含みます。
+今回の共有変更では自動 apply されないため、適用は別途 plan をレビューしてください。
+
+5 shard の PAT rate-limit の core は前後とも remaining 5000・used 0 でしたが、
+reset が変わっており、消費ゼロの証拠としては扱いません。
+primary / secondary rate-limit エラーはログで検出されませんでした。
+変更前の API 計測値がないため使用量の増減は未確認です。
+root 数・provider 更新の有無・runner 性能が異なる run の比較であり、
+単一計測からすべての実行で同じ短縮率になるとは判断しません。

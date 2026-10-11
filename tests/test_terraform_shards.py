@@ -164,6 +164,14 @@ class MetricsTests(unittest.TestCase):
         self.assertEqual(result["terraform_wall_seconds"], 60)
         self.assertEqual(result["terraform_runner_seconds"], 100)
         self.assertEqual(result["conclusions"], ["failure", "success"])
+        rerun = dict(run, run_attempt=2, run_started_at="2026-10-10T00:00:05Z")
+        for job in jobs:
+            job["run_attempt"] = 2
+        self.assertEqual(summarize(rerun, [{"jobs": jobs}])["workflow_seconds"], 75)
+        with self.assertRaises(ValueError):
+            summarize(dict(run, run_attempt=2), [{"jobs": jobs}])
+        for job in jobs:
+            job["run_attempt"] = 1
         jobs[0]["run_attempt"] = 2
         with self.assertRaises(ValueError):
             summarize(run, [{"jobs": jobs}])

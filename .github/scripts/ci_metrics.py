@@ -17,6 +17,11 @@ def summarize(run, pages):
     attempts = {job.get("run_attempt", 1) for job in jobs}
     if attempts != {run.get("run_attempt", 1)}:
         raise ValueError("Do not mix run attempts")
+    run_start = run.get("run_started_at")
+    if not run_start:
+        if run.get("run_attempt", 1) != 1:
+            raise ValueError("Rerun requires its attempt start time")
+        run_start = run["created_at"]
     terraform = [job for job in jobs if job["name"].startswith("terraform (")]
     if not terraform:
         raise ValueError("No Terraform jobs found")
@@ -26,7 +31,7 @@ def summarize(run, pages):
         "run_id": run["id"],
         "attempt": run.get("run_attempt", 1),
         "workflow_seconds": (max(timestamp(job["completed_at"]) for job in jobs)
-                             - timestamp(run["created_at"])).total_seconds(),
+                             - timestamp(run_start)).total_seconds(),
         "terraform_wall_seconds": (end - start).total_seconds(),
         "terraform_runner_seconds": sum(
             (timestamp(job["completed_at"]) - timestamp(job["started_at"])).total_seconds()
