@@ -116,6 +116,76 @@ class DevelopmentTests(unittest.TestCase):
         self.assertEqual(self.matrix(event="push").returncode, 0)
         self.assertEqual(self.result(), ["_empty"])
 
+    def archive_config(self, value="true", repo="one"):
+        path = self.root / "terraform/src/repositories" / repo / "main.tf"
+        path.write_text('module "this" {\n'
+                        '  source = "../../../modules/repository"\n'
+                        f'  archived = {value}\n'
+                        '}\n')
+        self.git("add", str(path.relative_to(self.root)))
+        self.git("commit", "-qm", "archive configuration")
+
+    def test_shared_changes_skip_existing_archived_roots(self):
+        self.archive_config("true # archived")
+        self.base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.commit_file("terraform/modules/repository/example.tf")
+        for event in ("pull_request", "push"):
+            self.assertEqual(self.matrix(event=event).returncode, 0)
+            self.assertEqual(self.result(), ["two"])
+            self.assertEqual(self.shards(), [{"id": 0, "repositories": ["two"]}])
+            self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
+    def test_archived_only_changes_skip_terraform(self):
+        self.archive_config()
+        self.base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.commit_file("terraform/src/repositories/one/variables.tf")
+        for event in ("pull_request", "push"):
+            self.assertEqual(self.matrix(event=event).returncode, 0)
+            self.assertEqual(self.result(), ["_empty"])
+            self.assertEqual(self.shards(), [])
+
+    def test_archive_transitions_remain_eligible(self):
+        for value in ("true", "false", "true", "var.archived"):
+            previous = self.git("rev-parse", "HEAD").stdout.strip()
+            self.archive_config(value)
+            for event in ("pull_request", "push"):
+                self.assertEqual(self.matrix(event=event, base=previous).returncode, 0)
+                self.assertEqual(self.result(), ["one"])
+
+    def test_manual_runs_include_archived_roots(self):
+        self.archive_config()
+        for target, expected in (("one", ["one"]), ("all", ["one", "two"])):
+            self.assertEqual(self.matrix(target=target).returncode, 0)
+            self.assertEqual(self.result(), expected)
+
+    def test_unknown_or_commented_archive_settings_remain_eligible(self):
+        for index, value in enumerate(("var.archived", "false # archived = true",
+                                       "false\n  /*\n  archived = true\n  */")):
+            self.archive_config(value)
+            self.base = self.git("rev-parse", "HEAD").stdout.strip()
+            self.commit_file(f"terraform/modules/repository/example-{index}.tf")
+            self.assertEqual(self.matrix(event="push").returncode, 0)
+            self.assertEqual(self.result(), ["one", "two"])
+
+    def test_archive_detection_uses_committed_head(self):
+        self.archive_config()
+        self.base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.commit_file("terraform/modules/repository/example.tf")
+        path = self.root / "terraform/src/repositories/one/main.tf"
+        path.write_text(path.read_text().replace("true", "false"))
+        self.assertEqual(self.matrix(event="pull_request").returncode, 0)
+        self.assertEqual(self.result(), ["two"])
+
+    def test_pr_archive_detection_uses_merge_base(self):
+        self.git("checkout", "-qb", "feature")
+        self.archive_config()
+        self.git("checkout", "-qb", "base-update", self.base)
+        self.archive_config("true # base branch")
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.git("checkout", "-q", "feature")
+        self.assertEqual(self.matrix(event="pull_request", base=base).returncode, 0)
+        self.assertEqual(self.result(), ["one"])
+
     def test_missing_history_fails(self):
         self.assertNotEqual(self.matrix(event="push", base="missing").returncode, 0)
 

@@ -103,6 +103,12 @@ runner 内の1つの Terraform process だけが更新します。
 root 単独の変更は main push で保存した `tfplan` を apply します。
 モジュール、共通 Action、shard スクリプト、対象選択、ワークフロー、Terraform バージョンの
 共有変更は全 root の plan を実行し、自動 apply を禁止します。
+ただし PR と main push では、比較元と変更後の両方で `main.tf` の
+`module "this"` に `archived = true` を設定済みの root を除外します。
+判定はコミット済みの設定を使い、標準形式のリテラル値だけを認識します。
+archive への変更・解除・新規追加は対象に残り、必要な plan / apply を実行します。
+GitHub の実状態は照会しないため、設定との差を確認・修復する場合は手動実行してください。
+`workflow_dispatch` の個別指定と `repository: all` は archive 済みの root も対象に含めます。
 plan を確認してから `workflow_dispatch` で `repository` と `apply: true` を指定してください。
 手動実行でも同じ実行内で新しく保存した plan だけを apply し、再計画による apply は行いません。
 PR でレビューした別 run の plan を転送する仕組みではありません。
