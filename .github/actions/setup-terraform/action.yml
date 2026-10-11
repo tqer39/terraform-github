@@ -3,9 +3,12 @@ name: Setup terraform
 description: Setup Terraform
 
 inputs:
+  setup-only:
+    description: Install common tools without processing a root
+    default: "false"
   working-directory:
     description: Terraform CLI 実行時のパス
-    required: true
+    required: false
 
 runs:
   using: composite
@@ -20,11 +23,13 @@ runs:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
 
     - name: Terraform Format
+      if: inputs.setup-only != 'true'
       run: terraform fmt -check -recursive -diff
       working-directory: ${{ inputs.working-directory }}
       shell: bash
 
     - name: Terraform Init
-      run: terraform init -upgrade
+      if: inputs.setup-only != 'true'
+      run: terraform init -input=false -lockfile=readonly
       working-directory: ${{ inputs.working-directory }}
       shell: bash

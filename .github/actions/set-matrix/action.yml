@@ -11,6 +11,9 @@ outputs:
   require_manual_apply:
     description: Shared changes require an explicit manual apply after plan review
     value: ${{ steps.set-matrix.outputs.require_manual_apply }}
+  shards:
+    description: JSON array of up to five sequential root groups
+    value: ${{ steps.set-matrix.outputs.shards }}
   matrix:
     description: JSON array of repository directories to process
     value: ${{ steps.set-matrix.outputs.matrix }}

@@ -49,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      shards: ${{ steps.set-matrix.outputs.shards }}
       require_manual_apply: ${{ steps.set-matrix.outputs.require_manual_apply }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -62,6 +63,7 @@ jobs:
           repository: ${{ inputs.repository }}
 
   terraform:
+    name: terraform (${{ matrix.shard.id }})
     needs: set-matrix
     if: needs.set-matrix.outputs.matrix != '["_empty"]'
     runs-on: ubuntu-latest
@@ -70,7 +72,7 @@ jobs:
       fail-fast: false
       max-parallel: 5
       matrix:
-        target: ${{ fromJson(needs.set-matrix.outputs.matrix) }}
+        shard: ${{ fromJson(needs.set-matrix.outputs.shards) }}
     permissions:
       contents: write
       id-token: write
@@ -83,28 +85,15 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
-      - name: Generate GitHub App Token
-        id: app_token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+      - uses: ./.github/actions/terraform-shard
         with:
-          app-id: ${{ secrets.GHA_APP_ID }}
-          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-
-      - uses: ./.github/actions/terraform-plan
-        with:
-          working-directory: ./terraform/src/repositories/${{ matrix.target }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_APPS_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
-          GHA_APP_ID: ${{ secrets.GHA_APP_ID }}
-
-      # NOTE: GitHub App では個人アカウントのリポジトリを作成することが仕様上不可能なので PAT を使用する。
-      - uses: ./.github/actions/terraform-apply
-        if: (github.event_name == 'push' && needs.set-matrix.outputs.require_manual_apply != 'true') || (github.event_name == 'workflow_dispatch' && inputs.apply)
-        with:
-          working-directory: ./terraform/src/repositories/${{ matrix.target }}
-          GITHUB_TOKEN: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
-          GHA_APP_ID: ${{ secrets.GHA_APP_ID }}
+          repositories: ${{ toJson(matrix.shard.repositories) }}
+          shard-id: ${{ matrix.shard.id }}
+          apply: ${{ inputs.apply || false }}
+          require-manual-apply: ${{ needs.set-matrix.outputs.require_manual_apply }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          gha-app-id: ${{ secrets.GHA_APP_ID }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]

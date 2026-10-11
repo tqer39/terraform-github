@@ -96,3 +96,6 @@ tldjs
 dieub
 globby
 nodupes
+argjson
+endgroup
+subshell
