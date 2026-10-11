@@ -1,4 +1,6 @@
 overrides:
+  # 深い pattern の DoS 対策。採用根拠と互換性検証は docs/workflow.md を参照。
+  braces: npm:@dieub/braces-depth-guard@3.0.3-pn.3
   'markdownlint-cli2>smol-toml': 1.9.0
   'micromark-extension-math>katex': 0.18.9
 
