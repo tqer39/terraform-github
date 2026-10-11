@@ -39,6 +39,26 @@ jobs:
         with:
           install: true
 
+      - name: Get validator cache key
+        id: validator-cache-key
+        run: |
+          echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/renovate-npm" >> "$GITHUB_ENV"
+          node --input-type=module <<'NODE' >> "$GITHUB_OUTPUT"
+          import { readFileSync } from 'node:fs';
+          const hook = readFileSync('lefthook.yml', 'utf8');
+          const version = hook.match(/--package=renovate@(\d+\.\d+\.\d+) /)?.[1];
+          if (!version) throw new Error('Pinned Renovate version not found');
+          console.log(`node=${process.version}`);
+          console.log(`renovate=${version}`);
+          NODE
+
+      - name: Cache Renovate validator
+        id: validator-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/renovate-npm
+          key: renovate-npm-${{ runner.os }}-${{ runner.arch }}-${{ steps.validator-cache-key.outputs.node }}-${{ steps.validator-cache-key.outputs.renovate }}
+
       - name: Install node dependencies
         run: pnpm install --frozen-lockfile
 
@@ -106,9 +126,13 @@ jobs:
         # cspell:ignore fromjson
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          gh api --paginate "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments" \
-            | jq -r '.[]
+          # jq variables must remain literal, without shell expansion.
+          # shellcheck disable=SC2016
+          comment_ids=$(gh api --paginate "repos/$GH_REPO/issues/$PR_NUMBER/comments" \
+            --jq '.[]
                 | select(.user.login == "github-actions[bot]")
                 | . as $comment
                 | (try (.body
@@ -117,15 +141,17 @@ jobs:
                 | select($metadata.Program == "tfcmt" and $metadata.Command == "plan"
                     and $metadata.WorkflowName == "Terraform - GitHub")
                 | select($comment.body
-                    | contains("No changes. Your infrastructure matches the configuration.")
+                    | (contains("<pre><code>No changes. Your infrastructure matches the configuration.</code></pre>")
+                        and (contains("<details>") | not))
                     or contains("<pre><code>Plan: 0 to add, 0 to change, 0 to destroy.</code></pre>"))
                 | select($comment.body
-                    | test("Warning:|Error:|:warning:|:x:") | not)
-                | $comment.id' \
-            | while read -r comment_id; do
-                echo "Deleting comment: $comment_id"
-                gh api -X DELETE "repos/${{ github.repository }}/issues/comments/$comment_id"
-              done
+                    | test("Warning:|Error:|:warning:|:x:|Objects have changed outside of Terraform") | not)
+                | $comment.id')
+          while read -r comment_id; do
+            [[ -n "$comment_id" ]] || continue
+            echo "Deleting comment: $comment_id"
+            gh api -X DELETE "repos/$GH_REPO/issues/comments/$comment_id"
+          done <<< "$comment_ids"
 
   workflow-result:
     needs: [lint, set-matrix, terraform, delete-nochange-comments]

@@ -29,6 +29,7 @@ homelab
 hono
 itkq
 jellyfin
+kazokubi
 justfile
 kentaro
 kintai

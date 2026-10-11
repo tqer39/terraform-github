@@ -1,11 +1,54 @@
 """開発依存の glob 互換性と深い入力の拒否を検証する。"""
 import os
+import json
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
 
 PROJECT = Path(__file__).resolve().parents[1]
+
+
+class RenovateValidatorTests(unittest.TestCase):
+    """固定版の更新検出と CI キャッシュの無効化を検証する。"""
+
+    def test_renovate_manager_detects_pinned_hook_and_future_updates(self):
+        config = json.loads((PROJECT / "renovate.json5").read_text())
+        manager, = config["customManagers"]
+        pattern = manager["matchStrings"][0].replace("(?<currentValue>",
+                                                   "(?P<currentValue>")
+        hook = (PROJECT / "lefthook.yml").read_text()
+        version, = re.findall(pattern, hook)
+        self.assertRegex(version, r"^\d+\.\d+\.\d+$")
+        updated = re.sub(pattern, "--package=renovate@99.1.2", hook)
+        self.assertEqual(re.findall(pattern, updated), ["99.1.2"])
+        file_pattern = manager["managerFilePatterns"][0][1:-1]
+        self.assertIsNotNone(re.search(file_pattern, "lefthook.yml"))
+        self.assertIsNone(re.search(file_pattern, "nested/lefthook.yml"))
+        self.assertEqual(manager["datasourceTemplate"], "npm")
+        self.assertEqual(manager["depNameTemplate"], "renovate")
+
+    def test_ci_cache_key_tracks_the_hook_version_and_rejects_unpinned_hook(self):
+        workflow = (PROJECT / ".github/workflows/terraform-github.yml").read_text()
+        script = workflow.split("          import { readFileSync }", 1)[1]
+        script = "import { readFileSync }" + script.split("          NODE", 1)[0]
+        hook = (PROJECT / "lefthook.yml").read_text()
+        version = re.search(r"--package=renovate@(\d+\.\d+\.\d+)", hook)[1]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "lefthook.yml"
+            for content, expected in ((hook, version),
+                                      (hook.replace(version, "99.1.2"), "99.1.2"),
+                                      (hook.replace("@" + version, ""), None)):
+                path.write_text(content)
+                result = subprocess.run(["node", "--input-type=module", "-e", script],
+                                        cwd=temp, text=True, capture_output=True)
+                if expected:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("renovate=" + expected, result.stdout)
+                    self.assertRegex(result.stdout, r"node=v\d+\.\d+\.\d+")
+                else:
+                    self.assertNotEqual(result.returncode, 0)
 
 
 class BracesTests(unittest.TestCase):

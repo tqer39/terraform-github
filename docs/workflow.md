@@ -17,6 +17,11 @@ HCL パターンとモジュールパラメータの詳細: [terraform-patterns.
 
 PR には plan 出力のサマリを含めること。破壊的変更は明示的にマークすること。
 
+差分も警告もない `No changes` の自動 plan コメントは後続 job で削除します。
+コメント一覧は全ページ取得し、30件を超える PR でも削除漏れを防ぎます。
+削除対象は GitHub Actions bot が投稿した tfcmt の plan 結果だけです。
+人のコメント、変更・警告・drift の詳細を含む結果は保持します。
+
 ## 認証方式
 
 - **GitHub App トークン**: Organization リポジトリ（推奨）
@@ -26,6 +31,53 @@ PR には plan 出力のサマリを含めること。破壊的変更は明示�
 ## State 管理
 
 バックエンド: AWS S3 + DynamoDB ロック。マイグレーションは `moved` ブロックで実施。
+
+## Renovate validator の固定版とキャッシュ
+
+[Issue #1753](https://github.com/tqer39/terraform-github/issues/1753) の対策として、
+`lefthook.yml` の npm package 指定で Renovate のバージョンを固定します。
+ローカル hook と CI は同じコマンドを実行します。
+`renovate.json5` の regex custom manager が固定版の更新を検出します。
+
+取得先は npm cache に統一します。通常の開発依存への追加は行わず、
+既存の pnpm lockfile と audit の依存範囲を維持します。
+[npm exec の仕様](https://docs.npmjs.com/cli/v11/commands/npm-exec/) に従い、
+キャッシュには配布物と npx の実行用依存を保存します。
+`--prefer-offline` で再取得を減らします。空のキャッシュでは取得が必要です。
+上流依存の deprecated 警告は固定化だけでは解消しません。
+
+CI は `NPM_CONFIG_CACHE` で runner の一時ディレクトリに取得先を固定し、
+`actions/cache` でその全体を保存します。キーは OS・CPU・実際の Node バージョン・
+hook から読み取った Renovate バージョンです。異なる版への fallback は使いません。
+cache hit でも validator を含む全 lint を実行します。
+
+計測は `pnpm install --frozen-lockfile` と provider の初期化後、
+各回で空の一時 npm cache を指定して `mise run lint` を実行し、
+同じキャッシュを再利用して再実行します。この組を3回繰り返します。
+lint 総時間はコマンドの経過時間、validator 時間は lefthook の summary で確認します。
+GitHub Actions の lint job 総時間には cache の復元・保存や setup も含まれるため、
+ローカルの測定値とは分けて評価してください。
+
+2026-10-11 に macOS arm64、Node 24.21.0、npm 11.19.0、
+Renovate 44.149.3 で測定した結果は以下のとおりです。時間の単位は秒です。
+
+| 回 | miss: lint 総時間 | hit: lint 総時間 | miss: validator | hit: validator |
+| --- | --- | --- | --- | --- |
+| 1 | 22.62 | 7.80 | 17.88 | 1.38 |
+| 2 | 22.42 | 7.64 | 17.32 | 1.18 |
+| 3 | 24.51 | 7.82 | 19.85 | 1.20 |
+| 平均 | 23.18 | 7.75 | 18.35 | 1.25 |
+
+ローカルでの平均短縮率は lint 総時間が約67%、validator が約93%でした。
+6回すべて全 lint が成功し、各回で Python の回帰テスト29件と
+Terraform モジュールテスト6件も成功しました。
+固定版の実コマンドで正常設定の終了コード0と、`enabled` に文字列を渡す
+不正設定の終了コード1を確認しました。frozen install と Terraform validate も成功しました。
+GitHub Actions 上の cache 転送時間や lint job 総時間の短縮量は未計測です。
+ローカルの npm cache は約673 MiB だったため、CI の復元・保存コストも確認してください。
+
+`aws-vault exec portfolio` と既存の GitHub 認証で Terraform plan を実行し、
+`No changes` を確認しました。今回 Terraform 設定や共有 state の変更はありません。
 
 ## 開発依存の深い brace pattern 対策
 
