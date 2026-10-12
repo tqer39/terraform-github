@@ -18,6 +18,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: terraform-github-${{ github.ref }}
   cancel-in-progress: true
@@ -83,7 +86,7 @@ jobs:
           repository: ${{ inputs.repository }}
 
   terraform:
-    name: terraform (${{ matrix.shard.id }})
+    name: terraform (${{ join(matrix.shard.repositories, ', ') }})
     needs: set-matrix
     if: needs.set-matrix.outputs.matrix != '["_empty"]'
     runs-on: ubuntu-latest
@@ -105,6 +108,10 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
+      - name: Load and verify Discord Webhook
+        if: contains(matrix.shard.repositories, 'family-schedule')
+        run: python3 .github/scripts/load_discord_webhook.py
+
       - uses: ./.github/actions/terraform-shard
         with:
           repositories: ${{ toJson(matrix.shard.repositories) }}
@@ -114,6 +121,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
           gha-app-id: ${{ secrets.GHA_APP_ID }}
+          release-secrets: ${{ contains(matrix.shard.repositories, 'family-schedule') && secrets.KAZOKUBI_RELEASE_SECRETS || '' }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]

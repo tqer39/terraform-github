@@ -26,6 +26,11 @@ case "${EVENT_NAME:?EVENT_NAME is required}" in
     workflow_dispatch) apply="${MANUAL_APPLY:-false}" ;;
     *) echo "Unsupported event" >&2; exit 1 ;;
 esac
+if [[ "$apply" == true && "${GITHUB_REF:-}" != refs/heads/main ]] &&
+    jq -e 'index("family-schedule") != null' <<< "$roots_json" > /dev/null; then
+    echo 'family-schedule apply requires refs/heads/main' >&2
+    exit 1
+fi
 metrics_dir="${METRICS_DIR:?METRICS_DIR is required}"
 mkdir -p "$metrics_dir"
 : > "$metrics_dir/roots.jsonl"
@@ -50,6 +55,14 @@ for root in "${roots[@]}"; do
     set +e
     (
         set -e
+        if [[ "$root" == family-schedule ]]; then
+            if [[ -n "${KAZOKUBI_RELEASE_SECRETS:-}" ]]; then
+                export TF_VAR_release_secrets="$KAZOKUBI_RELEASE_SECRETS"
+            fi
+        else
+            unset TF_VAR_discord_webhook_url TF_VAR_release_secrets
+        fi
+        unset KAZOKUBI_RELEASE_SECRETS
         cd "terraform/src/repositories/$root"
         rm -f tfplan
         echo fmt > "$stage_file"
@@ -60,9 +73,13 @@ for root in "${roots[@]}"; do
         terraform validate -no-color
         echo tflint > "$stage_file"
         tflint --chdir=. --call-module-type=all
+        if [[ "$root" == family-schedule ]]; then
+            echo test > "$stage_file"
+            terraform test -no-color
+        fi
         echo plan > "$stage_file"
         tfcmt --var "target:$root" plan -patch -skip-no-changes -- terraform plan -input=false -no-color -out=tfplan
-        if [[ "$apply" == true ]]; then
+        if [[ "$apply" == true && ( "$root" != family-schedule || "$EVENT_NAME" == workflow_dispatch ) ]]; then
             echo apply > "$stage_file"
             terraform apply -input=false tfplan
         fi
