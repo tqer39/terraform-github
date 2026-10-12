@@ -118,7 +118,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
           gha-app-id: ${{ secrets.GHA_APP_ID }}
-          release-secrets: ${{ secrets.KAZOKUBI_RELEASE_SECRETS }}
+          release-secrets: ${{ contains(matrix.shard.repositories, 'family-schedule') && secrets.KAZOKUBI_RELEASE_SECRETS || '' }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]

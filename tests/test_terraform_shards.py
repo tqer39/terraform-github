@@ -58,7 +58,7 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
                         METRICS_DIR=str(self.root / "metrics"),
                         GITHUB_STEP_SUMMARY=str(self.root / "summary"),
                         REQUIRE_MANUAL_APPLY="false", MANUAL_APPLY="false",
-                        EVENT_NAME="pull_request")
+                        EVENT_NAME="pull_request", GITHUB_REF="refs/heads/main")
 
     def tearDown(self):
         self.temp.cleanup()
@@ -144,6 +144,27 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
                 self.assertEqual(result.returncode, 0, result.stderr)
                 applies = [call for call in self.calls() if " terraform apply " in call]
                 self.assertEqual(bool(applies), expected)
+
+    def test_kazokubi_apply_rejects_unmerged_refs_before_any_apply(self):
+        for ref in ("refs/heads/feature", "refs/tags/v1.0.0", ""):
+            result = self.run_shard(("one", "family-schedule"), EVENT_NAME="workflow_dispatch",
+                                    MANUAL_APPLY="true", GITHUB_REF=ref)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertFalse((self.root / "calls").exists())
+
+    def test_credentials_are_only_visible_to_the_kazokubi_root(self):
+        self.cli("terraform", '''
+root="$(basename "$PWD")"
+if [[ "$root" == family-schedule ]]; then
+    [[ "${TF_VAR_discord_webhook_url:-}" == fixture && "${TF_VAR_release_secrets:-}" == fixture ]] || exit 29
+else
+    [[ -z "${TF_VAR_discord_webhook_url:-}" && -z "${TF_VAR_release_secrets:-}" ]] || exit 30
+fi
+[[ -z "${KAZOKUBI_RELEASE_SECRETS:-}" ]] || exit 31
+''')
+        result = self.run_shard(("one", "family-schedule", "two"),
+                                TF_VAR_discord_webhook_url="fixture", KAZOKUBI_RELEASE_SECRETS="fixture")
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_invalid_batch_is_rejected_before_any_apply(self):
         for roots in (("one", "../two"), ("one", "missing"), ("one", "one"), (),
