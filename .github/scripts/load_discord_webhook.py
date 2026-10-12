@@ -16,6 +16,31 @@ class ConfigurationError(Exception):
     """A safe error message that never includes a response or credential."""
 
 
+def read_state():
+    try:
+        result = subprocess.run(
+            ["aws", "s3", "cp", STATE_URI, "-", "--only-show-errors"],
+            capture_output=True, check=True, timeout=60,
+        )
+    except subprocess.CalledProcessError as error:
+        # Only classify known codes; raw AWS stderr may contain credentials.
+        stderr = error.stderr or b""
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode("utf-8", errors="replace")
+        codes = re.findall(r"\(([^()]+)\) (?:occurred )?when calling", stderr)
+        if any(code in ("404", "NoSuchKey", "NotFound") for code in codes):
+            raise ConfigurationError("Discord state was not found in S3 (404). Complete the initial Discord apply with the configured backend.") from None
+        if any(code in ("403", "AccessDenied", "Forbidden") for code in codes):
+            raise ConfigurationError("S3 denied access to Discord state (403). Check the CI role's s3:GetObject and s3:ListBucket permissions; without ListBucket, a missing state can also return 403.") from None
+        raise ConfigurationError("AWS CLI could not read Discord state. Check CI credentials, region and S3 access.") from None
+    except subprocess.TimeoutExpired:
+        raise ConfigurationError("Reading Discord state from S3 timed out.") from None
+    try:
+        return json.loads(result.stdout)
+    except ValueError:
+        raise ConfigurationError("Discord state in S3 is not valid JSON.") from None
+
+
 def webhook_from_state(state):
     if not isinstance(state, dict):
         raise ConfigurationError("Discord state is invalid.")
@@ -49,11 +74,7 @@ def verify_webhook(url, open_url=None):
 
 def main():
     try:
-        state = subprocess.run(
-            ["aws", "s3", "cp", STATE_URI, "-", "--only-show-errors"],
-            capture_output=True, check=True, timeout=60,
-        )
-        url = webhook_from_state(json.loads(state.stdout))
+        url = webhook_from_state(read_state())
         # Mask both the full URL and the token before any network operation.
         print(f"::add-mask::{url}", flush=True)
         print(f"::add-mask::{URL_PATTERN.fullmatch(url)[2]}", flush=True)

@@ -2,9 +2,12 @@
 
 import importlib.util
 import io
+import subprocess
 import unittest
 import urllib.error
+from contextlib import redirect_stderr
 from pathlib import Path
+from unittest.mock import patch
 
 SPEC = importlib.util.spec_from_file_location(
     "load_discord_webhook", Path(__file__).parents[1] / ".github/scripts/load_discord_webhook.py"
@@ -15,6 +18,29 @@ URL = "https://discord.com/api/webhooks/123456789012345678/example-token"
 
 
 class WebhookTests(unittest.TestCase):
+    def test_s3_failures_are_classified_without_disclosing_error_content(self):
+        for code, message in (("404", "not found"), ("NoSuchKey", "not found"),
+                              ("403", "denied access"), ("AccessDenied", "denied access"),
+                              ("UnknownCode", "AWS CLI could not read")):
+            failure = subprocess.CalledProcessError(
+                1, ["aws"], stderr=f"fatal error: An error occurred ({code}) when calling the HeadObject operation: {URL}".encode(),
+            )
+            with self.subTest(code=code), patch.object(MODULE.subprocess, "run", side_effect=failure):
+                output = io.StringIO()
+                with redirect_stderr(output):
+                    self.assertEqual(MODULE.main(), 1)
+                self.assertIn(message, output.getvalue())
+                self.assertNotIn(URL, output.getvalue())
+                self.assertNotIn("example-token", output.getvalue())
+
+    def test_invalid_state_json_and_timeouts_have_safe_diagnostics(self):
+        with patch.object(MODULE.subprocess, "run", return_value=subprocess.CompletedProcess([], 0, stdout=URL.encode())):
+            with self.assertRaisesRegex(MODULE.ConfigurationError, "not valid JSON"):
+                MODULE.read_state()
+        with patch.object(MODULE.subprocess, "run", side_effect=subprocess.TimeoutExpired(["aws"], 60, stderr=URL)):
+            with self.assertRaisesRegex(MODULE.ConfigurationError, "timed out"):
+                MODULE.read_state()
+
     def test_missing_empty_or_external_output_is_rejected(self):
         for value in (None, "", "https://example.com/api/webhooks/123/token", URL + "\n"):
             with self.subTest(value=value), self.assertRaises(MODULE.ConfigurationError):
