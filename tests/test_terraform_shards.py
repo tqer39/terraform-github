@@ -15,7 +15,7 @@ class ShardTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.bin = self.root / "bin"
         self.bin.mkdir()
-        for name in ("one", "two", "three", "family-schedule"):
+        for name in ("one", "two", "three", "kazokubi"):
             directory = self.root / "terraform/src/repositories" / name
             directory.mkdir(parents=True)
             (directory / "terraform.tf").write_text("terraform {}\n")
@@ -140,14 +140,14 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
                                         ("workflow_dispatch", "true", True)):
             with self.subTest(event=event, manual=manual):
                 (self.root / "calls").unlink(missing_ok=True)
-                result = self.run_shard(("family-schedule",), EVENT_NAME=event, MANUAL_APPLY=manual)
+                result = self.run_shard(("kazokubi",), EVENT_NAME=event, MANUAL_APPLY=manual)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 applies = [call for call in self.calls() if " terraform apply " in call]
                 self.assertEqual(bool(applies), expected)
 
     def test_kazokubi_apply_rejects_unmerged_refs_before_any_apply(self):
         for ref in ("refs/heads/feature", "refs/tags/v1.0.0", ""):
-            result = self.run_shard(("one", "family-schedule"), EVENT_NAME="workflow_dispatch",
+            result = self.run_shard(("one", "kazokubi"), EVENT_NAME="workflow_dispatch",
                                     MANUAL_APPLY="true", GITHUB_REF=ref)
             self.assertNotEqual(result.returncode, 0)
             self.assertFalse((self.root / "calls").exists())
@@ -155,14 +155,14 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
     def test_credentials_are_only_visible_to_the_kazokubi_root(self):
         self.cli("terraform", '''
 root="$(basename "$PWD")"
-if [[ "$root" == family-schedule ]]; then
+if [[ "$root" == kazokubi ]]; then
     [[ "${TF_VAR_discord_webhook_url:-}" == fixture && "${TF_VAR_release_secrets:-}" == fixture ]] || exit 29
 else
     [[ -z "${TF_VAR_discord_webhook_url:-}" && -z "${TF_VAR_release_secrets:-}" ]] || exit 30
 fi
 [[ -z "${KAZOKUBI_RELEASE_SECRETS:-}" ]] || exit 31
 ''')
-        result = self.run_shard(("one", "family-schedule", "two"),
+        result = self.run_shard(("one", "kazokubi", "two"),
                                 TF_VAR_discord_webhook_url="fixture", KAZOKUBI_RELEASE_SECRETS="fixture")
         self.assertEqual(result.returncode, 0, result.stderr)
 
