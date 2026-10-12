@@ -103,3 +103,5 @@ subshell
 shunsuke
 TURSO
 tfvars
+argparse
+sprintf
