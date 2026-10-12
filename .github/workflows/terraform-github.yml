@@ -18,6 +18,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: terraform-github-${{ github.ref }}
   cancel-in-progress: true
