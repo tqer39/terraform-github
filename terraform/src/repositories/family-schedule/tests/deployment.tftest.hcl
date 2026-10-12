@@ -4,7 +4,8 @@ override_module {
   outputs = {}
 }
 variables {
-  github_token = "test-token"
+  github_token        = "test-token"
+  discord_webhook_url = "https://discord.com/api/webhooks/123456789012345678/example-token"
 }
 run "separate_release_environments" {
   command = plan
@@ -41,4 +42,12 @@ run "reject_unexpected_environment" {
     release_secrets = { staging = { TURSO_AUTH_TOKEN = "test-token" } }
   }
   expect_failures = [var.release_secrets]
+}
+
+run "reject_missing_webhook" {
+  command = plan
+  variables {
+    discord_webhook_url = ""
+  }
+  expect_failures = [var.discord_webhook_url]
 }

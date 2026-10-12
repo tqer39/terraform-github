@@ -15,7 +15,7 @@ class ShardTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.bin = self.root / "bin"
         self.bin.mkdir()
-        for name in ("one", "two", "three"):
+        for name in ("one", "two", "three", "family-schedule"):
             directory = self.root / "terraform/src/repositories" / name
             directory.mkdir(parents=True)
             (directory / "terraform.tf").write_text("terraform {}\n")
@@ -132,6 +132,18 @@ echo '{"resources":{"core":{"used":10,"remaining":4990,"reset":123}}}'
                     self.assertEqual(result.returncode, 0, result.stderr)
                     applies = [call for call in self.calls() if " terraform apply " in call]
                     self.assertEqual(len(applies), len(roots) if expected else 0)
+
+    def test_kazokubi_only_applies_on_explicit_manual_run(self):
+        for event, manual, expected in (("push", "false", False),
+                                        ("pull_request", "true", False),
+                                        ("workflow_dispatch", "false", False),
+                                        ("workflow_dispatch", "true", True)):
+            with self.subTest(event=event, manual=manual):
+                (self.root / "calls").unlink(missing_ok=True)
+                result = self.run_shard(("family-schedule",), EVENT_NAME=event, MANUAL_APPLY=manual)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                applies = [call for call in self.calls() if " terraform apply " in call]
+                self.assertEqual(bool(applies), expected)
 
     def test_invalid_batch_is_rejected_before_any_apply(self):
         for roots in (("one", "../two"), ("one", "missing"), ("one", "one"), (),

@@ -50,6 +50,11 @@ for root in "${roots[@]}"; do
     set +e
     (
         set -e
+        if [[ "$root" == family-schedule ]]; then
+            if [[ -n "${KAZOKUBI_RELEASE_SECRETS:-}" ]]; then
+                export TF_VAR_release_secrets="$KAZOKUBI_RELEASE_SECRETS"
+            fi
+        fi
         cd "terraform/src/repositories/$root"
         rm -f tfplan
         echo fmt > "$stage_file"
@@ -60,9 +65,13 @@ for root in "${roots[@]}"; do
         terraform validate -no-color
         echo tflint > "$stage_file"
         tflint --chdir=. --call-module-type=all
+        if [[ "$root" == family-schedule ]]; then
+            echo test > "$stage_file"
+            terraform test -no-color
+        fi
         echo plan > "$stage_file"
         tfcmt --var "target:$root" plan -patch -skip-no-changes -- terraform plan -input=false -no-color -out=tfplan
-        if [[ "$apply" == true ]]; then
+        if [[ "$apply" == true && ( "$root" != family-schedule || "$EVENT_NAME" == workflow_dispatch ) ]]; then
             echo apply > "$stage_file"
             terraform apply -input=false tfplan
         fi

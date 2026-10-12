@@ -39,14 +39,12 @@ variable "discord_webhook_url" {
   description = "Discord Terraformのsensitive出力。承認前の通知にも必要なためrepository Secretへ保存。"
   type        = string
   sensitive   = true
-  default     = null
   validation {
-    condition     = var.discord_webhook_url == null || can(regex("^https://discord\\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+$", var.discord_webhook_url))
+    condition     = can(regex("^https://discord\\.com/api/webhooks/[0-9]+/[A-Za-z0-9_-]+$", var.discord_webhook_url))
     error_message = "DiscordのWebhook URLを環境変数経由で指定してください。"
   }
 }
 resource "github_actions_secret" "discord" {
-  count       = var.discord_webhook_url == null ? 0 : 1
   repository  = "kazokubi"
   secret_name = "DISCORD_WEBHOOK_URL"
   value       = var.discord_webhook_url

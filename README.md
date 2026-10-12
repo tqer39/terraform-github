@@ -187,7 +187,7 @@ graph TD
 Environmentの実行元はmainに限定します。非公開EnvironmentにはGitHub Pro/Team以上が必要です。
 
 Discordチャンネル・権限・Webhookはkazokubiの `infra/discord` で管理します。
-そのsensitive出力を `TF_VAR_discord_webhook_url` で渡すとRepository Secretへ保存します。
+そのsensitive出力を必須の `TF_VAR_discord_webhook_url` として渡し、Repository Secretへ保存します。CIではstateから自動取得します。
 `TF_VAR_release_secrets` はdev/productionをキーとするJSONオブジェクトで、各環境のTURSO_AUTH_TOKEN、CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、DB_BACKUP_KEYを設定します。
 DBトークンは環境専用、バックアップ鍵は環境ごとに独立した32バイトの鍵を64桁の16進数で指定します。
 秘密をtfvars・ログ・PRへ記載せず、state・planも秘密として保護してください。
@@ -203,3 +203,19 @@ mise run tf:apply family-schedule release.tfplan
 
 この設定の追加だけではDiscordの作成・通知・DB更新・公開は実行されません。
 両リポジトリのTerraform適用・認証値設定後に、kazokubiの公開手順でタグ申請と手動承認を行ってください。
+
+### DiscordのPR CIとSecretの受け渡し
+
+family-scheduleのCIはDiscordのS3 stateから `webhook_url` を読み、DiscordのGET APIで存在を確認してからplanします。
+出力が未作成・空・不正、stateの読み取り不可、Webhook削除済みの場合は失敗します。
+URL・トークンはマスクし、sensitive変数へ渡します。state・planをartifactとして公開しません。
+Repository Secret `DISCORD_WEBHOOK_URL` はこのTerraformが管理します。URLの手動転記は不要です。
+CIのAWS OIDCロールにはDiscord stateのGetObjectとprefixを限定したListBucketも必要です。
+初回にDiscordをapplyしてstate出力を作り、その後このPRのCIを再実行します。
+
+family-scheduleはmainへのpushで自動applyしません。PRのplanを確認・マージした後、mainの
+`Terraform - GitHub` を `repository=family-schedule`・`apply=true` で手動実行します。
+DB/CloudflareのSecretも管理する場合は、管理用リポジトリのRepository Secret
+`KAZOKUBI_RELEASE_SECRETS` にdev/production別のJSONを初回登録します。
+既存の `TERRAFORM_GITHUB_TOKEN` はkazokubiのSecrets・Environments・リポジトリ設定を管理できる権限が必要です。
+Discord Botトークンはこのリポジトリへ渡しません。kazokubi側の初期設定は `infra/discord/README.md` を参照してください。
