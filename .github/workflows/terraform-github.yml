@@ -54,7 +54,7 @@ jobs:
 
       - name: Cache Renovate validator
         id: validator-cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ${{ runner.temp }}/renovate-npm
           key: renovate-npm-${{ runner.os }}-${{ runner.arch }}-${{ steps.validator-cache-key.outputs.node }}-${{ steps.validator-cache-key.outputs.renovate }}
