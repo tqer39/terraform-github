@@ -105,6 +105,10 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
+      - name: Load and verify Discord Webhook
+        if: contains(matrix.shard.repositories, 'family-schedule')
+        run: python3 .github/scripts/load_discord_webhook.py
+
       - uses: ./.github/actions/terraform-shard
         with:
           repositories: ${{ toJson(matrix.shard.repositories) }}
@@ -114,6 +118,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
           gha-app-id: ${{ secrets.GHA_APP_ID }}
+          release-secrets: ${{ secrets.KAZOKUBI_RELEASE_SECRETS }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]
