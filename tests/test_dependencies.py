@@ -57,6 +57,60 @@ class RenovateValidatorTests(unittest.TestCase):
                     self.assertNotEqual(result.returncode, 0)
 
 
+class YamlParserTests(unittest.TestCase):
+    def yaml_cli(self, *args, input_text=""):
+        resolved = subprocess.run(
+            ["node", "--input-type=module", "-e", """
+import { createRequire } from 'node:module';
+const require = createRequire(process.cwd() + '/package.json');
+const rulesRequire = createRequire(require.resolve('rulesync'));
+const matterRequire = createRequire(rulesRequire.resolve('gray-matter/package.json'));
+const yamlRequire = createRequire(matterRequire.resolve('js-yaml/package.json'));
+console.log(yamlRequire.resolve('./bin/js-yaml.js'));
+"""], cwd=PROJECT, text=True, capture_output=True, check=True)
+        return subprocess.run(["node", resolved.stdout.strip(), *args],
+                              input=input_text, text=True, capture_output=True, timeout=20)
+
+    def test_yaml_cli_keeps_legacy_help_version_and_conversion(self):
+        help_result = self.yaml_cli("--help")
+        self.assertEqual(help_result.returncode, 0, help_result.stderr)
+        self.assertIn("usage:", help_result.stdout)
+        version = self.yaml_cli("--version")
+        self.assertEqual(version.returncode, 0, version.stderr)
+        self.assertRegex(version.stdout.strip(), r"^3\.\d+\.\d+$")
+        parsed = self.yaml_cli(input_text="name: sample\nenabled: true\n")
+        self.assertEqual(parsed.returncode, 0, parsed.stderr)
+        self.assertEqual(json.loads(parsed.stdout), {"name": "sample", "enabled": True})
+        dumped = self.yaml_cli(input_text='{"name":"sample","enabled":true}')
+        self.assertEqual(dumped.returncode, 0, dumped.stderr)
+        self.assertIn("name: sample", dumped.stdout)
+
+    def test_yaml_cli_rejects_bad_input_and_missing_file(self):
+        malformed = self.yaml_cli("--compact", input_text="name: [broken\n")
+        self.assertEqual(malformed.returncode, 1, malformed.stdout + malformed.stderr)
+        self.assertIn("YAMLException", malformed.stderr)
+        with tempfile.TemporaryDirectory() as temp:
+            missing = self.yaml_cli(str(Path(temp) / "missing.yaml"))
+            self.assertEqual(missing.returncode, 2, missing.stdout + missing.stderr)
+            self.assertIn("File not found:", missing.stderr)
+
+    def test_frontmatter_parser_has_no_sprintf_dependency(self):
+        result = subprocess.run(["node", "--input-type=module", "-e", """
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+const require = createRequire(process.cwd() + '/package.json');
+const rulesRequire = createRequire(require.resolve('rulesync'));
+const matter = rulesRequire('gray-matter');
+assert.deepEqual(matter('---\\nname: sample\\n---\\nbody').data, {name: 'sample'});
+const matterRequire = createRequire(rulesRequire.resolve('gray-matter/package.json'));
+const yamlRequire = createRequire(matterRequire.resolve('js-yaml/package.json'));
+const argparseRequire = createRequire(yamlRequire.resolve('argparse/package.json'));
+assert.equal(argparseRequire('./package.json').version, '2.0.1');
+assert.throws(() => argparseRequire.resolve('sprintf-js'), {code: 'MODULE_NOT_FOUND'});
+"""], cwd=PROJECT, text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+
 class BracesTests(unittest.TestCase):
     def node(self, script):
         result = subprocess.run(

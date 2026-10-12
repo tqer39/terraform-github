@@ -1,0 +1,14 @@
+diff --git a/bin/js-yaml.js b/bin/js-yaml.js
+index e79186be6f56f1d92de9bcd4fa4b10fff9564795..100ebc3a41a9d84eb79ec274a7eac1ce6f79c8ed 100755
+--- a/bin/js-yaml.js
++++ b/bin/js-yaml.js
+@@ -28,6 +28,9 @@ var cli = new argparse.ArgumentParser({
+ });
+
+
++// argparse 2's legacy version action reads parser.version at invocation time.
++cli.version = require('../package.json').version;
++
+ cli.addArgument([ '-c', '--compact' ], {
+   help:   'Display errors in compact mode',
+   action: 'storeTrue'

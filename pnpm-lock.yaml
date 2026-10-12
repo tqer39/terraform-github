@@ -166,6 +166,10 @@ overrides:
   braces: npm:@dieub/braces-depth-guard@3.0.3-pn.3
   markdownlint-cli2>smol-toml: 1.9.1
   micromark-extension-math>katex: 0.19.0
+  js-yaml@3>argparse: 2.0.1
+
+patchedDependencies:
+  js-yaml@3.15.2: dcc6ac71d83a483cbcd24d132bb07f857ee2dbade6bc784111742a24340fd6bb
 
 importers:
 
@@ -934,9 +938,6 @@ packages:
   app-root-path@3.1.0:
     resolution: {integrity: sha512-biN3PwB2gUtjaYy/isrU3aNWI5w+fAfvHkSvCKeQGxhmYpwKFUxudR3Yya+KqVRHBmEDYh+/lTozYCFbmzX4nA==}
     engines: {node: '>= 6.0.0'}
-
-  argparse@1.0.10:
-    resolution: {integrity: sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg==}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -2366,9 +2367,6 @@ packages:
   spdx-license-ids@3.0.23:
     resolution: {integrity: sha512-CWLcCCH7VLu13TgOH+r8p1O/Znwhqv/dbb6lqWy67G+pT1kHmeD/+V36AVb/vq8QMIQwVShJ6Ssl5FPh0fuSdw==}
 
-  sprintf-js@1.0.3:
-    resolution: {integrity: sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==}
-
   statuses@1.5.0:
     resolution: {integrity: sha512-OpZ3zP+jT1PI7I8nemJX4AKmAX070ZkYPVWV/AaKTJl+tXCTGyVdC1a4SL8RUQYEwk/f34ZX8UTykN68FwrqAA==}
     engines: {node: '>= 0.6'}
@@ -3430,10 +3428,6 @@ snapshots:
 
   app-root-path@3.1.0: {}
 
-  argparse@1.0.10:
-    dependencies:
-      sprintf-js: 1.0.3
-
   argparse@2.0.1: {}
 
   argparse@3.0.2: {}
@@ -4058,7 +4052,7 @@ snapshots:
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.15.2
+      js-yaml: 3.15.2(patch_hash=dcc6ac71d83a483cbcd24d132bb07f857ee2dbade6bc784111742a24340fd6bb)
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -4235,9 +4229,9 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  js-yaml@3.15.2:
+  js-yaml@3.15.2(patch_hash=dcc6ac71d83a483cbcd24d132bb07f857ee2dbade6bc784111742a24340fd6bb):
     dependencies:
-      argparse: 1.0.10
+      argparse: 2.0.1
       esprima: 4.0.1
 
   js-yaml@4.3.2:
@@ -5140,8 +5134,6 @@ snapshots:
       spdx-license-ids: 3.0.23
 
   spdx-license-ids@3.0.23: {}
-
-  sprintf-js@1.0.3: {}
 
   statuses@1.5.0: {}
 
