@@ -86,7 +86,7 @@ jobs:
           repository: ${{ inputs.repository }}
 
   terraform:
-    name: terraform (${{ matrix.shard.id }})
+    name: terraform (${{ join(matrix.shard.repositories, ', ') }})
     needs: set-matrix
     if: needs.set-matrix.outputs.matrix != '["_empty"]'
     runs-on: ubuntu-latest

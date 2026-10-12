@@ -122,3 +122,16 @@ else
                 select(.key % $count == $id) | .value]}]')"
 fi
 echo "shards=$shards" >> "$GITHUB_OUTPUT"
+
+# Publish before Terraform starts, so failed jobs still have a target inventory.
+if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
+    {
+        printf '### Terraform 実行対象\n\n'
+        if [[ "$shards" == '[]' ]]; then
+            printf '対象リポジトリはありません。\n'
+        else
+            printf '| グループ | 対象リポジトリ |\n| --- | --- |\n'
+            jq -r '.[] | "| \(.id) | \(.repositories | map("`" + . + "`") | join(", ")) |"' <<< "$shards"
+        fi
+    } >> "$GITHUB_STEP_SUMMARY"
+fi
