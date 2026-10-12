@@ -2,7 +2,7 @@
   "name": "terraform-github-devtools",
   "private": true,
   "description": "terraform-github の開発・文書検証・ルール生成用の依存",
-  "packageManager": "pnpm@12.7.0",
+  "packageManager": "pnpm@12.11.2",
   "devDependencies": {
     "cspell": "10.3.6",
     "markdownlint-cli2": "0.23.3",
