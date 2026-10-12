@@ -179,3 +179,27 @@ graph TD
 3. ワークフローが AWS 認証と Terraform の初期化を行い、指定したリポジトリを state に取り込みます。
 
 必要な `secrets.TERRAFORM_GITHUB_TOKEN` が設定されていることを確認してください。
+
+## kazokubiの承認付き公開設定
+
+既存root `terraform/src/repositories/family-schedule` とS3 stateキーを維持し、kazokubiのdev/production Environmentと公開タグの変更・削除防止を管理します。
+非公開・非EnterpriseのためRequired reviewersを設定せず、mainの承認用Actionsで運用者・再実行者を検証します。
+Environmentの実行元はmainに限定します。非公開EnvironmentにはGitHub Pro/Team以上が必要です。
+
+Discordチャンネル・権限・Webhookはkazokubiの `infra/discord` で管理します。
+そのsensitive出力を `TF_VAR_discord_webhook_url` で渡すとRepository Secretへ保存します。
+`TF_VAR_release_secrets` はdev/productionをキーとするJSONオブジェクトで、各環境のTURSO_AUTH_TOKEN、CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、DB_BACKUP_KEYを設定します。
+DBトークンは環境専用、バックアップ鍵は環境ごとに独立した32バイトの鍵を64桁の16進数で指定します。
+秘密をtfvars・ログ・PRへ記載せず、state・planも秘密として保護してください。
+適用後も毎回同じSecrets変数を渡します。値を省略して既存Secretを削除しようとするplanはprevent_destroyで拒否します。
+
+```bash
+mise run tf:init family-schedule
+mise run tf:validate family-schedule
+mise run tf:plan family-schedule -out=release.tfplan
+# planの確認後のみ実行
+mise run tf:apply family-schedule release.tfplan
+```
+
+この設定の追加だけではDiscordの作成・通知・DB更新・公開は実行されません。
+両リポジトリのTerraform適用・認証値設定後に、kazokubiの公開手順でタグ申請と手動承認を行ってください。
