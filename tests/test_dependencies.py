@@ -5,6 +5,7 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+import tomllib
 import unittest
 
 PROJECT = Path(__file__).resolve().parents[1]
@@ -12,6 +13,11 @@ PROJECT = Path(__file__).resolve().parents[1]
 
 class RenovateValidatorTests(unittest.TestCase):
     """固定版の更新検出と CI キャッシュの無効化を検証する。"""
+
+    def test_pnpm_toolchain_uses_one_version(self):
+        tools = tomllib.loads((PROJECT / "mise.toml").read_text())["tools"]
+        manifest = json.loads((PROJECT / "package.json").read_text())
+        self.assertEqual(manifest["packageManager"], "pnpm@" + tools["aqua:pnpm/pnpm"])
 
     def test_renovate_manager_detects_pinned_hook_and_future_updates(self):
         config = json.loads((PROJECT / "renovate.json5").read_text())
