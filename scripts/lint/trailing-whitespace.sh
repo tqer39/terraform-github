@@ -5,7 +5,9 @@ set -euo pipefail
 for f in "$@"; do
   [[ -f "$f" ]] || continue
   grep -Iq . "$f" || continue
-  sed -E 's/[[:space:]]+$//' "$f" >"$f.tmp"
-  cat "$f.tmp" >"$f"
-  rm -f "$f.tmp"
+  grep -qE '[[:blank:]]+$' "$f" || continue
+  temporary_file="$(mktemp "${f}.XXXXXX")"
+  cp -p "$f" "$temporary_file"
+  sed -E 's/[[:blank:]]+$//' "$f" >"$temporary_file"
+  mv -f "$temporary_file" "$f"
 done

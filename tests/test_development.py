@@ -54,6 +54,22 @@ class DevelopmentTests(unittest.TestCase):
         self.git("add", name)
         self.git("commit", "-qm", "change")
 
+    def test_whitespace_fix_preserves_open_readers_and_executable_mode(self):
+        target = self.root / "reader.sh"
+        original = "#!/usr/bin/env bash\necho ok  \n"
+        target.write_text(original)
+        target.chmod(0o755)
+        with target.open() as reader:
+            subprocess.run(["bash", str(PROJECT / "scripts/lint/trailing-whitespace.sh"),
+                            str(target)], check=True)
+            self.assertEqual(reader.read(), original)
+        self.assertEqual(target.read_text(), "#!/usr/bin/env bash\necho ok\n")
+        self.assertEqual(target.stat().st_mode & 0o777, 0o755)
+        inode = target.stat().st_ino
+        subprocess.run(["bash", str(PROJECT / "scripts/lint/trailing-whitespace.sh"),
+                        str(target)], check=True)
+        self.assertEqual(target.stat().st_ino, inode)
+
     def test_manual_single_root(self):
         self.assertEqual(self.matrix().returncode, 0)
         self.assertEqual(self.result(), ["one"])
