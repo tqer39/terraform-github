@@ -2,11 +2,14 @@ module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
 
-  repository          = "xtrade"
-  owner               = "tqer39"
-  default_branch      = "main"
-  enable_owner_bypass = true
-  description         = "XTrade - Trading platform and analysis tools"
+  repository                      = "xtrade"
+  owner                           = "tqer39"
+  default_branch                  = "main"
+  enable_owner_bypass             = true
+  description                     = "XTrade - Trading platform and analysis tools"
+  visibility                      = "private"
+  archived                        = true
+  disable_default_main_protection = true
   topics = [
     "trading",
     "finance",

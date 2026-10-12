@@ -3,6 +3,16 @@
   "extends": [
     "github>tqer39/renovate-config"
   ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^lefthook\\.yml$/"],
+      "matchStrings": ["--package=renovate@(?<currentValue>\\d+\\.\\d+\\.\\d+)"],
+      "depNameTemplate": "renovate",
+      "datasourceTemplate": "npm",
+      "versioningTemplate": "npm"
+    }
+  ],
   "packageRules": [
     {
       "matchPackageNames": ["pnpm", "pnpm/pnpm"],

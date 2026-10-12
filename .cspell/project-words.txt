@@ -29,6 +29,7 @@ homelab
 hono
 itkq
 jellyfin
+kazokubi
 justfile
 kentaro
 kintai
@@ -93,3 +94,12 @@ oxfmt
 Oxlint
 rulesync
 tldjs
+dieub
+globby
+nodupes
+argjson
+endgroup
+subshell
+shunsuke
+TURSO
+tfvars

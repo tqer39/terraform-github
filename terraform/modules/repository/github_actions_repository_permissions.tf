@@ -2,10 +2,11 @@ resource "github_actions_repository_permissions" "this" {
   count = var.configure_actions_permissions ? 1 : 0
 
   repository      = local.repository_name
-  allowed_actions = var.allowed_actions
+  enabled         = var.actions_enabled
+  allowed_actions = var.actions_enabled ? var.allowed_actions : null
 
   dynamic "allowed_actions_config" {
-    for_each = var.allowed_actions == "selected" ? [1] : []
+    for_each = var.actions_enabled && var.allowed_actions == "selected" ? [1] : []
     content {
       github_owned_allowed = var.github_owned_allowed
       patterns_allowed     = var.patterns_allowed

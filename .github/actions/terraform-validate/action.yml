@@ -3,17 +3,21 @@ name: Terraform Validate
 description: Terraform Validate
 
 inputs:
+  setup-only:
+    description: Install common tools without processing a root
+    default: "false"
   github-token:
     description: サードパーティの Action を実行するための権限を付与
-    required: true
+    required: false
   working-directory:
     description: Terraform CLI 実行時のパス
-    required: true
+    required: false
 
 runs:
   using: composite
   steps:
     - name: Terraform Validate
+      if: inputs.setup-only != 'true'
       run: terraform validate -no-color
       working-directory: ${{ inputs.working-directory }}
       shell: bash
@@ -40,5 +44,6 @@ runs:
       shell: bash
 
     - name: Run TFLint
+      if: inputs.setup-only != 'true'
       run: tflint --chdir=${{ inputs.working-directory }} --call-module-type=all
       shell: bash

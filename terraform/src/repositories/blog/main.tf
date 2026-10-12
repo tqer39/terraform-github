@@ -1,4 +1,9 @@
 module "this" {
+  visibility                      = "private"
+  archived                        = true
+  actions_enabled                 = false
+  disable_default_main_protection = true
+
   source              = "../../../modules/repository"
   github_token        = var.github_token
   repository          = "blog"
