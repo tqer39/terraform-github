@@ -7,9 +7,10 @@ terraform {
     }
   }
   backend "s3" {
-    bucket  = "terraform-tfstate-tqer39-072693953877-ap-northeast-1"
-    key     = "terraform-github/repositories/infra-canvas.tfstate"
-    region  = "ap-northeast-1"
-    encrypt = true
+    bucket       = "terraform-tfstate-tqer39-072693953877-ap-northeast-1"
+    key          = "terraform-github/repositories/infra-canvas.tfstate"
+    region       = "ap-northeast-1"
+    encrypt      = true
+    use_lockfile = true
   }
 }
