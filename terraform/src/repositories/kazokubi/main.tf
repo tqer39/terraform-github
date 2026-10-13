@@ -2,7 +2,7 @@ module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
 
-  # 既存リポジトリの改名。Terraform rootとS3 stateキーは継続し、履歴・Issue・PRを保持する。
+  # Terraform root の名称を kazokubi に統一。既存 S3 state とリソースアドレスを引き継ぐ。
   repository     = "kazokubi"
   owner          = "tqer39"
   default_branch = "main"

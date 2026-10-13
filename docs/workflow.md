@@ -130,9 +130,24 @@ pnpm audit --json
 ```
 
 置換後の audit では本 advisory と high の警告が解消しました。audit の除外設定は使いません。
-変更前から存在する `sprintf-js` の moderate 警告
-[GHSA-hp3w-g68c-fv3c](https://github.com/advisories/GHSA-hp3w-g68c-fv3c) は別件で残っています。
-audit 全体の終了コードはこの警告により失敗になるため、本 advisory の有無も確認してください。
+`sprintf-js` の moderate 警告も、以下の対策で依存経路を除去しました。
+
+## YAML 解析依存の sprintf-js 対策
+
+[GHSA-hp3w-g68c-fv3c](https://github.com/advisories/GHSA-hp3w-g68c-fv3c) は、
+外部から指定される format string の過大な precision による例外です。
+経路は `rulesync → gray-matter → js-yaml 3 → argparse 1 → sprintf-js` でした。
+通常の frontmatter 解析では脆弱なモジュールの読み込みを確認しませんでしたが、
+未修正の依存を残さず、`js-yaml@3>argparse` だけを `2.0.1` に固定します。
+
+argparse 2 は sprintf-js に依存せず、
+[旧 API の互換機能](https://github.com/nodeca/argparse/blob/master/doc/migrate_v2_to_v3.md)
+を維持しています。依存全体を argparse 3 に置き換えることはしません。
+互換 API の利用時は非推奨警告が出ます。旧 version オプションの互換不具合には、
+js-yaml CLI で parser.version を明示する固定パッチを適用し、標準出力への表示を保持します。
+回帰テストで frontmatter 解析、CLI の help・version・相互変換、
+不正 YAML と存在しないファイルの終了コード、sprintf-js の依存除去を確認します。
+rulesync の生成・検証と包括 lint、除外なしの pnpm audit も実行します。
 
 ## Terraform CI の shard 実行
 

@@ -15,6 +15,18 @@
   ],
   "packageRules": [
     {
+      "description": "js-yaml 3 CLI requires argparse v1 compatibility, removed in v3",
+      "matchManagers": ["npm"],
+      "matchDepNames": ["js-yaml@3>argparse"],
+      "allowedVersions": ">=2 <3"
+    },
+    {
+      "matchManagers": ["mise"],
+      "matchPackageNames": ["pnpm/pnpm"],
+      "overrideDatasource": "npm",
+      "overridePackageName": "pnpm"
+    },
+    {
       "matchPackageNames": ["pnpm", "pnpm/pnpm"],
       "groupName": "pnpm toolchain"
     }

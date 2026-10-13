@@ -18,6 +18,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: terraform-github-${{ github.ref }}
   cancel-in-progress: true
@@ -54,7 +57,7 @@ jobs:
 
       - name: Cache Renovate validator
         id: validator-cache
-        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: ${{ runner.temp }}/renovate-npm
           key: renovate-npm-${{ runner.os }}-${{ runner.arch }}-${{ steps.validator-cache-key.outputs.node }}-${{ steps.validator-cache-key.outputs.renovate }}
@@ -83,7 +86,7 @@ jobs:
           repository: ${{ inputs.repository }}
 
   terraform:
-    name: terraform (${{ matrix.shard.id }})
+    name: terraform (${{ join(matrix.shard.repositories, ', ') }})
     needs: set-matrix
     if: needs.set-matrix.outputs.matrix != '["_empty"]'
     runs-on: ubuntu-latest
@@ -105,6 +108,10 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
+      - name: Load and verify Discord Webhook
+        if: contains(matrix.shard.repositories, 'kazokubi')
+        run: python3 .github/scripts/load_discord_webhook.py
+
       - uses: ./.github/actions/terraform-shard
         with:
           repositories: ${{ toJson(matrix.shard.repositories) }}
@@ -114,6 +121,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
           gha-app-id: ${{ secrets.GHA_APP_ID }}
+          release-secrets: ${{ contains(matrix.shard.repositories, 'kazokubi') && secrets.KAZOKUBI_RELEASE_SECRETS || '' }}
 
   delete-nochange-comments:
     needs: [set-matrix, terraform]

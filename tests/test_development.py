@@ -74,6 +74,17 @@ class DevelopmentTests(unittest.TestCase):
         self.assertEqual(self.matrix().returncode, 0)
         self.assertEqual(self.result(), ["one"])
 
+    def test_renamed_root_is_selected_without_the_removed_directory(self):
+        self.git("mv", "terraform/src/repositories/one", "terraform/src/repositories/kazokubi")
+        self.git("commit", "-qm", "rename root")
+        for event in ("pull_request", "push"):
+            with self.subTest(event=event):
+                self.assertEqual(self.matrix(event=event).returncode, 0)
+                self.assertEqual(self.result(), ["kazokubi"])
+        self.assertEqual(self.matrix(target="kazokubi").returncode, 0)
+        self.assertEqual(self.result(), ["kazokubi"])
+        self.assertNotEqual(self.matrix(target="one").returncode, 0)
+
     def test_manual_all_roots(self):
         self.assertEqual(self.matrix(target="all").returncode, 0)
         self.assertEqual(self.result(), ["one", "two"])
@@ -110,6 +121,25 @@ class DevelopmentTests(unittest.TestCase):
             self.assertEqual(self.matrix(event="push").returncode, 0)
             self.assertEqual(self.result(), ["one", "two"])
             self.assertIn("require_manual_apply=true", (self.root / "output").read_text())
+
+    def test_summary_lists_every_group_and_handles_no_targets(self):
+        summary = self.root / "summary"
+        summary.write_text("Existing summary\n")
+        self.env["GITHUB_STEP_SUMMARY"] = str(summary)
+        for number in range(7):
+            path = self.root / "terraform/src/repositories" / f"repo-{number}"
+            path.mkdir()
+            (path / "terraform.tf").write_text("terraform {}\n")
+        self.assertEqual(self.matrix(target="all").returncode, 0)
+        contents = summary.read_text()
+        self.assertTrue(contents.startswith("Existing summary\n"))
+        self.assertIn("| グループ | 対象リポジトリ |", contents)
+        for shard in self.shards():
+            names = ", ".join(f"`{root}`" for root in shard["repositories"])
+            self.assertIn(f"| {shard['id']} | {names} |", contents)
+        summary.write_text("")
+        self.assertEqual(self.matrix(event="push").returncode, 0)
+        self.assertIn("対象リポジトリはありません。", summary.read_text())
 
     def test_invalid_manual_targets(self):
         for target in ("", "unknown", "../one", "one;echo bad"):
