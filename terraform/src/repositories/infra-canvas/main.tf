@@ -4,5 +4,5 @@ module "this" {
   repository     = "infra-canvas"
   owner          = "tqer39"
   default_branch = "main"
-  visibility     = "public"
+  visibility     = "private"
 }
