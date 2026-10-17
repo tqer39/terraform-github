@@ -7,7 +7,11 @@ module "this" {
   owner          = "tqer39"
   default_branch = "main"
   visibility     = "private"
-  description    = "Family schedules and shared tasks with Google Calendar, built on Cloudflare Workers and D1."
+
+  # 管理者にも PR と必須 CI を要求し、Action の許可設定は専用 resource で管理する。
+  default_main_protection_owner_bypass = false
+  configure_actions_permissions        = false
+  description                          = "Family schedules and shared tasks with Google Calendar, built on Cloudflare Workers and D1."
   topics = [
     "cloudflare-workers",
     "d1",

@@ -80,3 +80,23 @@ run "reject_missing_webhook" {
   }
   expect_failures = [var.discord_webhook_url]
 }
+
+
+run "trusted_actions_only" {
+  command = plan
+  assert {
+    condition = (
+      github_actions_repository_permissions.trusted_actions.enabled &&
+      github_actions_repository_permissions.trusted_actions.allowed_actions == "selected" &&
+      github_actions_repository_permissions.trusted_actions.sha_pinning_required &&
+      !github_actions_repository_permissions.trusted_actions.allowed_actions_config[0].github_owned_allowed &&
+      !github_actions_repository_permissions.trusted_actions.allowed_actions_config[0].verified_allowed &&
+      github_actions_repository_permissions.trusted_actions.allowed_actions_config[0].patterns_allowed == toset([
+        "1password/load-secrets-action@*", "actions/checkout@*", "actions/create-github-app-token@*",
+        "actions/download-artifact@*", "actions/setup-node@*", "actions/upload-artifact@*",
+        "aws-actions/configure-aws-credentials@*", "jdx/mise-action@*", "kentaro-m/auto-assign-action@*",
+      ])
+    )
+    error_message = "SHA 固定と必要な Action だけの許可を維持してください。"
+  }
+}
