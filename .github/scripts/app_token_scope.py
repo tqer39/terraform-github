@@ -20,13 +20,15 @@ def token_scope(roots, event, ref, manual_apply, shared_change):
                 and any(root != "kazokubi" for root in roots))
     if applying and ref != "refs/heads/main":
         raise ValueError("Apply requires refs/heads/main")
-    level = "write" if applying else "read"
     # Only kazokubi manages environments, Actions secrets and variables.
     release_level = ("write" if event == "workflow_dispatch" and applying else "read")
     return {
         "repositories": ",".join(roots),
-        "administration": level,
+        # GitHub omits merge settings and ruleset bypasses without admin write,
+        # even on GET. Read-only credentials would produce a false plan.
+        "administration": "write",
         "contents": "read",
+        "actions": "read" if "kazokubi" in roots else "",
         **{permission: release_level if "kazokubi" in roots else ""
            for permission in ("environments", "secrets", "variables")},
     }

@@ -49,7 +49,8 @@ jobs:
           private-key: ${{ secrets.TERRAFORM_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: ${{ steps.app-scope.outputs.repositories }}
-          permission-administration: read
+          permission-administration: ${{ steps.app-scope.outputs.administration }}
+          permission-actions: ${{ steps.app-scope.outputs.actions }}
           permission-contents: read
           permission-environments: ${{ steps.app-scope.outputs.environments }}
           permission-secrets: ${{ steps.app-scope.outputs.secrets }}

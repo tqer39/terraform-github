@@ -40,14 +40,18 @@ Actions Secret `TERRAFORM_GITHUB_APP_PRIVATE_KEY` を参照します。
 汎用 App を使うほかのワークフローの認証は、この変更の対象外です。
 
 App は Terraform 定義済みのリポジトリだけにインストールします。
-Administration・Environments・Secrets・Variables は読み書き、Contents は読み取りが最大権限です。
+Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
 現在の定義にブランチ新規作成はないため、Contents の書き込みは要求しません。
 新しい管理対象は、先に App のインストール先へ追加する必要があります。
 個人アカウントの新規リポジトリ作成は、installation token が対応する API の制約を別途確認してください。
 
 `.github/scripts/app_token_scope.py` が各 shard の対象名と実行種別からトークンの範囲を決めます。
-PR、共通変更の main push、Import、plan の手動実行は読み取りだけです。
-main の apply 時だけ書き込みを要求し、main 以外の apply はトークン発行前に拒否します。
+Administration は plan / Import も含めて書き込み権限を要求します。
+GitHub API は Administration 読み取りだけでは merge 設定や ruleset の bypass 情報を省略し、
+Terraform が実際には存在しない差分を検出するためです。実 API の比較で確認しています。
+PR、共通変更の main push、Import、plan の手動実行では apply を実行しません。
+main 以外の apply はトークン発行前に拒否します。
+Actions は kazokubi の Environment 取得に必要な読み取りだけを要求します。
 Environments・Secrets・Variables は kazokubi が対象に含まれるときだけ要求し、
 kazokubi を apply しない main push では読み取りに制限します。
 App の秘密鍵自体はトークン発行 Action だけに渡し、Terraform には短命のトークンだけを渡します。

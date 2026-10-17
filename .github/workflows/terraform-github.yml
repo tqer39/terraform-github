@@ -124,6 +124,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: ${{ steps.app-scope.outputs.repositories }}
           permission-administration: ${{ steps.app-scope.outputs.administration }}
+          permission-actions: ${{ steps.app-scope.outputs.actions }}
           permission-contents: ${{ steps.app-scope.outputs.contents }}
           permission-environments: ${{ steps.app-scope.outputs.environments }}
           permission-secrets: ${{ steps.app-scope.outputs.secrets }}

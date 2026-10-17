@@ -1,4 +1,4 @@
-"""Regressions for read-only plans and repository-scoped apply credentials."""
+"""Regressions for repository-scoped credentials and apply restrictions."""
 import importlib.util
 from pathlib import Path
 import unittest
@@ -14,16 +14,17 @@ class AppTokenScopeTests(unittest.TestCase):
               event="pull_request", ref="refs/pull/1/merge", manual="false", shared="false"):
         return policy.token_scope(list(roots), event, ref, manual, shared)
 
-    def test_pr_cannot_request_write_even_with_apply_input(self):
+    def test_pr_limits_permissions_even_with_apply_input(self):
         scope = self.scope(manual="true")
-        self.assertEqual(scope["administration"], "read")
+        self.assertEqual(scope["administration"], "write")
         self.assertEqual(scope["contents"], "read")
+        self.assertEqual(scope["actions"], "")
         self.assertEqual(scope["repositories"], "local-video-gen-lab,tts-partner")
         self.assertTrue(all(scope[p] == "" for p in ("environments", "secrets", "variables")))
 
     def test_shared_change_push_is_plan_only(self):
         self.assertEqual(self.scope(event="push", ref="refs/heads/main", shared="true")
-                         ["administration"], "read")
+                         ["administration"], "write")
 
     def test_main_apply_requests_write(self):
         for event, manual in (("push", "false"), ("workflow_dispatch", "true")):
@@ -38,11 +39,13 @@ class AppTokenScopeTests(unittest.TestCase):
 
     def test_kazokubi_release_permissions_only_write_on_manual_apply(self):
         scope = self.scope(roots=("kazokubi",), event="push", ref="refs/heads/main")
-        self.assertEqual(scope["administration"], "read")
+        self.assertEqual(scope["administration"], "write")
         self.assertEqual(scope["secrets"], "read")
+        self.assertEqual(scope["actions"], "read")
         scope = self.scope(roots=("kazokubi", "media-server"), event="push", ref="refs/heads/main")
         self.assertEqual(scope["administration"], "write")
         self.assertEqual(scope["secrets"], "read")
+        self.assertEqual(scope["actions"], "read")
         scope = self.scope(roots=("kazokubi",), event="workflow_dispatch",
                            ref="refs/heads/main", manual="true")
         self.assertTrue(all(scope[p] == "write" for p in ("environments", "secrets", "variables")))
