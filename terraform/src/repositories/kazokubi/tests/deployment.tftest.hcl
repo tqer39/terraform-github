@@ -1,4 +1,8 @@
 mock_provider "github" {}
+override_resource {
+  target = github_workflow_repository_permissions.security_updates
+  values = { id = "kazokubi" }
+}
 override_module {
   target  = module.this
   outputs = {}
@@ -20,6 +24,17 @@ run "separate_release_environments" {
   assert {
     condition     = alltrue([for environment in github_repository_environment.release : !environment.can_admins_bypass])
     error_message = "管理者のEnvironment迂回は無効にしてください。"
+  }
+}
+run "security_update_pull_requests" {
+  command = plan
+  assert {
+    condition = (
+      github_workflow_repository_permissions.security_updates.repository == "kazokubi" &&
+      github_workflow_repository_permissions.security_updates.default_workflow_permissions == "read" &&
+      github_workflow_repository_permissions.security_updates.can_approve_pull_request_reviews
+    )
+    error_message = "既定の読み取り権限を維持し、kazokubi の自動更新 PR 作成を許可してください。"
   }
 }
 run "explicit_environment_secrets" {
