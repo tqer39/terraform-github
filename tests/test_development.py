@@ -116,6 +116,7 @@ class DevelopmentTests(unittest.TestCase):
         for name in (".github/scripts/terraform_shard.sh",
                      ".github/scripts/set_matrix.sh",
                      ".github/workflows/terraform-github.yml",
+                     ".github/scripts/app_token_scope.py",
                      ".github/actions/terraform-shard/action.yml"):
             self.commit_file(name)
             self.assertEqual(self.matrix(event="push").returncode, 0)

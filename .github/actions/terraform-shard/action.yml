@@ -18,7 +18,7 @@ inputs:
     description: Token for PR comments
     required: true
   terraform-github-token:
-    description: PAT for the GitHub provider
+    description: Short-lived installation token for the GitHub provider
     required: true
   gha-app-id:
     description: Numeric App ID used by repository rulesets

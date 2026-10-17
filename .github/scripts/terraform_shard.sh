@@ -26,16 +26,15 @@ case "${EVENT_NAME:?EVENT_NAME is required}" in
     workflow_dispatch) apply="${MANUAL_APPLY:-false}" ;;
     *) echo "Unsupported event" >&2; exit 1 ;;
 esac
-if [[ "$apply" == true && "${GITHUB_REF:-}" != refs/heads/main ]] &&
-    jq -e 'index("kazokubi") != null' <<< "$roots_json" > /dev/null; then
-    echo 'kazokubi apply requires refs/heads/main' >&2
+if [[ "$apply" == true && "${GITHUB_REF:-}" != refs/heads/main ]]; then
+    echo 'Terraform apply requires refs/heads/main' >&2
     exit 1
 fi
 metrics_dir="${METRICS_DIR:?METRICS_DIR is required}"
 mkdir -p "$metrics_dir"
 : > "$metrics_dir/roots.jsonl"
 
-# The PAT is the provider's credential; the Actions token has a separate API budget.
+# The provider installation token and the Actions token have separate API budgets.
 # Snapshot failures are visible but must not hide the Terraform result.
 rate_limit() {
     local phase="$1"
@@ -106,7 +105,7 @@ if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
         echo '| --- | --- | --- | --- |'
         jq -r '"| \(.root) | \(.stage) | \(.exit_code) | \(.seconds) |"' "$metrics_dir/roots.jsonl"
         echo
-        echo 'Provider PAT rate-limit snapshots (shared with other runs; not a per-run request count):'
+        echo 'Provider installation rate-limit snapshots (shared with other runs; not a per-run request count):'
         echo '```json'
         jq -s '{before: .[0], after: .[1]}' "$metrics_dir"/rate-limit-{before,after}.json
         echo '```'
