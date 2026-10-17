@@ -1,10 +1,13 @@
 # 非公開・非Enterpriseではrequired reviewersが使えないため、承認はmainの
 # workflow_dispatchで運用者を検証する。EnvironmentはSecretsと実行元を分離する。
 resource "github_repository_environment" "release" {
-  for_each            = toset(["dev", "production"])
-  repository          = "kazokubi"
-  environment         = each.key
-  can_admins_bypass   = false
+  for_each    = toset(["dev", "production"])
+  repository  = "kazokubi"
+  environment = each.key
+  # private Pro ではバイパス禁止を設定できず、API は true を返す。
+  # ignore_changes で隠さず実値を管理し、承認は main の workflow 側で強制する。
+  # 公開範囲・契約変更時は Required reviewers と併せて再評価する。
+  can_admins_bypass   = true
   prevent_self_review = false
   deployment_branch_policy {
     protected_branches     = false

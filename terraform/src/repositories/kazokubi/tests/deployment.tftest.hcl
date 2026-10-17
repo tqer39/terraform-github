@@ -22,8 +22,22 @@ run "separate_release_environments" {
     error_message = "承認用Actionsはmainだけを許可してください。"
   }
   assert {
-    condition     = alltrue([for environment in github_repository_environment.release : !environment.can_admins_bypass])
-    error_message = "管理者のEnvironment迂回は無効にしてください。"
+    condition = alltrue([for environment in github_repository_environment.release :
+      environment.can_admins_bypass &&
+      !environment.deployment_branch_policy[0].protected_branches &&
+      environment.deployment_branch_policy[0].custom_branch_policies
+    ])
+    error_message = "private Pro の API 実値を管理し、実効性のある main 限定ポリシーを維持してください。"
+  }
+  assert {
+    condition = (
+      github_repository_ruleset.release_tags.enforcement == "active" &&
+      github_repository_ruleset.release_tags.target == "tag" &&
+      github_repository_ruleset.release_tags.conditions[0].ref_name[0].include == tolist(["refs/tags/v*"]) &&
+      github_repository_ruleset.release_tags.rules[0].deletion &&
+      github_repository_ruleset.release_tags.rules[0].update
+    )
+    error_message = "公開タグの上書き・削除を禁止してください。"
   }
 }
 run "security_update_pull_requests" {
