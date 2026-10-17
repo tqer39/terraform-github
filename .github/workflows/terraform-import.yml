@@ -43,9 +43,9 @@ jobs:
         id: app_token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         env:
-          INPUT_PERMISSION-VARIABLES: ${{ steps.app-scope.outputs.variables }}
+          INPUT_PERMISSION-ACTIONS-VARIABLES: ${{ steps.app-scope.outputs.variables }}
         with:
-          client-id: Iv23liAAVYfZee7FNR3m
+          client-id: ${{ vars.TERRAFORM_GITHUB_APP_CLIENT_ID }}
           private-key: ${{ secrets.TERRAFORM_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: ${{ steps.app-scope.outputs.repositories }}
