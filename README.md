@@ -189,6 +189,15 @@ S3 backendは既存の `terraform-github/repositories/family-schedule.tfstate` �
 非公開・非EnterpriseのためRequired reviewersを設定せず、mainの承認用Actionsで運用者・再実行者を検証します。
 Environmentの実行元はmainに限定します。非公開EnvironmentにはGitHub Pro/Team以上が必要です。
 
+private Pro では管理者による Environment 保護のバイパス禁止も設定できません。
+`can_admins_bypass = true` は API が返す実値に合わせた宣言です。`false` を適用しても反映されず、毎回差分が残るため、未対応の保護を有効とみなさず管理します。
+仕様は [GitHub の Environment 保護ルール](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments)を参照してください。
+代替として、main 限定の実行元制限、環境別 Secrets、公開タグの上書き・削除禁止を維持します。
+承認用 Actions は main・指定所有者による起動と再実行・明示確認を検証し、タグの main 所属と CI 成功、本番昇格前の Dev 検証記録も確認します。
+これらの workflow 条件は Environment の承認待ちを迂回する操作とは別です。kazokubi の CI は承認条件を弱める変更を回帰検査で拒否します。
+リポジトリ管理者や常設 runner の侵害までは防げません。管理権限を最小限に保ち、検証用と運用用 runner を分離します。
+公開範囲や契約プランを変更する際は、Required reviewers とバイパス禁止の利用可否を再評価してください。
+
 Discordチャンネル・権限・Webhookはkazokubiの `infra/discord` で管理します。
 そのsensitive出力を必須の `TF_VAR_discord_webhook_url` として渡し、Repository Secretへ保存します。CIではstateから自動取得します。
 `TF_VAR_release_secrets` はdev/productionをキーとするJSONオブジェクトで、各環境のTURSO_AUTH_TOKEN、CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、DB_BACKUP_KEYを設定します。
