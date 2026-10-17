@@ -64,7 +64,7 @@ else
     changes="$(git diff --name-only "$diff_base" "$head")"
     while IFS= read -r file; do
         case "$file" in
-            terraform/modules/repository/*|.github/workflows/terraform-github.yml|.github/scripts/set_matrix.sh|.github/scripts/terraform_shard.sh|.github/actions/terraform-shard/*|.github/actions/terraform-plan/*|.github/actions/terraform-apply/*|.github/actions/setup-terraform/*|.github/actions/terraform-validate/*)
+            terraform/modules/repository/*|.github/workflows/terraform-github.yml|.github/scripts/set_matrix.sh|.github/scripts/terraform_shard.sh|.github/scripts/app_token_scope.py|.github/actions/terraform-shard/*|.github/actions/terraform-plan/*|.github/actions/terraform-apply/*|.github/actions/setup-terraform/*|.github/actions/terraform-validate/*)
                 require_manual_apply=true
                 ;;
             mise.toml)

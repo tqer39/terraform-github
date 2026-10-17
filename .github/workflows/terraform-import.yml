@@ -30,13 +30,29 @@ jobs:
         with:
           oidc-iam-role: arn:aws:iam::072693953877:role/portfolio-terraform-github-deploy
 
+      - name: Select GitHub App token scope
+        id: app-scope
+        env:
+          REPOSITORY: ${{ inputs.repo }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_APPLY: "false"
+          REQUIRE_MANUAL_APPLY: "true"
+        run: python3 .github/scripts/app_token_scope.py
+
       - name: Generate GitHub App Token
         id: app_token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        env:
+          INPUT_PERMISSION-VARIABLES: ${{ steps.app-scope.outputs.variables }}
         with:
-          app-id: ${{ secrets.GHA_APP_ID }}
-          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+          client-id: Iv23liAAVYfZee7FNR3m
+          private-key: ${{ secrets.TERRAFORM_GITHUB_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+          repositories: ${{ steps.app-scope.outputs.repositories }}
+          permission-administration: read
+          permission-contents: read
+          permission-environments: ${{ steps.app-scope.outputs.environments }}
+          permission-secrets: ${{ steps.app-scope.outputs.secrets }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4

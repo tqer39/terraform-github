@@ -97,11 +97,36 @@ jobs:
       matrix:
         shard: ${{ fromJson(needs.set-matrix.outputs.shards) }}
     permissions:
-      contents: write
+      contents: read
       id-token: write
       pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Select GitHub App token scope
+        id: app-scope
+        env:
+          REPOSITORIES: ${{ toJson(matrix.shard.repositories) }}
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_APPLY: ${{ inputs.apply || false }}
+          REQUIRE_MANUAL_APPLY: ${{ needs.set-matrix.outputs.require_manual_apply }}
+        run: python3 .github/scripts/app_token_scope.py
+
+      - name: Generate Terraform GitHub App token
+        id: terraform-app
+        uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        env:
+          # The pinned action parses permission inputs from env; Variables is not yet in its metadata.
+          INPUT_PERMISSION-VARIABLES: ${{ steps.app-scope.outputs.variables }}
+        with:
+          client-id: Iv23liAAVYfZee7FNR3m
+          private-key: ${{ secrets.TERRAFORM_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ steps.app-scope.outputs.repositories }}
+          permission-administration: ${{ steps.app-scope.outputs.administration }}
+          permission-contents: ${{ steps.app-scope.outputs.contents }}
+          permission-environments: ${{ steps.app-scope.outputs.environments }}
+          permission-secrets: ${{ steps.app-scope.outputs.secrets }}
 
       - name: AWS Credential
         uses: ./.github/actions/aws-credential
@@ -119,7 +144,7 @@ jobs:
           apply: ${{ inputs.apply || false }}
           require-manual-apply: ${{ needs.set-matrix.outputs.require_manual_apply }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          terraform-github-token: ${{ secrets.TERRAFORM_GITHUB_TOKEN }}
+          terraform-github-token: ${{ steps.terraform-app.outputs.token }}
           gha-app-id: ${{ secrets.GHA_APP_ID }}
           release-secrets: ${{ contains(matrix.shard.repositories, 'kazokubi') && secrets.KAZOKUBI_RELEASE_SECRETS || '' }}
 
