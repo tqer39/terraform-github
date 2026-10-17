@@ -1,5 +1,5 @@
 module "this" {
-  archived                        = false
+  archived                        = true
   actions_enabled                 = false
   disable_default_main_protection = true
 
