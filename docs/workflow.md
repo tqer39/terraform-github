@@ -25,7 +25,43 @@ PR には plan 出力のサマリを含めること。破壊的変更は明示�
 ## 認証方式
 
 - **GitHub App トークン**: Organization リポジトリ（推奨）
-- **PAT**: 個人リポジトリ（`TERRAFORM_GITHUB_TOKEN`）
+- **Terraform CI / Import**: 専用 App `tqer39-terraform-github` の installation token
+- **ローカル Terraform**: `github_token` 変数で明示した既存認証
+
+専用 App の Client ID は `Iv23liAAVYfZee7FNR3m`、App ID は `5361381` です。
+認証情報の原本は 1Password の `shared-secrets` Vault で管理します。
+項目名は `GitHubApp`、セクション名は `tqer39-terraform-github` です。
+フィールド名は `tqer39-terraform-github/client-id` と `tqer39-terraform-github/private-key` です。
+フィールド名自体に `/` が含まれるため、CLI の参照には項目内の一意なフィールド ID を使用します。
+CI は同期した Repository Variable `TERRAFORM_GITHUB_APP_CLIENT_ID` と
+Actions Secret `TERRAFORM_GITHUB_APP_PRIVATE_KEY` を参照します。
+秘密値をログやコマンド引数へ展開せず、標準入力で同期してください。
+`TERRAFORM_GITHUB_TOKEN` と汎用の `GHA_APP_PRIVATE_KEY` は Terraform CI / Import で使いません。
+汎用 App を使うほかのワークフローの認証は、この変更の対象外です。
+
+App は Terraform 定義済みのリポジトリだけにインストールします。
+Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
+現在の定義にブランチ新規作成はないため、Contents の書き込みは要求しません。
+新しい管理対象は、先に App のインストール先へ追加する必要があります。
+個人アカウントの新規リポジトリ作成は、installation token が対応する API の制約を別途確認してください。
+
+`.github/scripts/app_token_scope.py` が各 shard の対象名と実行種別からトークンの範囲を決めます。
+Administration は plan / Import も含めて書き込み権限を要求します。
+GitHub API は Administration 読み取りだけでは merge 設定や ruleset の bypass 情報を省略し、
+Terraform が実際には存在しない差分を検出するためです。実 API の比較で確認しています。
+PR、共通変更の main push、Import、plan の手動実行では apply を実行しません。
+main 以外の apply はトークン発行前に拒否します。
+Actions は kazokubi の Environment 取得に必要な読み取りだけを要求します。
+Environments・Secrets・Variables は kazokubi が対象に含まれるときだけ要求し、
+kazokubi を apply しない main push では読み取りに制限します。
+App の秘密鍵自体はトークン発行 Action だけに渡し、Terraform には短命のトークンだけを渡します。
+トークンはジョブ終了時に Action の後処理で失効します。
+
+固定した `actions/create-github-app-token` v3 の metadata に Variables 入力がないため、
+同版が実装する permission 環境入力 `INPUT_PERMISSION-ACTIONS-VARIABLES` で明示します。
+上流の入力解析を固定版で検証し、App の全権限を暗黙に継承しないようにしています。
+App の登録・権限・インストール先は GitHub Settings で管理し、Terraform 自身の管理対象外です。
+
 - **AWS OIDC**: S3 バックエンド（静的認証情報不要）
 
 ## State 管理

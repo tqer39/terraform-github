@@ -178,7 +178,8 @@ graph TD
    例: `module=terraform-aws`、`repo=terraform-aws`。
 3. ワークフローが AWS 認証と Terraform の初期化を行い、指定したリポジトリを state に取り込みます。
 
-必要な `secrets.TERRAFORM_GITHUB_TOKEN` が設定されていることを確認してください。
+専用 App の `secrets.TERRAFORM_GITHUB_APP_PRIVATE_KEY` と対象リポジトリへのインストールが必要です。
+権限とトークンの制限は [認証方式](docs/workflow.md#認証方式) を参照してください。
 
 ## kazokubiの承認付き公開設定
 
@@ -236,5 +237,5 @@ kazokubiはmainへのpushで自動applyしません。PRのplanを確認・マ�
 `Terraform - GitHub` を `repository=kazokubi`・`apply=true` で手動実行します。
 DB/CloudflareのSecretも管理する場合は、管理用リポジトリのRepository Secret
 `KAZOKUBI_RELEASE_SECRETS` にdev/production別のJSONを初回登録します。
-既存の `TERRAFORM_GITHUB_TOKEN` はkazokubiのSecrets・Environments・リポジトリ設定を管理できる権限が必要です。
+専用 App はkazokubiのSecrets・Environments・Variables・リポジトリ設定を管理できる権限が必要です。
 Discord Botトークンはこのリポジトリへ渡しません。kazokubi側の初期設定は `infra/discord/README.md` を参照してください。
