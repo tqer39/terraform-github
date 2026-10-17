@@ -30,8 +30,9 @@ PR には plan 出力のサマリを含めること。破壊的変更は明示�
 
 専用 App の Client ID は `Iv23liAAVYfZee7FNR3m`、App ID は `5361381` です。
 認証情報の原本は 1Password の `shared-secrets` Vault で管理します。
-Client ID は `op://shared-secrets/GitHubApp/tqer39-terraform-github/client-id`、
-秘密鍵は `op://shared-secrets/GitHubApp/tqer39-terraform-github/private-key` です。
+項目名は `GitHubApp`、セクション名は `tqer39-terraform-github` です。
+フィールド名は `tqer39-terraform-github/client-id` と `tqer39-terraform-github/private-key` です。
+フィールド名自体に `/` が含まれるため、CLI の参照には項目内の一意なフィールド ID を使用します。
 CI は同期した Repository Variable `TERRAFORM_GITHUB_APP_CLIENT_ID` と
 Actions Secret `TERRAFORM_GITHUB_APP_PRIVATE_KEY` を参照します。
 秘密値をログやコマンド引数へ展開せず、標準入力で同期してください。
