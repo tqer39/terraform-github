@@ -198,6 +198,13 @@ private Pro では管理者による Environment 保護のバイパス禁止も�
 リポジトリ管理者や常設 runner の侵害までは防げません。管理権限を最小限に保ち、検証用と運用用 runner を分離します。
 公開範囲や契約プランを変更する際は、Required reviewers とバイパス禁止の利用可否を再評価してください。
 
+管理者にも main の PR と必須 CI を要求し、標準 main 保護の管理者 bypass を無効にします。
+GitHub 側でも Action の完全な SHA 固定を必須にし、現在使う9つの Action だけを許可します。
+GitHub 所有・認証済み作成者という理由だけで別の Action を許可しません。
+`github_actions_repository_permissions.trusted_actions` は、module 内の既存 resource から `moved` で state を引き継ぎます。
+新しい Action を追加するときは、取得元の確認と本設定の更新を先に行います。SHA 更新はリポジトリを変更しない限り許可されます。
+管理者自身による設定変更までは防げないため、アカウントのパスキー・二要素認証と、runner の分離も維持してください。
+
 Discordチャンネル・権限・Webhookはkazokubiの `infra/discord` で管理します。
 そのsensitive出力を必須の `TF_VAR_discord_webhook_url` として渡し、Repository Secretへ保存します。CIではstateから自動取得します。
 `TF_VAR_release_secrets` はdev/productionをキーとするJSONオブジェクトで、各環境のTURSO_AUTH_TOKEN、CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID、DB_BACKUP_KEYを設定します。
