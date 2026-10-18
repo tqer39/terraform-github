@@ -5,7 +5,7 @@ module "this" {
   repository     = "adaptive-textbook"
   owner          = "tqer39"
   default_branch = "main"
-  visibility     = "private"
+  visibility     = "public"
   description    = "Personalized technical textbooks with adaptive concept difficulty and hands-on learning history."
   topics = [
     "adaptive-learning",
