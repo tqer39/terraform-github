@@ -37,7 +37,7 @@ CI は同期した Repository Variable `TERRAFORM_GITHUB_APP_CLIENT_ID` と
 Actions Secret `TERRAFORM_GITHUB_APP_PRIVATE_KEY` を参照します。
 秘密値をログやコマンド引数へ展開せず、標準入力で同期してください。
 `TERRAFORM_GITHUB_TOKEN` と汎用の `GHA_APP_PRIVATE_KEY` は Terraform CI / Import で使いません。
-汎用 App を使うほかのワークフローの認証は、この変更の対象外です。
+コード保守と Secrets 配布には、以下の別の専用 App を使用します。
 
 App は Terraform 定義済みのリポジトリだけにインストールします。
 Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
@@ -74,14 +74,29 @@ Repository Secrets の `MAINTENANCE_APP_ID` と `MAINTENANCE_APP_PRIVATE_KEY` �
 移行前に保守専用 App のインストールと両 Secret の登録を完了してください。
 秘密鍵の値をログや文書へ記載しないでください。
 Terraform 専用 App は Contents の読み取り権限だけなので、この保守処理には流用しません。
-`GHA_APP_*` を使う共通 Secrets 配布などの認証は別途移行します。
-この2処理の切り替えだけで共通 App や既存の Secret を削除しないでください。
+ほかのリポジトリの移行完了を確認するまで、共通 App や既存の Secret は削除しないでください。
 
 ライセンス更新の手動実行は `dry_run: true` を既定にします。
 対象が現在の1リポジトリだけで、コード・PR を読み取れ、管理権限と Secrets の取得権限がないことを確認します。
 API 制限・通信障害・取得失敗を権限検査の成功として扱いません。
 この検査はコードや PR を変更しません。実際の更新には `dry_run: false` を指定します。
 毎年の定期実行は権限検査後に更新します。手動・定期実行とも所有者の main に限定します。
+
+### API キー配布用 App
+
+`Distribute API Key` は、承認した配布先だけにインストールする Secrets 配布専用 App を使います。
+Repository Secrets の `DISTRIBUTOR_APP_CLIENT_ID` と `DISTRIBUTOR_APP_PRIVATE_KEY`、
+Repository Variable の `SECRET_DISTRIBUTION_REPOSITORIES` を参照します。
+変数は承認済みのリポジトリ名をカンマで区切り、空白や所有者名を含めずに設定します。
+Contents・PR・管理権限は要求せず、Secrets 書き込みと metadata 読み取りだけを許可します。
+
+所有者による main の手動実行だけを許可し、再実行者も検証します。
+`dry_run: true` が既定で、トークンの対象と全配布先への Secrets API アクセスを確認します。
+不正な設定、対象の過不足、通信・権限検査の失敗では配布を開始しません。
+実際の更新は `dry_run: false` を明示した場合だけです。
+`OPENROUTER_API_KEY` だけを標準入力で配布し、App の秘密鍵は配布しません。
+途中の書き込み失敗はジョブを失敗させ、以降の配布先には書き込みません。
+既に更新できた配布先は元に戻さないため、設定を確認してから再実行してください。
 
 ## State 管理
 

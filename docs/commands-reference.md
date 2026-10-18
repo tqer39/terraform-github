@@ -109,6 +109,14 @@ gh repo delete <owner>/<repo-name> --confirm
 
 ## リポジトリシークレット
 
+Secrets 配布専用 App の短命トークンと、承認済み対象名を設定して実行します。
+`SECRET_DISTRIBUTION_REPOSITORIES` はカンマ区切りのリポジトリ名です。
+既定では配布先の検査だけを行い、書き込みません。
+
 ```bash
 ./scripts/set-common-github-secrets.sh <github_owner>
 ```
+
+実際の配布時だけ `DRY_RUN=false` と `OPENROUTER_API_KEY` を設定します。
+`GH_TOKEN` の対象が配布先と完全一致しない場合は、書き込み前に停止します。
+共通 App の ID・秘密鍵や、ほかの Secrets は配布しません。
