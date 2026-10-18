@@ -4,7 +4,13 @@ variable "github_token" {
   sensitive   = true
 }
 
-variable "gha_app_id" {
-  type        = string
-  description = "goreleaser が Formula/*.rb を push するための GitHub App の numeric App ID (ruleset bypass actor 用)"
+variable "publisher_app_id" {
+  type        = number
+  description = "Formula を直接更新する公開専用 App の ID。Installation ID ではない。"
+  default     = 5363329
+
+  validation {
+    condition     = var.publisher_app_id > 0 && floor(var.publisher_app_id) == var.publisher_app_id
+    error_message = "publisher_app_id は正の整数の GitHub App ID を指定すること。"
+  }
 }

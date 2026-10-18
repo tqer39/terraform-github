@@ -9,5 +9,5 @@ module "this" {
   description         = "personal information repository"
 
   # 3D contribution 更新用の Actions App だけに直接 push を許可する。
-  default_main_protection_bypass_app_ids = [var.gha_app_id]
+  default_main_protection_bypass_app_ids = [var.maintenance_app_id]
 }

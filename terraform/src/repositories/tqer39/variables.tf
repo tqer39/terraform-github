@@ -4,12 +4,13 @@ variable "github_token" {
   sensitive   = true
 }
 
-variable "gha_app_id" {
+variable "maintenance_app_id" {
   type        = number
-  description = "3D contribution 更新に使う GHA_APP_ID。Installation ID ではなく GitHub App ID。"
+  description = "プロフィール更新に使う保守専用 App の ID。Installation ID ではない。"
+  default     = 5363311
 
   validation {
-    condition     = var.gha_app_id > 0 && floor(var.gha_app_id) == var.gha_app_id
-    error_message = "gha_app_id は正の整数の GitHub App ID を指定すること。"
+    condition     = var.maintenance_app_id > 0 && floor(var.maintenance_app_id) == var.maintenance_app_id
+    error_message = "maintenance_app_id は正の整数の GitHub App ID を指定すること。"
   }
 }

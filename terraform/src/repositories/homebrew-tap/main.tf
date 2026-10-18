@@ -40,7 +40,7 @@ module "this" {
       }
       bypass_actors = [
         {
-          actor_id    = tonumber(var.gha_app_id)
+          actor_id    = var.publisher_app_id
           actor_type  = "Integration"
           bypass_mode = "always"
         },
