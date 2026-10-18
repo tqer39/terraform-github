@@ -13,9 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: >-
-      startsWith(github.event.pull_request.head.ref, 'renovate/') ||
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.base.ref == 'main' &&
+      (startsWith(github.event.pull_request.head.ref, 'renovate/') ||
       startsWith(github.event.pull_request.head.ref, 'worktree-') ||
-      startsWith(github.event.pull_request.head.ref, 'ccw-')
+      startsWith(github.event.pull_request.head.ref, 'ccw-'))
     permissions:
       contents: read
       pull-requests: read
@@ -24,8 +26,12 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         with:
-          app-id: ${{ secrets.GHA_APP_ID }}
-          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.MAINTENANCE_APP_ID }}
+          private-key: ${{ secrets.MAINTENANCE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: PR の approve
         env:
