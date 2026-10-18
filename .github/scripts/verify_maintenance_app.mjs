@@ -25,20 +25,20 @@ export async function verifyMaintenanceAccess({ token, repository, fetchImpl = f
     throw new Error('App token must target exactly the current repository');
   }
   const target = await read(`/repos/${repository}`);
-  if (target.full_name !== repository || target.permissions?.push !== true
-      || target.permissions?.admin !== false) {
-    throw new Error('App must have code write access without repository administration');
-  }
+  if (target.full_name !== repository) throw new Error('Unexpected repository');
+  await read(`/repos/${repository}/git/ref/heads/main`);
   await read(`/repos/${repository}/pulls?per_page=1`);
-  const secrets = await fetchImpl(`https://api.github.com/repos/${repository}/actions/secrets`, {
-    headers,
-    redirect: 'error',
-    signal: AbortSignal.timeout(15000),
-  });
-  const denial = await secrets.json();
-  if (secrets.status !== 403 || secrets.headers.get('x-ratelimit-remaining') === '0'
-      || denial.message !== 'Resource not accessible by integration') {
-    throw new Error('Expected an explicit denial of Secrets access');
+  for (const path of ['permissions', 'secrets']) {
+    const response = await fetchImpl(`https://api.github.com/repos/${repository}/actions/${path}`, {
+      headers,
+      redirect: 'error',
+      signal: AbortSignal.timeout(15000),
+    });
+    const denial = await response.json();
+    if (response.status !== 403 || response.headers.get('x-ratelimit-remaining') === '0'
+        || denial.message !== 'Resource not accessible by integration') {
+      throw new Error(`Expected an explicit denial of ${path} access`);
+    }
   }
 }
 

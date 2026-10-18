@@ -6,8 +6,10 @@ const repository = 'owner/example';
 function responses(overrides = {}) {
   const data = {
     '/installation/repositories?per_page=100': { total_count: 1, repositories: [{ full_name: repository }] },
-    [`/repos/${repository}`]: { full_name: repository, permissions: { push: true, admin: false } },
+    [`/repos/${repository}`]: { full_name: repository, permissions: { push: false, admin: false } },
+    [`/repos/${repository}/git/ref/heads/main`]: { ref: 'refs/heads/main' },
     [`/repos/${repository}/pulls?per_page=1`]: [],
+    [`/repos/${repository}/actions/permissions`]: { message: 'Resource not accessible by integration' },
     [`/repos/${repository}/actions/secrets`]: { message: 'Resource not accessible by integration' },
     ...overrides,
   };
@@ -19,7 +21,7 @@ function responses(overrides = {}) {
     assert.ok(Object.hasOwn(data, path));
     const value = data[path];
     if (value instanceof Response) return value;
-    return Response.json(value, { status: path.endsWith('/actions/secrets') ? 403 : 200 });
+    return Response.json(value, { status: /\/actions\/(permissions|secrets)$/.test(path) ? 403 : 200 });
   };
 }
 const verify = (overrides) => verifyMaintenanceAccess({ token: 'synthetic', repository, fetchImpl: responses(overrides) });
@@ -38,14 +40,20 @@ test('other and additional repositories are rejected', async () => {
   }
 });
 
-test('admin access or missing code write access is rejected', async () => {
-  for (const permissions of [{ push: true, admin: true }, { push: false, admin: false }, {}]) {
-    await assert.rejects(verify({ [`/repos/${repository}`]: { full_name: repository, permissions } }), /administration/);
-  }
+test('admin access is rejected even when user-role flags are missing', async () => {
+  await assert.rejects(verify({
+    [`/repos/${repository}`]: { full_name: repository },
+    [`/repos/${repository}/actions/permissions`]: Response.json({ enabled: true }),
+  }), /permissions access/);
+});
+
+test('App authorization uses API probes instead of the repository user-role flags', async () => {
+  await verify({ [`/repos/${repository}`]: { full_name: repository } });
+  await assert.rejects(verify({ [`/repos/${repository}/git/ref/heads/main`]: Response.json({}, { status: 403 }) }), /403/);
 });
 
 test('Secrets access is rejected even when the secret list is empty', async () => {
-  await assert.rejects(verify({ [`/repos/${repository}/actions/secrets`]: Response.json({ secrets: [] }) }), /Secrets/);
+  await assert.rejects(verify({ [`/repos/${repository}/actions/secrets`]: Response.json({ secrets: [] }) }), /secrets access/);
 });
 
 test('rate limits, missing endpoints and unexpected denials cannot pass as permission checks', async () => {
@@ -54,7 +62,7 @@ test('rate limits, missing endpoints and unexpected denials cannot pass as permi
     Response.json({ message: 'Resource not accessible by integration' }, { status: 403, headers: { 'x-ratelimit-remaining': '0' } }),
     Response.json({ message: 'Not Found' }, { status: 404 }),
   ]) {
-    await assert.rejects(verify({ [`/repos/${repository}/actions/secrets`]: response }), /Secrets/);
+    await assert.rejects(verify({ [`/repos/${repository}/actions/secrets`]: response }), /secrets access/);
   }
 });
 
