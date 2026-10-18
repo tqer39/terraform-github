@@ -146,7 +146,6 @@ jobs:
           require-manual-apply: ${{ needs.set-matrix.outputs.require_manual_apply }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           terraform-github-token: ${{ steps.terraform-app.outputs.token }}
-          gha-app-id: ${{ secrets.GHA_APP_ID }}
           release-secrets: ${{ contains(matrix.shard.repositories, 'kazokubi') && secrets.KAZOKUBI_RELEASE_SECRETS || '' }}
 
   delete-nochange-comments:
