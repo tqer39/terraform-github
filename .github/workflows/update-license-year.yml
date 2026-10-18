@@ -34,10 +34,13 @@ jobs:
         with:
           app-id: ${{ secrets.MAINTENANCE_APP_ID }}
           private-key: ${{ secrets.MAINTENANCE_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: ${{ github.event.repository.name }}
           permission-contents: write
           permission-pull-requests: write
+
+      - name: Configure authenticated Git
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: gh auth setup-git
 
       - name: Verify maintenance App access
         env:
