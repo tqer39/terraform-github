@@ -20,10 +20,6 @@ inputs:
   terraform-github-token:
     description: Short-lived installation token for the GitHub provider
     required: true
-  gha-app-id:
-    description: Numeric App ID used by repository rulesets
-    default: ""
-
   release-secrets:
     description: Optional JSON of dev/production credentials for kazokubi
     default: ""
@@ -66,7 +62,6 @@ runs:
         TF_IN_AUTOMATION: "true"
         GITHUB_TOKEN: ${{ inputs.github-token }}
         TF_VAR_github_token: ${{ inputs.terraform-github-token }}
-        TF_VAR_gha_app_id: ${{ inputs.gha-app-id }}
         KAZOKUBI_RELEASE_SECRETS: ${{ inputs.release-secrets }}
         METRICS_DIR: ${{ runner.temp }}/terraform-metrics
       run: bash "${{ github.action_path }}/../../scripts/terraform_shard.sh"
