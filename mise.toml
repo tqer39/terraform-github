@@ -93,6 +93,7 @@ run = [
 description = "Run target selection, secret scanning and module regression tests"
 run = [
   "python3 -m unittest discover -s tests -v",
+  "node --test tests/maintenance_app.test.mjs",
   "terraform -chdir=terraform/modules/repository init -backend=false -lockfile=readonly",
   "terraform -chdir=terraform/modules/repository test",
 ]

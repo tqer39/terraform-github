@@ -4,27 +4,47 @@ on:
   schedule:
     - cron: '0 0 1 1 *' # 毎年1月1日に実行
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '認証と権限だけを確認し、コードや PR は変更しない'
+        type: boolean
+        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   commit-changes:
+    if: >-
+      github.repository == 'tqer39/terraform-github' &&
+      github.ref == 'refs/heads/main' &&
+      github.actor == 'tqer39' && github.triggering_actor == 'tqer39'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write # git push するために必要
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Generate GitHub App Token
         id: app_token
         uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
         with:
-          app-id: ${{ secrets.GHA_APP_ID }}
-          private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.MAINTENANCE_APP_ID }}
+          private-key: ${{ secrets.MAINTENANCE_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Verify maintenance App access
+        env:
+          GH_TOKEN: ${{ steps.app_token.outputs.token }}
+        run: node .github/scripts/verify_maintenance_app.mjs
 
       - uses: tqer39/update-license-year@ecb1743b65a4f7e6d2a7cbc7b96663a58db24304 # v1.0.0
+        if: github.event_name != 'workflow_dispatch' || !inputs.dry_run
         with:
           github-token: ${{ steps.app_token.outputs.token }}
