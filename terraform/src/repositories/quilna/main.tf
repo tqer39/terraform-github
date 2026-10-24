@@ -1,4 +1,4 @@
-# Keep this root and its backend key stable to rename the existing repository in place.
+# Keep the legacy backend key so the renamed root uses the existing repository state.
 module "this" {
   source       = "../../../modules/repository"
   github_token = var.github_token
