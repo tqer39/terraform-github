@@ -1,5 +1,7 @@
 module "this" {
-  archived                        = true
+  archived = false
+
+  # self-hosted runner への移行が完了するまで Actions を無効化する。
   actions_enabled                 = false
   disable_default_main_protection = true
 
