@@ -9,3 +9,9 @@ module "this" {
   topics              = ["observability", "opentelemetry", "grafana", "docker-compose", "claude-code", "codex"]
   description         = "Local observability for Claude Code / Claude Desktop and Codex CLI / Codex Desktop (OTLP + transcript summaries)."
 }
+
+# CI の App installation token は個人アカウントにリポジトリを作成できないため、先に作成したものを取り込む。
+import {
+  to = module.this.github_repository.this[0]
+  id = "agent-telemetry"
+}
