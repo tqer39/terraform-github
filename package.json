@@ -4,7 +4,7 @@
   "description": "terraform-github の開発・文書検証・ルール生成用の依存",
   "packageManager": "pnpm@12.13.0",
   "devDependencies": {
-    "cspell": "10.3.6",
+    "cspell": "10.4.0",
     "markdownlint-cli2": "0.23.3",
     "oxfmt": "0.73.0",
     "rulesync": "33.0.0",
