@@ -8,7 +8,7 @@ node = "24"
 python = "3.15.0"
 "aqua:pnpm/pnpm" = "12.13.0"
 "aqua:betterleaks/betterleaks" = "1.9.0"
-"aqua:ByteNess/aws-vault" = "7.16.2"
+"aqua:ByteNess/aws-vault" = "7.16.3"
 "aqua:suzuki-shunsuke/tfcmt" = "4.14.19"
 
 [env]
