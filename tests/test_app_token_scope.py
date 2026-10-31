@@ -1,6 +1,11 @@
 """Regressions for repository-scoped credentials and apply restrictions."""
 import importlib.util
+import json
+import os
 from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location(
@@ -10,6 +15,30 @@ spec.loader.exec_module(policy)
 
 
 class AppTokenScopeTests(unittest.TestCase):
+    def test_omnodi_root_uses_current_token_target_and_existing_state(self):
+        project = Path(__file__).resolve().parents[1]
+        root = project / "terraform/src/repositories/omnodi"
+        # root名が実リポジトリ名と異なるとApp token発行が404になる。
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "output"
+            result = subprocess.run(
+                [sys.executable, str(project / ".github/scripts/app_token_scope.py")],
+                cwd=project, env=dict(
+                    os.environ, REPOSITORIES=json.dumps(["omnodi"]),
+                    EVENT_NAME="pull_request", GITHUB_REF="refs/pull/1/merge",
+                    MANUAL_APPLY="false", REQUIRE_MANUAL_APPLY="false",
+                    GITHUB_OUTPUT=str(output)),
+                text=True, capture_output=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            scope = dict(line.split("=", 1) for line in output.read_text().splitlines())
+            self.assertEqual(scope["repositories"], "omnodi")
+            self.assertEqual(scope["contents"], "read")
+            self.assertTrue(all(scope[p] == "" for p in ("environments", "secrets", "variables")))
+        self.assertIn('repository     = "omnodi"', (root / "main.tf").read_text())
+        # 既存リポジトリのStateを新規Stateに切り替えない。
+        self.assertIn('"terraform-github/repositories/infra-canvas.tfstate"',
+                      (root / "terraform.tf").read_text())
+
     def scope(self, roots=("local-video-gen-lab", "tts-partner"),
               event="pull_request", ref="refs/pull/1/merge", manual="false", shared="false"):
         return policy.token_scope(list(roots), event, ref, manual, shared)
