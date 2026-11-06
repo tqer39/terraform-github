@@ -6,7 +6,7 @@
   "devDependencies": {
     "cspell": "10.4.0",
     "markdownlint-cli2": "0.24.0",
-    "oxfmt": "0.73.0",
+    "oxfmt": "0.74.0",
     "rulesync": "36.0.2",
     "textlint": "15.8.0",
     "textlint-filter-rule-allowlist": "4.0.0",
