@@ -4,7 +4,7 @@
 
 1. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
 2. `../../../modules/repository` モジュールを必須パラメータ付きで使用
-3. `mise run tf:validate && mise run tf:plan` を実行
+3. `mise run tf:validate` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
 4. PR を作成してレビュー依頼
 
 HCL パターンとモジュールパラメータの詳細: [terraform-patterns.md](terraform-patterns.md) を参照
@@ -15,7 +15,7 @@ HCL パターンとモジュールパラメータの詳細: [terraform-patterns.
 2. push して PR を作成 → GitHub Actions が `terraform plan` を実行し、コメントとして投稿
 3. main にマージ後 → 自動で `terraform apply` が実行
 
-PR には plan 出力のサマリを含めること。破壊的変更は明示的にマークすること。
+PR には plan 出力のサマリを含めること。ローカル plan を省略した場合は、理由と CI で確認する旨を記載すること。破壊的変更は明示的にマークすること。
 
 差分も警告もない `No changes` の自動 plan コメントは後続 job で削除します。
 コメント一覧は全ページ取得し、30件を超える PR でも削除漏れを防ぎます。
