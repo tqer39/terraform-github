@@ -197,8 +197,8 @@ importers:
         specifier: 1.3.0
         version: 1.3.0
       textlint-rule-ja-no-space-between-full-width:
-        specifier: 3.0.3
-        version: 3.0.3
+        specifier: 3.0.4
+        version: 3.0.4
       textlint-rule-no-dropping-the-ra:
         specifier: 3.0.0
         version: 3.0.0
@@ -2459,8 +2459,8 @@ packages:
   textlint-rule-helper@2.5.0:
     resolution: {integrity: sha512-QIbFPtyqLy0g5BJn8mryk9iHzGYicNaFIpLFPiEnb4RXxrEGeQ2W2aARQ9yEXLIAqo+OwK4ndWBAWkbgJEPzTQ==}
 
-  textlint-rule-ja-no-space-between-full-width@3.0.3:
-    resolution: {integrity: sha512-fOobxsjnVLG05TdtOCnCbK/iFIE3crlVDkJN+QtbuysPT45wE0g2t4NW/NHmzvtpy8wF2I6cuMEPuAssjuEkpw==}
+  textlint-rule-ja-no-space-between-full-width@3.0.4:
+    resolution: {integrity: sha512-kIObqfsOYnaFS22nrLbVDXGl39J4J+GjM/UF4+qhSSlGY9V1wwvTxDe3q/NMFtLvu93kE+pFE2s7Bd8P3rNOgQ==}
 
   textlint-rule-no-dropping-the-ra@3.0.0:
     resolution: {integrity: sha512-KbSIlcxj1kLs4sGSMSLGA8OmgRoaPAWtodJaGEyEUiy7uiZM/VPqYALpuD8vf16N1OR5SM/bXXeZFME65r8ZgQ==}
@@ -5229,7 +5229,7 @@ snapshots:
       structured-source: 4.0.0
       unist-util-visit: 2.0.3
 
-  textlint-rule-ja-no-space-between-full-width@3.0.3:
+  textlint-rule-ja-no-space-between-full-width@3.0.4:
     dependencies:
       regx: 1.0.4
       textlint-rule-helper: 2.5.0
