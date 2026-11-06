@@ -2,16 +2,16 @@
   "name": "terraform-github-devtools",
   "private": true,
   "description": "terraform-github の開発・文書検証・ルール生成用の依存",
-  "packageManager": "pnpm@12.14.0",
+  "packageManager": "pnpm@12.15.0",
   "devDependencies": {
     "cspell": "10.4.0",
-    "markdownlint-cli2": "0.23.3",
-    "oxfmt": "0.73.0",
+    "markdownlint-cli2": "0.24.0",
+    "oxfmt": "0.74.0",
     "rulesync": "36.0.2",
     "textlint": "15.8.0",
     "textlint-filter-rule-allowlist": "4.0.0",
     "textlint-filter-rule-comments": "1.3.0",
-    "textlint-rule-ja-no-space-between-full-width": "3.0.3",
+    "textlint-rule-ja-no-space-between-full-width": "3.0.4",
     "textlint-rule-no-dropping-the-ra": "3.0.0",
     "textlint-rule-terminology": "5.2.16"
   }
