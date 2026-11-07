@@ -2,10 +2,24 @@
 
 ## リポジトリの追加
 
-1. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
-2. `../../../modules/repository` モジュールを必須パラメータ付きで使用
-3. `mise run tf:validate` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
-4. PR を作成してレビュー依頼
+CI の App installation token は個人アカウントにリポジトリを作成できません。
+対象のリポジトリが存在しないとトークンの発行自体が失敗し、PR の plan も実行できません。
+そのため、新しいリポジトリは先に作成し、Terraform に取り込みます。
+
+1. GitHub にリポジトリを作成し、Terraform CI 用 App のインストール先へ追加
+2. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
+3. `../../../modules/repository` モジュールを必須パラメータ付きで使用し、作成済みのリポジトリを取り込む `import` ブロックを追加
+4. `mise run tf:validate` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
+5. PR を作成してレビュー依頼
+
+```hcl
+import {
+  to = module.this.github_repository.this[0]
+  id = "<repo-name>"
+}
+```
+
+手順 1 より先に PR を作成した場合、リポジトリが揃うまで PR の CI は失敗します。揃ったら CI を再実行してください。
 
 HCL パターンとモジュールパラメータの詳細: [terraform-patterns.md](terraform-patterns.md) を参照
 
@@ -43,7 +57,7 @@ App は Terraform 定義済みのリポジトリだけにインストールし�
 Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
 現在の定義にブランチ新規作成はないため、Contents の書き込みは要求しません。
 新しい管理対象は、先に App のインストール先へ追加する必要があります。
-個人アカウントの新規リポジトリ作成は、installation token が対応する API の制約を別途確認してください。
+installation token では個人アカウントにリポジトリを作成できないため、[リポジトリの追加](#リポジトリの追加)の手順で先に作成します。
 
 `.github/scripts/app_token_scope.py` が各 shard の対象名と実行種別からトークンの範囲を決めます。
 Administration は plan / Import も含めて書き込み権限を要求します。
