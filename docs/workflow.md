@@ -6,11 +6,14 @@ CI の App installation token は個人アカウントにリポジトリを作�
 対象のリポジトリが存在しないとトークンの発行自体が失敗し、PR の plan も実行できません。
 そのため、新しいリポジトリは先に作成し、Terraform に取り込みます。
 
-1. GitHub にリポジトリを作成し、Terraform CI 用 App のインストール先へ追加
-2. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
+1. GitHub にリポジトリを初期コミット付きで作成し、Terraform CI 用 App のインストール先へ追加（`import` では `auto_init` が効きません）
+2. 既存の root を参考に、`terraform/src/repositories/<repo-name>/` に `terraform.tf`、`main.tf`、`providers.tf`、`variables.tf`、`.terraform.lock.hcl` を用意
+   - CI は `terraform.tf` がある root だけを対象にします
+   - `terraform.tf` の backend の `key` は root ごとに変えます
 3. `../../../modules/repository` モジュールを必須パラメータ付きで使用し、作成済みのリポジトリを取り込む `import` ブロックを追加
-4. `mise run tf:validate` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
-5. PR を作成してレビュー依頼
+   - `visibility` は実際の設定に合わせます。省略すると `public` になり、private のリポジトリが公開される可能性があります
+4. `mise run tf:validate <repo-name>` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
+5. PR を作成してレビュー依頼。マージ後に自動で apply されるため、plan に意図しない変更がないことを確認
 
 ```hcl
 import {
@@ -18,6 +21,8 @@ import {
   id = "<repo-name>"
 }
 ```
+
+この例は通常のリポジトリ用です。`fork` や `template_repository` を使う場合は、`import` 先のアドレスが異なります。
 
 手順 1 より先に PR を作成した場合、リポジトリが揃うまで PR の CI は失敗します。揃ったら CI を再実行してください。
 
