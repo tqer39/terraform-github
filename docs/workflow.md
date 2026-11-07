@@ -12,8 +12,9 @@ CI の App installation token は個人アカウントにリポジトリを作�
    - `terraform.tf` の backend の `key` は root ごとに変えます
 3. `../../../modules/repository` モジュールを必須パラメータ付きで使用し、作成済みのリポジトリを取り込む `import` ブロックを追加
    - `visibility` は実際の設定に合わせます。省略すると `public` になり、private のリポジトリが公開される可能性があります
-4. `mise run tf:validate <repo-name>` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
+4. `mise run tf:init <repo-name> -backend=false` で初期化してから `mise run tf:validate <repo-name>` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
 5. PR を作成してレビュー依頼。マージ後に自動で apply されるため、plan に意図しない変更がないことを確認
+   - `terraform/modules/repository/`、Terraform CI の共通ファイル、`mise.toml` のツールバージョンも変更した PR は、全 root が plan のみになります。plan を確認してから `apply=true` で手動実行します
 
 ```hcl
 import {
