@@ -2,10 +2,30 @@
 
 ## リポジトリの追加
 
-1. `terraform/src/repositories/<repo-name>/` 配下にディレクトリを作成
-2. `../../../modules/repository` モジュールを必須パラメータ付きで使用
-3. `mise run tf:validate && mise run tf:plan` を実行
-4. PR を作成してレビュー依頼
+CI の App installation token は個人アカウントにリポジトリを作成できません。
+対象のリポジトリが存在しないとトークンの発行自体が失敗し、PR の plan も実行できません。
+そのため、新しいリポジトリは先に作成し、Terraform に取り込みます。
+
+1. GitHub にリポジトリを初期コミット付きで作成し、Terraform CI 用 App のインストール先へ追加（`import` では `auto_init` が効きません）
+2. 既存の root を参考に、`terraform/src/repositories/<repo-name>/` に `terraform.tf`、`main.tf`、`providers.tf`、`variables.tf`、`.terraform.lock.hcl` を用意
+   - CI は `terraform.tf` がある root だけを対象にします
+   - `terraform.tf` の backend の `key` は root ごとに変えます
+3. `../../../modules/repository` モジュールを必須パラメータ付きで使用し、作成済みのリポジトリを取り込む `import` ブロックを追加
+   - `visibility` は実際の設定に合わせます。省略すると `public` になり、private のリポジトリが公開される可能性があります
+4. `mise run tf:init <repo-name> -backend=false` で初期化してから `mise run tf:validate <repo-name>` を実行し、plan はローカルまたは PR の CI で確認（[開発ルール](rules/development.md)）
+5. PR を作成してレビュー依頼。マージ後に自動で apply されるため、plan に意図しない変更がないことを確認
+   - `terraform/modules/repository/`、Terraform CI の共通ファイル、`mise.toml` のツールバージョンも変更した PR は、全 root が plan のみになります。plan を確認してから `apply=true` で手動実行します
+
+```hcl
+import {
+  to = module.this.github_repository.this[0]
+  id = "<repo-name>"
+}
+```
+
+この例は通常のリポジトリ用です。`fork` や `template_repository` を使う場合は、`import` 先のアドレスが異なります。
+
+手順 1 より先に PR を作成した場合、リポジトリが揃うまで PR の CI は失敗します。揃ったら CI を再実行してください。
 
 HCL パターンとモジュールパラメータの詳細: [terraform-patterns.md](terraform-patterns.md) を参照
 
@@ -15,7 +35,7 @@ HCL パターンとモジュールパラメータの詳細: [terraform-patterns.
 2. push して PR を作成 → GitHub Actions が `terraform plan` を実行し、コメントとして投稿
 3. main にマージ後 → 自動で `terraform apply` が実行
 
-PR には plan 出力のサマリを含めること。破壊的変更は明示的にマークすること。
+PR には plan 出力のサマリを含めること。ローカル plan を省略した場合は、理由と CI で確認する旨を記載すること。破壊的変更は明示的にマークすること。
 
 差分も警告もない `No changes` の自動 plan コメントは後続 job で削除します。
 コメント一覧は全ページ取得し、30件を超える PR でも削除漏れを防ぎます。
@@ -43,7 +63,7 @@ App は Terraform 定義済みのリポジトリだけにインストールし�
 Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
 現在の定義にブランチ新規作成はないため、Contents の書き込みは要求しません。
 新しい管理対象は、先に App のインストール先へ追加する必要があります。
-個人アカウントの新規リポジトリ作成は、installation token が対応する API の制約を別途確認してください。
+installation token では個人アカウントにリポジトリを作成できないため、[リポジトリの追加](#リポジトリの追加)の手順で先に作成します。
 
 `.github/scripts/app_token_scope.py` が各 shard の対象名と実行種別からトークンの範囲を決めます。
 Administration は plan / Import も含めて書き込み権限を要求します。
