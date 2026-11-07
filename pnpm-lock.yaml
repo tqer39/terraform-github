@@ -185,8 +185,8 @@ importers:
         specifier: 0.74.0
         version: 0.74.0
       rulesync:
-        specifier: 38.0.0
-        version: 38.0.0(supports-color@7.2.0)
+        specifier: 40.2.0
+        version: 40.2.0(supports-color@7.2.0)
       textlint:
         specifier: 15.8.0
         version: 15.8.0(supports-color@7.2.0)
@@ -1499,6 +1499,10 @@ packages:
     resolution: {integrity: sha512-yzzNtgczwgoVHNigCyKTXcQJU4Y8t/ikU4UxXW0BvrLfHTGWZhsNcOT2s/a7vn81/4KqVnNmHjaUEPlvWnNwVw==}
     hasBin: true
 
+  js-yaml@5.5.0:
+    resolution: {integrity: sha512-paNr4LFIFPjeeSmwNYdrb8FafLLG/Cr2Af3GjbsHJ5CxIjH4r0c2emlmRdAtpPAieP1gRVzk6buBbVP5gBMGAg==}
+    hasBin: true
+
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
 
@@ -1982,8 +1986,8 @@ packages:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
 
-  rulesync@38.0.0:
-    resolution: {integrity: sha512-FgM6mlDMAvgzsifZ+j5Amd/znPsQWc9ruRb3YsvkIvqIWfzm2TUSOG3vG78uoDJW7ADNC//rEb9XIWOOBYPwQA==}
+  rulesync@40.2.0:
+    resolution: {integrity: sha512-emcJKJyQPVS35Sp91qqqTqbTuzPnVuYGgpZ4eH+XHJZCgamy0EGqZSgzdFwS3e4jQQ9pwHa8VIZnjVbsZ3JfVg==}
     engines: {node: '>=22.0.0', pnpm: '>=10'}
     hasBin: true
 
@@ -3563,6 +3567,10 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
+  js-yaml@5.5.0:
+    dependencies:
+      argparse: 3.0.4
+
   json-schema-traverse@1.0.0: {}
 
   json-schema-typed@8.0.2: {}
@@ -4253,7 +4261,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  rulesync@38.0.0(supports-color@7.2.0):
+  rulesync@40.2.0(supports-color@7.2.0):
     dependencies:
       '@inquirer/checkbox': 5.2.6
       '@modelcontextprotocol/sdk': 1.32.1(supports-color@7.2.0)(zod@4.6.7)
@@ -4265,7 +4273,7 @@ snapshots:
       es-toolkit: 1.52.0
       globby: 16.2.4
       gray-matter: 4.0.3
-      js-yaml: 5.4.3
+      js-yaml: 5.5.0
       jsonc-parser: 3.3.1
       minisearch: 7.2.0
       smol-toml: 1.9.1
