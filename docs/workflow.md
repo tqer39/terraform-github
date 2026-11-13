@@ -6,7 +6,9 @@ CI の App installation token は個人アカウントにリポジトリを作�
 対象のリポジトリが存在しないとトークンの発行自体が失敗し、PR の plan も実行できません。
 そのため、新しいリポジトリは先に作成し、Terraform に取り込みます。
 
-1. GitHub にリポジトリを初期コミット付きで作成し、Terraform CI 用 App のインストール先へ追加（`import` では `auto_init` が効きません）
+1. `mise run repo:create -- <repo-name> --private`（公開する場合は `--public`）で、リポジトリを初期コミット付きで作成し、Terraform CI 用 App のインストール先へ追加（`import` では `auto_init` が効きません）
+   - リポジトリが既にある場合は作成を飛ばし、インストール先への追加だけを行います
+   - 実行には下記の[インストール先を変更するトークン](#インストール先を変更するトークン)が必要です
 2. 既存の root を参考に、`terraform/src/repositories/<repo-name>/` に `terraform.tf`、`main.tf`、`providers.tf`、`variables.tf`、`.terraform.lock.hcl` を用意
    - CI は `terraform.tf` がある root だけを対象にします
    - `terraform.tf` の backend の `key` は root ごとに変えます
@@ -26,6 +28,23 @@ import {
 この例は通常のリポジトリ用です。`fork` や `template_repository` を使う場合は、`import` 先のアドレスが異なります。
 
 手順 1 より先に PR を作成した場合、リポジトリが揃うまで PR の CI は失敗します。揃ったら CI を再実行してください。
+
+### インストール先を変更するトークン
+
+`gh` の通常のログイン（OAuth App のトークン）では、App のインストール先を変更する API が 403 になります。
+そのため、`mise run repo:create` は追加の API 呼び出しだけに環境変数 `APP_INSTALLATION_GITHUB_TOKEN` のトークンを使います。
+リポジトリの作成と ID の取得は `gh` の通常のログインで行います。
+
+- fine-grained PAT を使います。Resource owner は `tqer39`、Repository access は作成前のリポジトリも含めるため `All repositories` にします
+- 権限は Repository permissions の `GitHub App installation repository access` の Read and write だけにし、有効期限を付けます
+- トークンは 1Password の `shared-secrets` Vault の項目 `GitHubApp`、フィールド `install-github-apps` に保管し、実行時だけ環境変数で渡します。CI の Secrets やリポジトリ内のファイルには置きません
+
+```bash
+APP_INSTALLATION_GITHUB_TOKEN="$(op read 'op://shared-secrets/GitHubApp/install-github-apps')" mise run repo:create -- <repo-name> --private
+```
+
+追加先の installation ID（`172503992`）は秘密情報ではないため、`scripts/create-repository.sh` に記載しています。
+App を再インストールした場合は、`https://github.com/settings/installations` の Configure 先 URL の数字に更新します。
 
 HCL パターンとモジュールパラメータの詳細: [terraform-patterns.md](terraform-patterns.md) を参照
 
@@ -63,7 +82,8 @@ App は Terraform 定義済みのリポジトリだけにインストールし�
 Administration・Environments・Secrets・Variables は読み書き、Contents・Actions は読み取りが最大権限です。
 現在の定義にブランチ新規作成はないため、Contents の書き込みは要求しません。
 新しい管理対象は、先に App のインストール先へ追加する必要があります。
-installation token では個人アカウントにリポジトリを作成できないため、[リポジトリの追加](#リポジトリの追加)の手順で先に作成します。
+installation token では個人アカウントにリポジトリを作成できないため、[リポジトリの追加](#リポジトリの追加)の手順で、
+`mise run repo:create` を使って作成とインストール先への追加を先に行います。
 
 `.github/scripts/app_token_scope.py` が各 shard の対象名と実行種別からトークンの範囲を決めます。
 Administration は plan / Import も含めて書き込み権限を要求します。
