@@ -17,6 +17,8 @@ usage() {
 [[ $# -ge 1 && $# -le 2 ]] || usage
 repo="$1"
 visibility="${2:-}"
+# Same rule as the Terraform roots and CI target selection: a name they reject
+# (such as one with ".") could not be managed after being created here.
 if [[ ! "$repo" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]]; then
     echo "Invalid repository name: $repo" >&2
     exit 1
