@@ -79,6 +79,12 @@ find "$TERRAFORM_DIR" -type d -name ".terraform" -exec rm -rf {} + 2>/dev/null |
 find "$TERRAFORM_DIR" -type f -name "*.tfstate.backup" -delete 2>/dev/null || true
 '''
 
+# ---- repo:* ----
+[tasks."repo:create"]
+description = "Create a repository and add it to the Terraform CI App installation"
+dir = "{{ config_root }}"
+run = '"{{ config_root }}/scripts/create-repository.sh" "$@"'
+
 # ---- dev:* ----
 [tasks."dev:lint"]
 alias = "lint"

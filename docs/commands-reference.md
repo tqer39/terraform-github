@@ -38,6 +38,14 @@ AWS_PROFILE=portfolio mise run tf:apply -- terraform-github tfplan
 PR と push は差分から対象を選び、共通 module / Terraform Action 変更は全 root の plan のみを処理する。
 共通変更の適用は plan 確認後の手動実行で明示する。
 
+### リポジトリの作成
+
+```bash
+mise run repo:create -- <repo-name> --private  # 作成し、Terraform CI 用 App のインストール先へ追加
+```
+
+`APP_INSTALLATION_GITHUB_TOKEN` が必要。手順とトークンは [リポジトリの追加](workflow.md#リポジトリの追加) を参照。
+
 ### 既存リポジトリのインポート
 
 ```bash
