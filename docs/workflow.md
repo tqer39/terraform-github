@@ -37,11 +37,10 @@ import {
 
 - fine-grained PAT を使います。Resource owner は `tqer39`、Repository access は作成前のリポジトリも含めるため `All repositories` にします
 - 権限は Repository permissions の `GitHub App installation repository access` の Read and write だけにし、有効期限を付けます
-- GitHub が fine-grained PAT を拒否する場合だけ、`repo` スコープの classic PAT を使います。全リポジトリへの書き込みを含むため、有効期限を短くします
-- トークンは 1Password に保管し、実行時だけ環境変数で渡します。CI の Secrets やリポジトリ内のファイルには置きません
+- トークンは 1Password の `shared-secrets` Vault の項目 `GitHubApp`、フィールド `install-github-apps` に保管し、実行時だけ環境変数で渡します。CI の Secrets やリポジトリ内のファイルには置きません
 
 ```bash
-APP_INSTALLATION_GITHUB_TOKEN="$(op read 'op://<vault>/<item>/<field>')" mise run repo:create -- <repo-name> --private
+APP_INSTALLATION_GITHUB_TOKEN="$(op read 'op://shared-secrets/GitHubApp/install-github-apps')" mise run repo:create -- <repo-name> --private
 ```
 
 追加先の installation ID（`172503992`）は秘密情報ではないため、`scripts/create-repository.sh` に記載しています。
