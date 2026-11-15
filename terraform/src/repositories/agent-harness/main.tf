@@ -6,7 +6,8 @@ module "this" {
   default_branch      = "main"
   enable_owner_bypass = true
   visibility          = "public"
-  topics              = ["claude-code", "codex", "ai-agents", "orca"]
+  archived            = true
+  topics              = ["claude-code", "codex", "ai-agents"]
   description         = "承認済みの GitHub Issue から、Codex の実装、Claude のレビュー、マージまでを進めるエージェントハーネス"
 }
 
