@@ -185,8 +185,8 @@ importers:
         specifier: 0.75.0
         version: 0.75.0
       rulesync:
-        specifier: 43.4.1
-        version: 43.4.1(supports-color@7.2.0)
+        specifier: 43.8.2
+        version: 43.8.2(supports-color@7.2.0)
       textlint:
         specifier: 15.8.0
         version: 15.8.0(supports-color@7.2.0)
@@ -1138,8 +1138,8 @@ packages:
     resolution: {integrity: sha512-HWcBoN6NileqtSydK2FqHbS/LoDd2pqrnQHLyJzBj4kOp/ky2MWMN694xOfkK8/SnUsW2DH7EfyVlydKCsm1Zw==}
     engines: {node: '>= 0.4'}
 
-  es-toolkit@1.53.0:
-    resolution: {integrity: sha512-3+AYXp9fmJ/UhHBMYj2/U+RaUouMD90SzoItyDOB2Za7W6dB7fQApFGnZPl2MF6K8/Tv1koh1JyirSx/kju6Pw==}
+  es-toolkit@1.53.1:
+    resolution: {integrity: sha512-VhMc6IXmexu8iYFfL2aaAww6IvJTdHlqBLruLoEUs33YD4IcP5DdZcLOybMsMmmLsiy1c8PsiLsrM0DdIuuRUA==}
 
   escape-html@1.0.3:
     resolution: {integrity: sha512-NiSupZ4OeuGwr68lGIeym/ksIZMJodUGOSCZ/FSnTxcrekbvqrgdUxlJOMpijaKZVjAJrWrGs/6Jy8OMuyj9ow==}
@@ -1995,8 +1995,8 @@ packages:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
 
-  rulesync@43.4.1:
-    resolution: {integrity: sha512-pb5KjJ3SLHQYA2P0PSmFfXhiKDWdLbw2mULSK/afGu6s+UvCy5qbUZvOgoE7cBusuC2SVu3lbrEds0S+BsGdDA==}
+  rulesync@43.8.2:
+    resolution: {integrity: sha512-A1MxbQIcXAndTpXM/sgR9NjFd2q5OMXdxYx5sBeM0ZfdY7UtcIewvZALUc1cfumxzoAt6U2tlGF39CytYanzJQ==}
     engines: {node: '>=22.22.0', pnpm: '>=10'}
     hasBin: true
 
@@ -3223,7 +3223,7 @@ snapshots:
     dependencies:
       es-errors: 1.3.0
 
-  es-toolkit@1.53.0: {}
+  es-toolkit@1.53.1: {}
 
   escape-html@1.0.3: {}
 
@@ -4272,7 +4272,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  rulesync@43.4.1(supports-color@7.2.0):
+  rulesync@43.8.2(supports-color@7.2.0):
     dependencies:
       '@inquirer/checkbox': 5.2.8
       '@modelcontextprotocol/sdk': 1.32.2(supports-color@7.2.0)(zod@4.6.7)
@@ -4281,7 +4281,7 @@ snapshots:
       '@toon-format/toon': 4.4.0
       chokidar: 6.0.0
       commander: 15.0.0
-      es-toolkit: 1.53.0
+      es-toolkit: 1.53.1
       globby: 16.2.4
       gray-matter: 4.0.3
       js-yaml: 5.5.0
