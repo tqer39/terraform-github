@@ -131,6 +131,24 @@ variable "vulnerability_alerts" {
   default     = true
 }
 
+variable "secret_scanning" {
+  type        = bool
+  description = "(Optional) Whether secret scanning is enabled. Leave null to keep the current GitHub setting unmanaged. Must be set together with secret_scanning_push_protection."
+  default     = null
+}
+
+variable "secret_scanning_push_protection" {
+  type        = bool
+  description = "(Optional) Whether secret scanning push protection is enabled. Leave null to keep the current GitHub setting unmanaged. Must be set together with secret_scanning."
+  default     = null
+
+  # provider は両方の現在値を state に読み込むため、片方だけ指定すると省いた側の削除差分が出る。
+  validation {
+    condition     = (var.secret_scanning == null) == (var.secret_scanning_push_protection == null)
+    error_message = "secret_scanning and secret_scanning_push_protection must be set together or both left null."
+  }
+}
+
 variable "branches_to_protect" {
   type        = any
   default     = {}
@@ -153,6 +171,12 @@ variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
   default     = "all"
+}
+
+variable "sha_pinning_required" {
+  type        = bool
+  description = "(Optional) Whether actions must be pinned to a full-length commit SHA. Reusable workflows can still be referenced by tag. Leave null to keep the current GitHub setting unmanaged. Provider 6.13.0 does not send false, so changing true to false does not disable the setting."
+  default     = null
 }
 
 variable "github_owned_allowed" {

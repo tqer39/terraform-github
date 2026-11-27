@@ -20,6 +20,18 @@ resource "github_repository" "this" {
   archived                    = var.archived
   is_template                 = var.is_template
 
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
+      }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
+      }
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       auto_init,
@@ -47,6 +59,18 @@ resource "github_repository" "this_from_template" {
   delete_branch_on_merge      = var.delete_branch_on_merge
   archived                    = var.archived
   is_template                 = var.is_template
+
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
+      }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
+      }
+    }
+  }
 
   template {
     owner                = coalesce(var.template_owner, var.owner)
@@ -78,6 +102,18 @@ resource "github_repository" "this_from_fork" {
   source_owner = var.source_owner
   source_repo  = var.source_repo
 
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
+      }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
+      }
+    }
+  }
+
   lifecycle {
     precondition {
       condition     = var.source_owner != null && var.source_repo != null
@@ -87,6 +123,9 @@ resource "github_repository" "this_from_fork" {
 }
 
 locals {
+  # 未指定のリポジトリには block を出さず、GitHub 側の現在値を変えない。
+  security_and_analysis = var.secret_scanning == null ? [] : [1]
+
   repository_name = coalescelist(
     github_repository.this[*].name,
     github_repository.this_from_template[*].name,

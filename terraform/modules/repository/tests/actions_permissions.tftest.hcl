@@ -15,6 +15,19 @@ run "active_default" {
   }
 }
 
+run "sha_pinning_required" {
+  command = plan
+
+  variables {
+    sha_pinning_required = true
+  }
+
+  assert {
+    condition     = github_actions_repository_permissions.this[0].sha_pinning_required
+    error_message = "明示した SHA 固定の必須化を Actions の権限に反映すること。"
+  }
+}
+
 run "retired_repository" {
   command = plan
 

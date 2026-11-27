@@ -1,9 +1,10 @@
 resource "github_actions_repository_permissions" "this" {
   count = var.configure_actions_permissions ? 1 : 0
 
-  repository      = local.repository_name
-  enabled         = var.actions_enabled
-  allowed_actions = var.actions_enabled ? var.allowed_actions : null
+  repository           = local.repository_name
+  enabled              = var.actions_enabled
+  allowed_actions      = var.actions_enabled ? var.allowed_actions : null
+  sha_pinning_required = var.sha_pinning_required
 
   dynamic "allowed_actions_config" {
     for_each = var.actions_enabled && var.allowed_actions == "selected" ? [1] : []

@@ -14,4 +14,28 @@ module "this" {
   vulnerability_alerts        = false
   squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
   squash_merge_commit_message = "COMMIT_MESSAGES"
+
+  # public リポジトリへの秘密情報の混入と、未固定アクションの実行を GitHub 側で拒否する。
+  secret_scanning                 = true
+  secret_scanning_push_protection = true
+  sha_pinning_required            = true
+}
+
+# 公開済みの版タグの付け替えと削除を禁止する。自律保守が新しい版を公開できるよう、作成は制限しない。
+resource "github_repository_ruleset" "release_tags" {
+  name        = "immutable-release-tags"
+  repository  = "dev-standards"
+  target      = "tag"
+  enforcement = "active"
+  conditions {
+    ref_name {
+      include = ["refs/tags/v*"]
+      exclude = []
+    }
+  }
+  rules {
+    deletion = true
+    update   = true
+  }
+  depends_on = [module.this]
 }
