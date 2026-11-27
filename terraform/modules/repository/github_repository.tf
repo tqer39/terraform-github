@@ -23,17 +23,11 @@ resource "github_repository" "this" {
   dynamic "security_and_analysis" {
     for_each = local.security_and_analysis
     content {
-      dynamic "secret_scanning" {
-        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
-        content {
-          status = secret_scanning.value ? "enabled" : "disabled"
-        }
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
       }
-      dynamic "secret_scanning_push_protection" {
-        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
-        content {
-          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
-        }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
       }
     }
   }
@@ -69,17 +63,11 @@ resource "github_repository" "this_from_template" {
   dynamic "security_and_analysis" {
     for_each = local.security_and_analysis
     content {
-      dynamic "secret_scanning" {
-        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
-        content {
-          status = secret_scanning.value ? "enabled" : "disabled"
-        }
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
       }
-      dynamic "secret_scanning_push_protection" {
-        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
-        content {
-          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
-        }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
       }
     }
   }
@@ -117,17 +105,11 @@ resource "github_repository" "this_from_fork" {
   dynamic "security_and_analysis" {
     for_each = local.security_and_analysis
     content {
-      dynamic "secret_scanning" {
-        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
-        content {
-          status = secret_scanning.value ? "enabled" : "disabled"
-        }
+      secret_scanning {
+        status = var.secret_scanning ? "enabled" : "disabled"
       }
-      dynamic "secret_scanning_push_protection" {
-        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
-        content {
-          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
-        }
+      secret_scanning_push_protection {
+        status = var.secret_scanning_push_protection ? "enabled" : "disabled"
       }
     }
   }
@@ -142,7 +124,7 @@ resource "github_repository" "this_from_fork" {
 
 locals {
   # 未指定のリポジトリには block を出さず、GitHub 側の現在値を変えない。
-  security_and_analysis = var.secret_scanning == null && var.secret_scanning_push_protection == null ? [] : [1]
+  security_and_analysis = var.secret_scanning == null ? [] : [1]
 
   repository_name = coalescelist(
     github_repository.this[*].name,

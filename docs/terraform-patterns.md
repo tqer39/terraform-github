@@ -138,7 +138,7 @@ module "my_legacy_repo" {
 | `default_main_protection_bypass_app_ids` | いいえ | 標準 main 保護を常時 bypass できる GitHub App ID の集合（デフォルト: `[]`）。Installation ID は指定しない |
 | `branch_rulesets` | いいえ | 追加 ruleset（`main` 以外や特殊な上書きに使用） |
 | `branches_to_protect` | いいえ | レガシーブランチ保護（非推奨） |
-| `secret_scanning`, `secret_scanning_push_protection` | いいえ | secret scanning と push protection の有効・無効（デフォルト: `null` で管理しない） |
-| `sha_pinning_required` | いいえ | Actions と再利用ワークフローに full-length commit SHA での固定を必須にするか（デフォルト: `null` で管理しない） |
+| `secret_scanning`, `secret_scanning_push_protection` | いいえ | secret scanning と push protection の有効・無効。2 つは同時に指定する（デフォルト: `null` で管理しない） |
+| `sha_pinning_required` | いいえ | Actions に full-length commit SHA での固定を必須にするか。再利用ワークフローの呼び出しはタグ参照のままでも拒否されない。provider 6.13.0 は `false` を API に送らないため、`true` から `false` に戻しても無効にならない（デフォルト: `null` で管理しない） |
 | `has_wiki`, `has_issues`, `has_projects` | いいえ | 機能トグル |
 | `allow_merge_commit`, `allow_squash_merge`, `allow_rebase_merge` | いいえ | マージ戦略 |

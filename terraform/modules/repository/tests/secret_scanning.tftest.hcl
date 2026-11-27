@@ -32,3 +32,13 @@ run "enabled" {
     error_message = "secret scanning と push protection を有効にすること。"
   }
 }
+
+run "partial_input_rejected" {
+  command = plan
+
+  variables {
+    secret_scanning = true
+  }
+
+  expect_failures = [var.secret_scanning_push_protection]
+}
