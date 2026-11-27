@@ -20,6 +20,24 @@ resource "github_repository" "this" {
   archived                    = var.archived
   is_template                 = var.is_template
 
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      dynamic "secret_scanning" {
+        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
+        content {
+          status = secret_scanning.value ? "enabled" : "disabled"
+        }
+      }
+      dynamic "secret_scanning_push_protection" {
+        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
+        content {
+          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
+        }
+      }
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       auto_init,
@@ -47,6 +65,24 @@ resource "github_repository" "this_from_template" {
   delete_branch_on_merge      = var.delete_branch_on_merge
   archived                    = var.archived
   is_template                 = var.is_template
+
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      dynamic "secret_scanning" {
+        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
+        content {
+          status = secret_scanning.value ? "enabled" : "disabled"
+        }
+      }
+      dynamic "secret_scanning_push_protection" {
+        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
+        content {
+          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
+        }
+      }
+    }
+  }
 
   template {
     owner                = coalesce(var.template_owner, var.owner)
@@ -78,6 +114,24 @@ resource "github_repository" "this_from_fork" {
   source_owner = var.source_owner
   source_repo  = var.source_repo
 
+  dynamic "security_and_analysis" {
+    for_each = local.security_and_analysis
+    content {
+      dynamic "secret_scanning" {
+        for_each = var.secret_scanning == null ? [] : [var.secret_scanning]
+        content {
+          status = secret_scanning.value ? "enabled" : "disabled"
+        }
+      }
+      dynamic "secret_scanning_push_protection" {
+        for_each = var.secret_scanning_push_protection == null ? [] : [var.secret_scanning_push_protection]
+        content {
+          status = secret_scanning_push_protection.value ? "enabled" : "disabled"
+        }
+      }
+    }
+  }
+
   lifecycle {
     precondition {
       condition     = var.source_owner != null && var.source_repo != null
@@ -87,6 +141,9 @@ resource "github_repository" "this_from_fork" {
 }
 
 locals {
+  # 未指定のリポジトリには block を出さず、GitHub 側の現在値を変えない。
+  security_and_analysis = var.secret_scanning == null && var.secret_scanning_push_protection == null ? [] : [1]
+
   repository_name = coalescelist(
     github_repository.this[*].name,
     github_repository.this_from_template[*].name,

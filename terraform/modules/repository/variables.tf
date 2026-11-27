@@ -131,6 +131,18 @@ variable "vulnerability_alerts" {
   default     = true
 }
 
+variable "secret_scanning" {
+  type        = bool
+  description = "(Optional) Whether secret scanning is enabled. Leave null to keep the current GitHub setting unmanaged."
+  default     = null
+}
+
+variable "secret_scanning_push_protection" {
+  type        = bool
+  description = "(Optional) Whether secret scanning push protection is enabled. Leave null to keep the current GitHub setting unmanaged."
+  default     = null
+}
+
 variable "branches_to_protect" {
   type        = any
   default     = {}
@@ -153,6 +165,12 @@ variable "allowed_actions" {
   type        = string
   description = "(Optional) The permissions policy that controls the actions that are allowed to run. Can be one of: `all`, `local_only`, or `selected`."
   default     = "all"
+}
+
+variable "sha_pinning_required" {
+  type        = bool
+  description = "(Optional) Whether actions and reusable workflows must be pinned to a full-length commit SHA. Leave null to keep the current GitHub setting unmanaged."
+  default     = null
 }
 
 variable "github_owned_allowed" {
