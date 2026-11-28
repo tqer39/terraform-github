@@ -138,8 +138,11 @@ resource "github_repository_ruleset" "default_main_protection" {
 
     required_status_checks {
       strict_required_status_checks_policy = false
-      required_check {
-        context = "workflow-result"
+      dynamic "required_check" {
+        for_each = setunion(["workflow-result"], var.default_main_protection_additional_required_checks)
+        content {
+          context = required_check.value
+        }
       }
     }
   }

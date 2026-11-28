@@ -238,6 +238,17 @@ variable "default_main_protection_bypass_app_ids" {
   }
 }
 
+variable "default_main_protection_additional_required_checks" {
+  type        = set(string)
+  description = "標準 main 保護で `workflow-result` に加えて必須にするステータスチェックの context。対象のチェックがすべての PR で実行されるリポジトリにだけ指定する。"
+  default     = []
+
+  validation {
+    condition     = alltrue([for context in var.default_main_protection_additional_required_checks : trimspace(context) != ""])
+    error_message = "ステータスチェックの context は空にできません。"
+  }
+}
+
 variable "is_template" {
   type        = bool
   description = "(Optional) Whether the repository is a template repository."
