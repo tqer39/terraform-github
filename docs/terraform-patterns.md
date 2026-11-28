@@ -42,6 +42,20 @@ module "my_new_repo" {
 標準保護を維持して GitHub App から直接コミットする場合は、`default_main_protection_bypass_app_ids` に App ID を指定する。
 指定した App は標準 ruleset 全体を `always` で bypass するため、保存パスの制限は App 側で実装する。
 
+### 必須ステータスチェックの追加
+
+標準保護の必須チェックは `workflow-result` だけである。
+リポジトリごとにチェックを足す場合は、`default_main_protection_additional_required_checks` に context を指定する。
+`workflow-result` は常に残り、追加分も同じ扱い（`integration_id` なし）になる。
+
+```hcl
+  # dev-standards.yml の standards-check を必須にする
+  default_main_protection_additional_required_checks = ["standards-check"]
+```
+
+必須にしたチェックが動かない PR はマージできなくなる。
+指定前に、対象のワークフローの `pull_request` に `paths` や `branches` の絞り込みがないことと、実際の PR に表示されるチェック名を確認する。
+
 ### 標準保護を無効にするケース
 
 archived リポジトリや保護が不要なリポジトリは `disable_default_main_protection = true` を明示する。
@@ -136,6 +150,7 @@ module "my_legacy_repo" {
 | `disable_default_main_protection` | いいえ | `true` にすると標準 main 保護を無効化（デフォルト: `false`） |
 | `default_main_protection_owner_bypass` | いいえ | 標準 main 保護で所有者 bypass を許可するか（デフォルト: `true`） |
 | `default_main_protection_bypass_app_ids` | いいえ | 標準 main 保護を常時 bypass できる GitHub App ID の集合（デフォルト: `[]`）。Installation ID は指定しない |
+| `default_main_protection_additional_required_checks` | いいえ | 標準 main 保護で `workflow-result` に加えて必須にするステータスチェックの context の集合（デフォルト: `[]`） |
 | `branch_rulesets` | いいえ | 追加 ruleset（`main` 以外や特殊な上書きに使用） |
 | `branches_to_protect` | いいえ | レガシーブランチ保護（非推奨） |
 | `secret_scanning`, `secret_scanning_push_protection` | いいえ | secret scanning と push protection の有効・無効。2 つは同時に指定する（デフォルト: `null` で管理しない） |
