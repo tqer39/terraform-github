@@ -6,6 +6,7 @@ module "this" {
   default_branch      = "main"
   enable_owner_bypass = true
   visibility          = "private"
+  archived            = true
   topics = [
     "claude-code",
     "remote-orchestration",
